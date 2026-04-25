@@ -1,0 +1,25 @@
+#include "{{femDataClassName}}.h"
+{% for field in project.fields %}
+#include "{{field.fieldDataClassName}}.h"
+{% endfor %}
+
+{{femDataClassName}}::{{femDataClassName}}() {
+    _dim = {{project.dim}};
+{% for field in project.fields %}
+    _phyDatas.push_back(new {{field.fieldDataClassName}}(this));
+{% endfor %}
+}
+
+{{femDataClassName}}::~{{femDataClassName}}() {
+
+}
+
+int {{femDataClassName}}::caculate() {
+{{project.caculateCode}}
+    return 1;
+}
+
+int {{femDataClassName}}::main() {
+    caculate();
+    return 1;
+}

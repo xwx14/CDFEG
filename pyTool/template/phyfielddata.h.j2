@@ -1,0 +1,13 @@
+#ifndef {{headerGuard}}
+#define {{headerGuard}}
+#include "SIFEG/PhyFieldData.h"
+
+class {{field.fieldDataClassName}} : public SIFEG::PhyFieldData {
+public:
+    {{field.fieldDataClassName}}(SIFEG::FEMData* femData);
+    ~{{field.fieldDataClassName}}();
+
+
+};
+
+#endif

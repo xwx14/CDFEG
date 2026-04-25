@@ -1,0 +1,14 @@
+#ifndef {{headerGuard}}
+#define {{headerGuard}}
+#include <string>
+#include "SIFEG/FemData.h"
+
+class {{femDataClassName}} : public SIFEG::FEMData {
+public:
+    {{femDataClassName}}();
+    ~{{femDataClassName}}();
+    virtual int caculate() override;
+    virtual int main() override;
+};
+
+#endif

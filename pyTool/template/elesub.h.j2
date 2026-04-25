@@ -1,0 +1,34 @@
+#ifndef {{headerGuard}}
+#define {{headerGuard}}
+#include "SIFEG/{{baseClass}}.h"
+
+class {{ele.name}} : public SIFEG::{{baseClass}} {
+public:
+    {{ele.name}}(SIFEG::PhyFieldData* pData);
+    ~{{ele.name}}();
+
+    virtual SIFEG::EleSubResult& run(
+        const std::vector<double>& r,
+        const std::map<std::string, std::vector<double>>& coef,
+        const std::map<std::string, double>& matParams
+    ) override;
+
+    virtual SIFEG::uResult uEle(
+        const std::vector<double>& r,
+        const std::map<std::string, std::vector<double>>& coef,
+        const std::map<std::string, double>& matParams
+    ) override;
+{% if baseClass == "IsoEleBase" %}
+
+    virtual std::vector<double> shapeFun(
+        const std::vector<double>& refc
+    ) override;
+
+    virtual std::vector<double> coordTransFun(
+        const std::vector<double>& refc,
+        const std::vector<double>& coords
+    ) override;
+{% endif %}
+};
+
+#endif

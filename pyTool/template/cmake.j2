@@ -1,0 +1,39 @@
+cmake_minimum_required(VERSION 3.10)
+
+project({{pprojectName}} LANGUAGES CXX)
+
+# 使用父级CMakeLists.txt中定义的Eigen目录
+message(STATUS "{{pprojectName}} Eigen include directory: ${EIGEN_INCLUDE_DIR}")
+
+set(SOURCES
+{% for cpp in cppFiles %}
+    {{cpp}}
+{% endfor %}
+)
+
+set(HEADERS
+{% for h in hFiles %}
+    {{h}}
+{% endfor %}
+)
+
+{% if iProgramType == 0 %}
+# 创建可执行文件
+add_executable({{projectName}} ${SOURCES} ${HEADERS})
+{% elif iProgramType == 1 %}
+# 创建动态库
+add_library({{projectName}} SHARED ${SOURCES} ${HEADERS})
+{% else %}
+# 创建静态库
+add_library({{projectName}} STATIC ${SOURCES} ${HEADERS})
+{% endif %}
+
+# 链接SIFEG库
+target_link_libraries({{projectName}} PRIVATE SIFEG)
+
+# 添加包含目录
+target_include_directories({{projectName}} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${EIGEN_INCLUDE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
+)

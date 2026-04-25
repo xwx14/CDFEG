@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Element">
+      <UniqueIdentifier>{63a10f2c-bf60-4e67-bf13-08c948fb3f12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SIFEG.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EquationSystem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FemData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PhyFieldData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixFun.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="gidProPost.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Processor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Q4Base.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Q4g.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="T3IsoNum.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="IsoEleBase.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="EleSub.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="vtkCellType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vtkPost.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TextReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="C8G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="C20G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="C27G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="L2G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="L3G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="Q9G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="T3G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="T6G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="W4G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="W10G.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="inpReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GidPrePost2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="InpDataStructures.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EquationSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FemData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PhyFieldData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixFun.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gidProPost.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Processor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EleSub.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="IsoEleBase.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Q4Base.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Q4g.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="T3IsoNum.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="vtkPost.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="C8G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="C20G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="C27G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="L2G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="L3G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="Q9G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="T3G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="T6G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="W4G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="W10G.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="inpReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GidPrePost2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
