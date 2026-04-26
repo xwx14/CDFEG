@@ -118,7 +118,7 @@ namespace SIFEG {
 		// 刚度矩阵
 		EquationSystem _equSys;
 		// 矩阵的右值，由矩阵与位移值相乘所得
-		std::vector<double> _rightVals;
+		//std::vector<double> _rightVals;
 
 		
 		// 节点结果

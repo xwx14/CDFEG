@@ -5,7 +5,7 @@ Truss1D::Truss1D(SIFEG::PhyFieldData* pData)
     : SIFEG::EleSubBase(2, pData) {
     _name="Truss1D";
     _dispNames = { "u"};
-    _paramNames ={  };
+    _paramNames ={ "E","A"};
     _types.insert("Truss1D");
     // TODO: 设置 VTK 单元类型
     // _vtkCellType = VTKCellType::VTK_<TYPE>;
@@ -38,8 +38,10 @@ SIFEG::uResult Truss1D::uEle(
     const std::map<std::string, double>& matParams
 ) {
     SIFEG::uResult  res;
-
-
+    double E = matParams.at("E");
+    double A = matParams.at("A");
+    double L = abs(r[0] - r[1]);
+    res.eleResult["T"] = A * E * (coef.at("u").at(1) - coef.at("u").at(0)) / L;
 
     return res;
 }

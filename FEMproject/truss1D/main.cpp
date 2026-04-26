@@ -10,9 +10,9 @@ int makeData(Truss1DData& data1) {
 	data1.addNode(4, 1.8);
 	data1.addNodeEnd();
 	// 单元信息
-	data1.addEle(1, { 1,2 }, "turss1D");
-	data1.addEle(2, { 2,3 },"turss1D");
-	data1.addEle(3, { 3,4 }, "turss1D");
+	data1.addEle(1, { 1,2 }, "Truss1D");
+	data1.addEle(2, { 2,3 },"Truss1D");
+	data1.addEle(3, { 3,4 }, "Truss1D");
 	//材料信息
 	std::map<std::string, double> param1;
 	param1["E"] = 2e11;
