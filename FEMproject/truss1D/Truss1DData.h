@@ -1,9 +1,9 @@
 #ifndef TRUSS1D_DATA_H
 #define TRUSS1D_DATA_H
 #include <string>
-#include "SIFEG/FemData.h"
+#include "CDFEG/FemData.h"
 
-class Truss1DData : public SIFEG::FEMData {
+class Truss1DData : public CDFEG::FEMData {
 public:
     Truss1DData();
     ~Truss1DData();

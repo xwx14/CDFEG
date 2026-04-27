@@ -2,8 +2,8 @@
 #include "{{femDataClassName}}.h"
 #include "{{field.fieldDataClassName}}.h"
 {#### Constructor function ####}
-{{ele.name}}::{{ele.name}}(SIFEG::PhyFieldData* pData)
-    : SIFEG::{{baseClass}}({{baseClassParam}}) {
+{{ele.name}}::{{ele.name}}(CDFEG::PhyFieldData* pData)
+    : CDFEG::{{baseClass}}({{baseClassParam}}) {
     _name="{{ele.name}}";
     _dispNames = { {% for name in ele.dispNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
     _paramNames ={ {% for name in ele.paramNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
@@ -21,7 +21,7 @@
 
 }
 {#### Main function ####}
-SIFEG::EleSubResult& {{ele.name}}::run(
+CDFEG::EleSubResult& {{ele.name}}::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
@@ -33,12 +33,12 @@ SIFEG::EleSubResult& {{ele.name}}::run(
     return _result;
 }
 {#### PostProcessing function ####}
-SIFEG::uResult {{ele.name}}::uEle(
+CDFEG::uResult {{ele.name}}::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    SIFEG::uResult  res;
+    CDFEG::uResult  res;
 
 {{ele.uCode}}
 

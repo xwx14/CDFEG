@@ -1,8 +1,8 @@
 #include "Truss1D.h"
 #include "Truss1DData.h"
 #include "Truss1DDispFieldData.h"
-Truss1D::Truss1D(SIFEG::PhyFieldData* pData)
-    : SIFEG::EleSubBase(2, pData) {
+Truss1D::Truss1D(CDFEG::PhyFieldData* pData)
+    : CDFEG::EleSubBase(2, pData) {
     _name="Truss1D";
     _dispNames = { "u"};
     _paramNames ={ "E","A"};
@@ -14,7 +14,7 @@ Truss1D::Truss1D(SIFEG::PhyFieldData* pData)
 Truss1D::~Truss1D() {
 
 }
-SIFEG::EleSubResult& Truss1D::run(
+CDFEG::EleSubResult& Truss1D::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
@@ -32,12 +32,12 @@ SIFEG::EleSubResult& Truss1D::run(
     if (_bSaveResult) _results.push_back(_result);
     return _result;
 }
-SIFEG::uResult Truss1D::uEle(
+CDFEG::uResult Truss1D::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    SIFEG::uResult  res;
+    CDFEG::uResult  res;
     double E = matParams.at("E");
     double A = matParams.at("A");
     double L = abs(r[0] - r[1]);

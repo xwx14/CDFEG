@@ -1,10 +1,10 @@
 #ifndef {{headerGuard}}
 #define {{headerGuard}}
-#include "SIFEG/PhyFieldData.h"
+#include "CDFEG/PhyFieldData.h"
 
-class {{field.fieldDataClassName}} : public SIFEG::PhyFieldData {
+class {{field.fieldDataClassName}} : public CDFEG::PhyFieldData {
 public:
-    {{field.fieldDataClassName}}(SIFEG::FEMData* femData);
+    {{field.fieldDataClassName}}(CDFEG::FEMData* femData);
     ~{{field.fieldDataClassName}}();
 
 

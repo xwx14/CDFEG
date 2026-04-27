@@ -1,2 +1,0 @@
-#define SIFEG_API __declspec(dllexport)
-#define SIFEG_API __declspec(dllimport)

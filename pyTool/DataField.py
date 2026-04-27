@@ -11,6 +11,8 @@ class DataField:
         self.pdeType=1
         # 广义位移，需通过遍历self.eleSubs获得
         self.dispNames=[]
+        # 单元变量名称集合
+        self.eleResNames=[]
         self.project=None
         self.index=1
         self.bDynamic=False
@@ -27,13 +29,20 @@ class DataField:
         for dispName in ele.dispNames:
             if dispName not in self.dispNames:
                 self.dispNames.append(dispName)
+        for resName in ele.eleResNames:
+            if resName not in self.eleResNames:
+                self.eleResNames.append(resName)
 
     def makeData(self):
         self.dispNames.clear()
+        self.eleResNames.clear()
         for ele in self.eleSubs:
             for disp in ele.dispNames:
                 if disp not in self.dispNames:
                     self.dispNames.append(disp)
+            for res in ele.eleResNames:
+                if res not in self.eleResNames:
+                    self.eleResNames.append(res)
     def toDict(self):
         """
         将场数据转换为字典
@@ -45,6 +54,12 @@ class DataField:
         """
         # 动态计算 dof
         self.dof = len(self.dispNames)
+        # 动态计算 eleResNames
+        self.eleResNames = []
+        for ele in self.eleSubs:
+            for res in ele.eleResNames:
+                if res not in self.eleResNames:
+                    self.eleResNames.append(res)
 
         return {
             'name': self.name,

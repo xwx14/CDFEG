@@ -1,10 +1,10 @@
 #ifndef TRUSS1DDISP_FIELD_DATA_H
 #define TRUSS1DDISP_FIELD_DATA_H
-#include "SIFEG/PhyFieldData.h"
+#include "CDFEG/PhyFieldData.h"
 
-class Truss1DDispFieldData : public SIFEG::PhyFieldData {
+class Truss1DDispFieldData : public CDFEG::PhyFieldData {
 public:
-    Truss1DDispFieldData(SIFEG::FEMData* femData);
+    Truss1DDispFieldData(CDFEG::FEMData* femData);
     ~Truss1DDispFieldData();
 
 

@@ -9,6 +9,8 @@ class DataEleSub:
         self.nNodes=nNode
         # 广义位移
         self.dispNames=[]
+        # 单元变量
+        self.eleResNames=[]
         # 参数名称
         self.paramNames=[]
         # 参数默认值
@@ -61,6 +63,7 @@ class DataEleSub:
             'coordVars': self.coordVars,
             'nNodes': self.nNodes,
             'dispNames': self.dispNames,
+            'eleResNames': self.eleResNames,
             'paramNames': self.paramNames,
             'paramValues': self.paramValues,
             'bBC': self.bBC,
@@ -97,6 +100,7 @@ class DataEleSub:
         ele.dim = data.get('dim', 2)
         ele.coordVars = data.get('coordVars', ['x', 'y'])
         ele.dispNames = data.get('dispNames', [])
+        ele.eleResNames = data.get('eleResNames', [])
         ele.paramNames = data.get('paramNames', [])
         ele.paramValues = data.get('paramValues', [])
         ele.bBC = data.get('bBC', False)

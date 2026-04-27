@@ -4,8 +4,8 @@
 #include "{{ele.name}}.h"
 {% endfor %}
 
-{{field.fieldDataClassName}}::{{field.fieldDataClassName}}(SIFEG::FEMData* femData)
-    : SIFEG::PhyFieldData({{field.dof}}, femData) {
+{{field.fieldDataClassName}}::{{field.fieldDataClassName}}(CDFEG::FEMData* femData)
+    : CDFEG::PhyFieldData({{field.dof}}, femData) {
     _name="{{field.name}}";
     _dispNames = { {% for disp in field.dispNames %}"{{disp}}"{% if not loop.last %}, {% endif %}{% endfor %} };
     _dof2 = {{field.dof}};

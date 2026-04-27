@@ -1,7 +1,7 @@
 """
 VTK 单元类型枚举
 
-根据 include/SIFEG/vtkCellType.h 生成的 Python 枚举类
+根据 include/CDFEG/vtkCellType.h 生成的 Python 枚举类
 用于指定有限元单元的 VTK 可视化类型
 
 作者：系统自动生成

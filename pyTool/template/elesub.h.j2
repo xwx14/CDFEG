@@ -1,19 +1,19 @@
 #ifndef {{headerGuard}}
 #define {{headerGuard}}
-#include "SIFEG/{{baseClass}}.h"
+#include "CDFEG/{{baseClass}}.h"
 
-class {{ele.name}} : public SIFEG::{{baseClass}} {
+class {{ele.name}} : public CDFEG::{{baseClass}} {
 public:
-    {{ele.name}}(SIFEG::PhyFieldData* pData);
+    {{ele.name}}(CDFEG::PhyFieldData* pData);
     ~{{ele.name}}();
 
-    virtual SIFEG::EleSubResult& run(
+    virtual CDFEG::EleSubResult& run(
         const std::vector<double>& r,
         const std::map<std::string, std::vector<double>>& coef,
         const std::map<std::string, double>& matParams
     ) override;
 
-    virtual SIFEG::uResult uEle(
+    virtual CDFEG::uResult uEle(
         const std::vector<double>& r,
         const std::map<std::string, std::vector<double>>& coef,
         const std::map<std::string, double>& matParams

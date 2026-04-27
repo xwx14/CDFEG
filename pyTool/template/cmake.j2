@@ -28,8 +28,8 @@ add_library({{projectName}} SHARED ${SOURCES} ${HEADERS})
 add_library({{projectName}} STATIC ${SOURCES} ${HEADERS})
 {% endif %}
 
-# 链接SIFEG库
-target_link_libraries({{projectName}} PRIVATE SIFEG)
+# 链接CDFEG库
+target_link_libraries({{projectName}} PRIVATE CDFEG)
 
 # 添加包含目录
 target_include_directories({{projectName}} PRIVATE

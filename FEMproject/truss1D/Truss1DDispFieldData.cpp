@@ -2,8 +2,8 @@
 #include "Truss1DData.h"
 #include "Truss1D.h"
 
-Truss1DDispFieldData::Truss1DDispFieldData(SIFEG::FEMData* femData)
-    : SIFEG::PhyFieldData(1, femData) {
+Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::FEMData* femData)
+    : CDFEG::PhyFieldData(1, femData) {
     _name="Truss1DDisp";
     _dispNames = { "u"};
     _dof2 = 0;

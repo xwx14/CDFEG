@@ -209,8 +209,8 @@ class MakerCpp(MakerBase):
 
         # 根据程序类型确定配置
         config_type_map = {
-            0: ("Application", "Console", "_CONSOLE", "SIFEG.lib"),
-            1: ("DynamicLibrary", "Windows", "_CONSOLE", "SIFEG.lib"),
+            0: ("Application", "Console", "_CONSOLE", "CDFEG.lib"),
+            1: ("DynamicLibrary", "Windows", "_CONSOLE", "CDFEG.lib"),
             2: ("StaticLibrary", "Windows", "_CONSOLE", "")
         }
         configuration_type, sub_system, preprocessor_defs, additional_deps = config_type_map.get(self.iProgramType, config_type_map[0])
