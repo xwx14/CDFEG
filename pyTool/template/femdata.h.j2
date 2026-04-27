@@ -1,0 +1,14 @@
+#ifndef {{headerGuard}}
+#define {{headerGuard}}
+#include <string>
+#include "CDFEG/FemData.h"
+
+class {{femDataClassName}} : public CDFEG::FEMData {
+public:
+    {{femDataClassName}}();
+    ~{{femDataClassName}}();
+    virtual int caculate() override;
+    virtual int main() override;
+};
+
+#endif

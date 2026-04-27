@@ -1,0 +1,13 @@
+#ifndef {{headerGuard}}
+#define {{headerGuard}}
+#include "CDFEG/PhyFieldData.h"
+
+class {{field.fieldDataClassName}} : public CDFEG::PhyFieldData {
+public:
+    {{field.fieldDataClassName}}(CDFEG::FEMData* femData);
+    ~{{field.fieldDataClassName}}();
+
+
+};
+
+#endif

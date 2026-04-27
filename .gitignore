@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+.venv/
+venv/
+ENV/
+
+# C++ / Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vspscc
+.vssscc
+x64/
+Debug/
+Release/
+*.obj
+*.lib
+*.exp
+*.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Specific to this project
+/FEMproject/SIFEG/x64
+/FEMproject/truss1D/x64

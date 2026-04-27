@@ -1,0 +1,21 @@
+#include "{{field.fieldDataClassName}}.h"
+#include "{{femDataClassName}}.h"
+{% for ele in field.eleSubs %}
+#include "{{ele.name}}.h"
+{% endfor %}
+
+{{field.fieldDataClassName}}::{{field.fieldDataClassName}}(CDFEG::FEMData* femData)
+    : CDFEG::PhyFieldData({{field.dof}}, femData) {
+    _name="{{field.name}}";
+    _dispNames = { {% for disp in field.dispNames %}"{{disp}}"{% if not loop.last %}, {% endif %}{% endfor %} };
+    _dof2 = {{field.dof}};
+{% for ele in field.eleSubs %}
+    _eleSubs.push_back(new {{ele.name}}(this));
+{% endfor %}
+    _eleResNames = { {% for res in field.eleResNames %}"{{res}}"{% if not loop.last %}, {% endif %}{% endfor %} };
+}
+
+{{field.fieldDataClassName}}::~{{field.fieldDataClassName}}() {
+
+}
+

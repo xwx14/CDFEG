@@ -1,0 +1,18 @@
+#include <iostream>
+{% for field in project.fields %}
+#include "{{field.fieldDataClassName}}.h"
+{% endfor %}
+#include "{{project.name}}Data.h"
+int makeData({{femDataClassName}}& data) {
+    // TODO: 添加测试数据
+
+
+    return 0;
+}
+
+int main() {
+    {{femDataClassName}} data;
+    makeData(data);
+    data.caculate();
+    return 0;
+}

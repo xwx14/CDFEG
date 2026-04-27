@@ -1,0 +1,65 @@
+#include "{{ele.name}}.h"
+#include "{{femDataClassName}}.h"
+#include "{{field.fieldDataClassName}}.h"
+{#### Constructor function ####}
+{{ele.name}}::{{ele.name}}(CDFEG::PhyFieldData* pData)
+    : CDFEG::{{baseClass}}({{baseClassParam}}) {
+    _name="{{ele.name}}";
+    _dispNames = { {% for name in ele.dispNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
+    _paramNames ={ {% for name in ele.paramNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
+    _types.insert("{{ele.name}}");
+{% if ele.vtkCellType %}
+    _vtkCellType = VTKCellType::{{ele.vtkCellType}};
+{% else %}
+    // TODO: 设置 VTK 单元类型
+    // _vtkCellType = VTKCellType::VTK_<TYPE>;
+{% endif %}
+{{ele.initCode}}
+}
+{#### Destructor function ####}
+{{ele.name}}::~{{ele.name}}() {
+
+}
+{#### Main function ####}
+CDFEG::EleSubResult& {{ele.name}}::run(
+    const std::vector<double>& r,
+    const std::map<std::string, std::vector<double>>& coef,
+    const std::map<std::string, double>& matParams
+) {
+
+{{ele.runCode}}
+
+    if (_bSaveResult) _results.push_back(_result);
+    return _result;
+}
+{#### PostProcessing function ####}
+CDFEG::uResult {{ele.name}}::uEle(
+    const std::vector<double>& r,
+    const std::map<std::string, std::vector<double>>& coef,
+    const std::map<std::string, double>& matParams
+) {
+    CDFEG::uResult  res;
+
+{{ele.uCode}}
+
+    return res;
+}
+{% if baseClass == "IsoEleBase" %}
+
+std::vector<double> {{ele.name}}::shapeFun(
+    const std::vector<double>& refc
+) {
+    std::vector<double> shapes;
+    {{ele.shapeFunCode}}
+    return shapes;
+}
+
+std::vector<double> {{ele.name}}::coordTransFun(
+    const std::vector<double>& refc,
+    const std::vector<double>& coords
+) {
+    std::vector<double> globalCoords;
+    {{ele.coordTransFunCode}}
+    return globalCoords;
+}
+{% endif %}

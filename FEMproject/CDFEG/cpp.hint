@@ -1,0 +1,2 @@
+#define CDFEG_API __declspec(dllexport)
+#define CDFEG_API __declspec(dllimport)
