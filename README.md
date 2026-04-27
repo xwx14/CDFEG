@@ -11,10 +11,10 @@ C++ 有限元程序框架与代码自动生成工具。
 │   │   ├── EleSubBase.h        # 单元子程序基类
 │   │   ├── IsoEleBase.h      # 等参元基类
 │   │   ├── EquationSystem.h   # 方程组求解
-│   │   ├── MatrixFun.h       # 矩阵运算
-│   │   ├── PhyFieldData.h   # 物理场数据
-│   │   ├── FemData.h        # 有限元空间数据
-│   │   └── gidProPost.h    # GID前后处理
+│   │   ├── MatrixFun.h       # 常用的计算函数
+│   │   ├── PhyFieldData.h   # 物理场数据基类
+│   │   ├── FemData.h        # 有限元空间数据基类
+│   │   └── gidProPost.h    # GID前后处理接口
 │   ├── truss1D/       # 一维桁架示例
 │   └── sample/        # 示例程序
 ├── pyTool/            # Python 代码生成工具
@@ -27,7 +27,7 @@ C++ 有限元程序框架与代码自动生成工具。
 
 ## 核心库 CDFEG
 
-CDFEG (C++ Dynamic Finite Element Generator) 是本课程的核心有限元程序框架，采用面向对象设计，支持单元类型扩展与多物理场分析。
+CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单元类型扩展与多物理场分析。
 
 ### 类层次结构
 

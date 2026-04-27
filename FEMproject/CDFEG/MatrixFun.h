@@ -143,7 +143,7 @@ namespace CDFEG {
 	 * @author Xie Wenxi
 	 * @date 2026-4-26
 	 */
-	CDFEG_API std::array<double, 2> calcDir2D(std::vector<double>&r );
+	CDFEG_API std::array<double, 3> calcDir2D(std::vector<double>&r );
 	/**
 	 * @brief 计算向量3D方向
 	 * @param r 向量坐标值
@@ -151,7 +151,7 @@ namespace CDFEG {
 	 * @author Xie Wenxi
 	 * @date 2026-4-26
 	 */
-	CDFEG_API std::array<double, 3> calcDir3D(std::vector<double>& r);
+	CDFEG_API std::array<double, 4> calcDir3D(std::vector<double>& r);
 	/**
  * @brief 计算2D方向（2点）
  * @param r 2点坐标值
@@ -159,7 +159,7 @@ namespace CDFEG {
  * @author Xie Wenxi
  * @date 2026-4-26
  */
-	CDFEG_API std::array<double, 2> calcDir2D2(std::vector<double>& r);
+	CDFEG_API std::array<double, 3> calcDir2D2(const std::vector<double>& r);
 	/**
 	 * @brief 计算3D方向(2点)
 	 * @param r 2点坐标值
@@ -167,6 +167,6 @@ namespace CDFEG {
 	 * @author Xie Wenxi
 	 * @date 2026-4-26
 	 */
-	CDFEG_API std::array<double, 3> calcDir3D2(std::vector<double>& r);
+	CDFEG_API std::array<double, 4> calcDir3D2(const std::vector<double>& r);
 }
 #endif

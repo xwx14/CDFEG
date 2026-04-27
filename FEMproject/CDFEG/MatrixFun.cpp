@@ -216,46 +216,50 @@ namespace CDFEG {
 		return std::sqrt(dotProduct(a, a));
 	}
 
-	std::array<double, 2> calcDir2D(std::vector<double>& r)
+	std::array<double, 3> calcDir2D(std::vector<double>& r)
 	{
 		double L =sqrt( r[0] * r[0] + r[1] * r[1]);
-		std::array<double, 2> rt;
-		rt[0] = r[0] / L;
-		rt[1] = r[1] / L;
-		return rt;
-	}
-
-	std::array<double, 3> calcDir3D(std::vector<double>& r)
-	{
-		double L = sqrt(r[0] * r[0] + r[1] * r[1]+r[2]*r[2]);
 		std::array<double, 3> rt;
 		rt[0] = r[0] / L;
 		rt[1] = r[1] / L;
-		rt[2] = r[2] / L;
+		rt[2] = L;
 		return rt;
 	}
 
-	std::array<double, 2> calcDir2D2(std::vector<double>& r)
+	std::array<double, 4> calcDir3D(std::vector<double>& r)
+	{
+		double L = sqrt(r[0] * r[0] + r[1] * r[1]+r[2]*r[2]);
+		std::array<double, 4> rt;
+		rt[0] = r[0] / L;
+		rt[1] = r[1] / L;
+		rt[2] = r[2] / L;
+		rt[3] = L;
+		return rt;
+	}
+
+	std::array<double, 3> calcDir2D2(const std::vector<double>& r)
 	{
 		double x = r[2] - r[0];
 		double y = r[3] - r[1];
 		double L = sqrt(x * x + y * y);
-		std::array<double, 2> rt;
+		std::array<double, 3> rt;
 		rt[0] = x / L;
 		rt[1] = y / L;
+		rt[2] = L;
 		return rt;
 	}
 
-	std::array<double, 3> calcDir3D2(std::vector<double>& r)
+	std::array<double, 4> calcDir3D2(const std::vector<double>& r)
 	{
 		double x = r[3] - r[0];
 		double y = r[4] - r[1];
 		double z = r[5] - r[2];
 		double L = sqrt(x * x + y * y + z* z);
-		std::array<double, 3> rt;
+		std::array<double, 4> rt;
 		rt[0] = x / L;
 		rt[1] = y / L;
 		rt[2] = z / L;
+		rt[3] = L;
 		return rt;
 	}
 

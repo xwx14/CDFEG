@@ -8,7 +8,7 @@ Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::FEMData* femData)
     _dispNames = { "u"};
     _dof2 = 0;
     _eleSubs.push_back(new Truss1D(this));
-    _eleResNames = { "T"};
+    _eleResNames = { "T","sigma" };
 }
 
 Truss1DDispFieldData::~Truss1DDispFieldData() {

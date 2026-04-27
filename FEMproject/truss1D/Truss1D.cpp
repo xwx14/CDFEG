@@ -41,7 +41,9 @@ CDFEG::uResult Truss1D::uEle(
     double E = matParams.at("E");
     double A = matParams.at("A");
     double L = abs(r[0] - r[1]);
-    res.eleResult["T"] = A * E * (coef.at("u").at(1) - coef.at("u").at(0)) / L;
+    double axialDisp = coef.at("u").at(1) - coef.at("u").at(0);
+    res.eleResult["T"] = A * E * axialDisp / L;
+    res.eleResult["sigma"] = E * axialDisp / L;
 
     return res;
 }
