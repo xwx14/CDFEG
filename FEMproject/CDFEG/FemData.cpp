@@ -51,7 +51,7 @@ void CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::
 	{
 		for (PhyFieldData* p : _phyDatas)
 		{
-			for (EleSubBase* pEle : p->_eleSubs)
+			for (ElementBase* pEle : p->_eleSubs)
 			{
 				if (pEle->_types.find(eleType) != pEle->_types.end())
 				{
@@ -101,7 +101,7 @@ int CDFEG::FEMData::addMate(const std::map<std::string, double>& matParam, const
 
 
 
-const std::map<std::string, double>& CDFEG::FEMData::getElemMatParams(int eleID, EleSubBase* ele) const
+const std::map<std::string, double>& CDFEG::FEMData::getElemMatParams(int eleID, ElementBase* ele) const
 {
 	// 为适应旧版本数据而设
 	if (ele->_eleMatIDMap.find(eleID) != ele->_eleMatIDMap.find(eleID)) {

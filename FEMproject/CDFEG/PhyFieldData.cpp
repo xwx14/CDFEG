@@ -1,5 +1,5 @@
 ﻿#include "PhyFieldData.h"
-#include "EleSubBase.h"
+#include "ElementBase.h"
 #include "FemData.h"
 #include <set>
 #include <iostream>
@@ -14,7 +14,7 @@ namespace CDFEG {
 
 	PhyFieldData::~PhyFieldData()
 	{
-		for (EleSubBase* eleSub : _eleSubs)
+		for (ElementBase* eleSub : _eleSubs)
 		{
 			if (eleSub)delete eleSub;
 		}
@@ -74,7 +74,7 @@ namespace CDFEG {
 		// 边界条件添加
 		_equSys.applyFirstBCs(_nodeBC1s, _ida);
 		_equSys.applySecondBCs(_nodeBC2s, _ida);
-		return 0;
+		return 1;
 	}
 
 	std::map<std::string, std::vector<double>> PhyFieldData::getCoef1(std::vector<int> nodeIds)
@@ -99,7 +99,7 @@ namespace CDFEG {
 	}
 
 
-	int PhyFieldData::addEleSub(EleSubBase* eleSub)
+	int PhyFieldData::addEleSub(ElementBase* eleSub)
 	{
 		_eleSubs.push_back(eleSub);
 		return _eleSubs.size() - 1;
@@ -213,7 +213,7 @@ namespace CDFEG {
 		int nEq = -1;
 		std::vector<std::set<int>> mht(_kVar);
 		// 根据节点所在单元确定节点自由度状况，-1代表无此自由度，>=0代表相应的方程编号
-		for (CDFEG::EleSubBase* eleSub:_eleSubs)
+		for (CDFEG::ElementBase* eleSub:_eleSubs)
 		{
 			nNodesPerEle = eleSub->getnNodesPerEle();
 			std::vector<int>& eleIds = eleSub->_eleIds;

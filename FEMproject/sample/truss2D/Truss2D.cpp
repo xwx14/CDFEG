@@ -3,7 +3,7 @@
 #include "Truss2DDispFieldData.h"
 #include "CDFEG\MatrixFun.h"
 Truss2D::Truss2D(CDFEG::PhyFieldData* pData)
-    : CDFEG::EleSubBase(2, pData) {
+    : CDFEG::ElementBase(2, pData) {
     _name="Truss2D";
     _dispNames = { "u", "v" };
     _paramNames ={ "E", "A" };

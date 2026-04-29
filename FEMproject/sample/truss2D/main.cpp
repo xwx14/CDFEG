@@ -31,7 +31,9 @@ int makeData(Truss2DData& data) {
     phydata->setSecondBoundry(1, -50000,1);
     return 0;
 }
+int makeData2(Truss2DData& data) {
 
+}
 int main() {
     Truss2DData data;
     makeData(data);

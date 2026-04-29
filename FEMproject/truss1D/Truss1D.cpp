@@ -2,7 +2,7 @@
 #include "Truss1DData.h"
 #include "Truss1DDispFieldData.h"
 Truss1D::Truss1D(CDFEG::PhyFieldData* pData)
-    : CDFEG::EleSubBase(2, pData) {
+    : CDFEG::ElementBase(2, pData) {
     _name="Truss1D";
     _dispNames = { "u"};
     _paramNames ={ "E","A"};

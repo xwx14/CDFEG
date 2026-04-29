@@ -45,7 +45,7 @@
     <ClInclude Include="IsoEleBase.h">
       <Filter>Element</Filter>
     </ClInclude>
-    <ClInclude Include="EleSubBase.h">
+    <ClInclude Include="ElementBase.h">
       <Filter>Element</Filter>
     </ClInclude>
     <ClInclude Include="vtkCellType.h">
@@ -86,7 +86,7 @@
     <ClCompile Include="Processor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="EleSubBase.cpp">
+    <ClCompile Include="ElementBase.cpp">
       <Filter>Element</Filter>
     </ClCompile>
     <ClCompile Include="IsoEleBase.cpp">

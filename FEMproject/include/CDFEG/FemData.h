@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 #include "CDFEG.h"
-#include "EleSubBase.h"
+#include "ElementBase.h"
 #include "EquationSystem.h"
 
 namespace CDFEG {
 	class PhyFieldData;
-	class EleSubBase;
+	class ElementBase;
 	// 有限元空间数据
 	class CDFEG_API FEMData {
 	public:
@@ -78,7 +78,7 @@ namespace CDFEG {
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		const std::map<std::string, double>& getElemMatParams(int eleID, EleSubBase* ele) const;
+		const std::map<std::string, double>& getElemMatParams(int eleID, ElementBase* ele) const;
 		// 计算程序
 		virtual int caculate() { return -1; };
 		// main程序

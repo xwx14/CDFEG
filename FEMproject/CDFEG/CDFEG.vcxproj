@@ -242,7 +242,7 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EleSubBase.h" />
+    <ClInclude Include="ElementBase.h" />
     <ClInclude Include="FemData.h" />
     <ClInclude Include="GidPrePost2.h" />
     <ClInclude Include="gidProPost.h" />
@@ -259,7 +259,7 @@
     <ClInclude Include="vtkPost.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EleSubBase.cpp" />
+    <ClCompile Include="ElementBase.cpp" />
     <ClCompile Include="FemData.cpp" />
     <ClCompile Include="GidPrePost2.cpp" />
     <ClCompile Include="gidProPost.cpp" />

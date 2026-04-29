@@ -16,7 +16,7 @@
  * @date 2025-3-27
  */
 namespace CDFEG {
-	class EleSubBase;
+	class ElementBase;
 	class CDFEG_API GidProPost :public Processor
 	{
 	public:
@@ -43,9 +43,9 @@ namespace CDFEG {
 		// 后处理结果文件
 		std::string _gidResFn;
 		std::vector<std::vector<int>> _matStartID;
-		std::vector<EleSubBase*> _mshOutEle;
-		std::map< EleSubBase*, int> _matStartID2;
-		std::vector<EleSubBase*> _mshOutEle2;
+		std::vector<ElementBase*> _mshOutEle;
+		std::map< ElementBase*, int> _matStartID2;
+		std::vector<ElementBase*> _mshOutEle2;
 	};
 }
 #endif

@@ -8,7 +8,7 @@
 #define DOF_ID(nodeId, iDof) ((nodeId)*_dof+(iDof))
 
 namespace CDFEG {
-	class EleSubBase;
+	class ElementBase;
 	class FEMData;
 	class CDFEG_API  PhyFieldData {
 	public:
@@ -19,7 +19,7 @@ namespace CDFEG {
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		virtual int eProgram() { return -1; };
+		virtual int eProgram() { return eProgram_el(); };
 		/**
 		 * @brief 求解线性椭圆方程的算法
 		 * @author Xie Wenxi
@@ -50,7 +50,7 @@ namespace CDFEG {
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		int addEleSub(EleSubBase* eleSub);
+		int addEleSub(ElementBase* eleSub);
 		
 		void addBoundary(int nodeId,int typeId, double val = 0, int iDof = 0);
 		/**
@@ -110,7 +110,7 @@ namespace CDFEG {
 		// 有限元空间数据
 		FEMData* _femData = nullptr;
 		// 单元子程序
-		std::vector<CDFEG::EleSubBase*> _eleSubs;
+		std::vector<CDFEG::ElementBase*> _eleSubs;
 		// 节点规格数，start程序后会记录等式号
 		//- 1：表示此节点自由度不存在
 		// >=0 ：表示具有相同整型数的自由度对应相同的方程号（即代数方程组的同一个未知量）。

@@ -1,8 +1,8 @@
 #ifndef TRUSS2D_H
 #define TRUSS2D_H
-#include "CDFEG/EleSubBase.h"
+#include "CDFEG/ElementBase.h"
 
-class Truss2D : public CDFEG::EleSubBase {
+class Truss2D : public CDFEG::ElementBase {
 public:
     Truss2D(CDFEG::PhyFieldData* pData);
     ~Truss2D();

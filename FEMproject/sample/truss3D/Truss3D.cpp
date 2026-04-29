@@ -4,7 +4,7 @@
 #include "CDFEG\MatrixFun.h"
 
 Truss3D::Truss3D(CDFEG::PhyFieldData* pData)
-    : CDFEG::EleSubBase(3, pData) {
+    : CDFEG::ElementBase(3, pData) {
     _name = "Truss3D";
     _dispNames = { "u", "v", "w" };
     _paramNames = { "E", "A" };

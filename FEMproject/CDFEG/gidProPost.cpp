@@ -5,7 +5,7 @@
 #include <iomanip>
 #include "FemData.h"
 #include "PhyFieldData.h"
-#include "EleSubBase.h"
+#include "ElementBase.h"
 namespace CDFEG {
 	GidProPost::GidProPost(FEMData* data) :Processor(data,nullptr)
 	{
@@ -68,10 +68,10 @@ namespace CDFEG {
 	int GidProPost::readMate(const std::map<std::string, std::string>& params)
 	{
 		std::string name = params.at("name");
-		EleSubBase* curEle = nullptr;
+		ElementBase* curEle = nullptr;
 		for (PhyFieldData* f : _femData->_phyDatas)
 		{
-			for (EleSubBase* e : f->_eleSubs)
+			for (ElementBase* e : f->_eleSubs)
 			{
 				if ("mat_" + e->_name == name)curEle = e;
 			}
@@ -241,7 +241,7 @@ namespace CDFEG {
 		std::vector<int>& elePt = _femData->_elePt;
 		int iMat;
 		int iMatStart;
-		for (EleSubBase* eleSub : _mshOutEle)
+		for (ElementBase* eleSub : _mshOutEle)
 		{
 			iMatStart = _matStartID2[eleSub];
 			outFile << "Mesh \"" << eleSub->_name << "\" Dimension " << dim << " Elemtype Quadrilateral Nnode  " << eleSub->_nNode << std::endl;

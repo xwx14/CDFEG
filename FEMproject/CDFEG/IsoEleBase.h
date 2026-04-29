@@ -1,6 +1,6 @@
 ﻿#ifndef ISO_ELE_BASE_H
 #define ISO_ELE_BASE_H
-#include "EleSubBase.h"
+#include "ElementBase.h"
 namespace CDFEG {
 	/**
 	 * @class IsoEleBase
@@ -8,7 +8,7 @@ namespace CDFEG {
 	 * @author xwx
 	 * @date 2025-4-21
 	 */
-	class CDFEG_API IsoEleBase :public EleSubBase {
+	class CDFEG_API IsoEleBase :public ElementBase {
 	public:
 		IsoEleBase(int nNode, PhyFieldData* pData = nullptr);
 		virtual ~IsoEleBase();
