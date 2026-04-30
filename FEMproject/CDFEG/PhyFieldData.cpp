@@ -28,7 +28,7 @@ namespace CDFEG {
 		// 填充刚度矩阵
 		for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
 		{
-			CDFEG::EleSubBase* eleSub = _eleSubs[iEleSub];
+			CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
 			int nNode = eleSub->getnNodesPerEle();
 			int k = nNode * _dof;
 			const std::vector<int>& eleIds = eleSub->getEleIds();
@@ -153,7 +153,7 @@ namespace CDFEG {
 		int nEleSub = _eleSubs.size();
 		for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
 		{
-			CDFEG::EleSubBase* eleSub = _eleSubs[iEleSub];
+			CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
 			int nNode = eleSub->getnNodesPerEle();
 			int k = nNode * _dof;
 			const std::vector<int>& eleIds = eleSub->getEleIds();

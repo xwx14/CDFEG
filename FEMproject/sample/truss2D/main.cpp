@@ -32,7 +32,7 @@ int makeData(Truss2DData& data) {
     return 0;
 }
 int makeData2(Truss2DData& data) {
-
+    return 1;
 }
 int main() {
     Truss2DData data;

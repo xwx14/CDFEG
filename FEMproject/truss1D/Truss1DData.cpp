@@ -13,7 +13,7 @@ Truss1DData::~Truss1DData() {
 int Truss1DData::caculate() {
     Truss1DDispFieldData* f = static_cast<Truss1DDispFieldData*>(_phyDatas[0]);
     f->initMatrix();
-    f->eProgram_el();
+    f->eProgram();
     f->solve();
     f->uPhy();
     f->_equSys.calRightVals();

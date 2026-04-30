@@ -19,7 +19,7 @@ namespace CDFEG {
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		virtual int eProgram() { return -1; };
+		virtual int eProgram() { return eProgram_el(); };
 		/**
 		 * @brief 求解线性椭圆方程的算法
 		 * @author Xie Wenxi
