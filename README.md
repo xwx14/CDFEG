@@ -1,6 +1,6 @@
-# 桁架有限元编程课程项目
+# 创道有限元程序生成系统
 
-C++ 有限元程序框架与代码自动生成工具。
+创道有限元程序生成系统是一款专业有限元程序生成系统。它由C++有限元核心库和程序生成工具组成。有限元核心库中实现了有限元程序所需的各种通用类及方法，仅依赖Eigen3.4一个第三方库。程序生成工具采用Python编写，基于Jinja2模板库。
 
 ## 项目结构
 
@@ -18,11 +18,11 @@ C++ 有限元程序框架与代码自动生成工具。
 │   ├── truss1D/       # 一维桁架示例
 │   └── sample/        # 示例程序
 ├── pyTool/            # Python 代码生成工具
-│   ├── MakerBase.py          # 代码生成器基类
-│   ├── DataEleSub.py         # 单元数据结构
-│   ├── vtkCellType.py        # VTK单元类型
-│   └── template/            # Jinja2 模板
-└── 课程大纲.md        # 教学大纲
+    ├── MakerBase.py          # 代码生成器基类
+    ├── DataEleSub.py         # 单元数据结构
+    ├── vtkCellType.py        # VTK单元类型
+    └── template/            # Jinja2 模板
+
 ```
 
 ## 核心库 CDFEG
