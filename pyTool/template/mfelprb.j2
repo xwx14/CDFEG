@@ -1,0 +1,11 @@
+PROBLEM DATA
+QUESTION: TimeStep
+VALUE: 0.1
+QUESTION: TotalTime
+VALUE: 1.0
+{%for mat in materials%}
+QUESTION: {{mat.name}}({{mat.strParams}})
+VALUE: #N# {{mat.nParams}} {%for p in mat.defaultParams%} {{p}}{%endfor%}
+
+{%endfor%}
+END PROBLEM DATA
