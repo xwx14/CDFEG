@@ -35,7 +35,7 @@ class DataField:
         # 求解方案
         self.sch = DataSch()
     def addEleSub(self,ele0):
-        if type(ele0)==DataEleSub:
+        if isinstance(ele0, DataEleSub):
             ele=ele0
         elif type(ele0)==str:
             ele=DataEleSub(ele0)

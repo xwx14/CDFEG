@@ -21,6 +21,8 @@ class DataProject:
         self.name = name
         # 总体坐标维度
         self.dim = dim
+        # 坐标变量名称列表，默认为 ['x', 'y']，根据维度自动调整
+        self.coordVars = ['x', 'y', 'z'][:dim]
         # 单元类型
         self.eleType = []
         # 场
@@ -59,6 +61,7 @@ class DataProject:
         return {
             'name': self.name,
             'dim': self.dim,
+            'coordVars': self.coordVars,
             'eleType': self.eleType,
             'fields': fields_data,
             'caculateCode': self.caculateCode
@@ -77,7 +80,7 @@ class DataProject:
         # 创建实例
         project = cls(data.get('name', ''), data.get('dim', 2))
 
-        # 恢复单元类型
+        project.coordVars = data.get('coordVars', ['x', 'y', 'z'][:project.dim])
         project.eleType = data.get('eleType', [])
 
         # 恢复场

@@ -181,10 +181,11 @@ class MakerCpp(MakerBase):
         context = {
             "ele": ele.toDict(),
             "femDataClassName":self.femDataClassName,
-            "field": field,  # 传递 field 对象，模板中使用 field.fieldDataClassName
+            "field": field,
             "baseClass": base_class,
             "headerGuard": f"{ele.name.upper()}_H",
-            "baseClassParam":f"{ele.nNodes}, pData"
+            "baseClassParam":f"{ele.nNodes}, pData",
+            "dim": self.project.dim
         }
         # 头文件
         h_filename = f"{ele.name}.h"

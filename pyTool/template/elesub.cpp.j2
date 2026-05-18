@@ -15,6 +15,9 @@
     // _vtkCellType = VTKCellType::VTK_<TYPE>;
 {% endif %}
 {{ele.initCode}}
+{% if baseClass == "IsoEleBase" %}
+
+{% endif %}
 }
 {#### Destructor function ####}
 {{ele.name}}::~{{ele.name}}() {
@@ -50,16 +53,19 @@ std::vector<double> {{ele.name}}::shapeFun(
     const std::vector<double>& refc
 ) {
     std::vector<double> shapes;
+{% if ele.shapeFuns is defined and ele.shapeFuns|length > 0 %}
+    double fval;
+{% for i in range(dim) %}
+    double x{{i+1}} = refc[{{i}}];
+{% endfor %}
+{% for sf in ele.shapeFuns %}
+    fval = {{sf}};
+    shapes.push_back(fval);
+{% endfor %}
+{% elif ele.shapeFunCode is defined and ele.shapeFunCode|length > 0 %}
     {{ele.shapeFunCode}}
+{% endif %}
     return shapes;
 }
 
-std::vector<double> {{ele.name}}::coordTransFun(
-    const std::vector<double>& refc,
-    const std::vector<double>& coords
-) {
-    std::vector<double> globalCoords;
-    {{ele.coordTransFunCode}}
-    return globalCoords;
-}
 {% endif %}

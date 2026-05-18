@@ -148,3 +148,7 @@ class DataEleSub:
                 pass  # 如果转换失败，保持为 None
 
         return ele
+    
+    def makeCode(self):
+        "生成代码，由子类实现"
+        pass
