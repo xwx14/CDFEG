@@ -22,6 +22,5 @@ target_link_libraries(Truss3D PRIVATE CDFEG)
 target_include_directories(Truss3D PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${EIGEN_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/CDFEG
-    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}
 )

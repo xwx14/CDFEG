@@ -44,18 +44,3 @@ target_include_directories(CDFEG PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${EIGEN_INCLUDE_DIR}
 )
-
-set(CDFEG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/CDFEG)
-
-add_custom_command(TARGET CDFEG POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CDFEG_INCLUDE_DIR}
-    COMMENT "Copying headers to include/CDFEG"
-)
-
-foreach(HEADER ${HEADERS})
-    add_custom_command(TARGET CDFEG POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}
-        ${CDFEG_INCLUDE_DIR}/${HEADER}
-    )
-endforeach()
