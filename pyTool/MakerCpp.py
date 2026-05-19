@@ -8,7 +8,7 @@
 #
 # CDFEG is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -32,51 +32,136 @@ class MakerCpp(MakerBase):
     根据 DataProject 配置自动生成 C++ 有限元程序代码，
     支持生成可执行文件、动态库和静态库。
 
-    提供两种模式：
+    支持多项目生成，提供两种模式：
     - 生成新解决方案（mode='new'）：创建完整文件夹，包含 CDFEG 库、third 和解决方案 CMake
     - 添加到现有项目（mode='add'）：仅生成项目文件，在现有解决方案 CMake 中追加 add_subdirectory
     """
 
-    def __init__(self, project: DataProject, output_path: str, iProgramType: int = 0, mode: str = 'new', sln_cmake_path: str = None):
+    def __init__(self, projects, output_path: str, mode: str = 'new', sln_cmake_path: str = None, sln_name: str = None):
         """
         初始化 C++ 代码生成器
 
         Args:
-            project: DataProject 项目配置对象
+            projects: 项目配置，支持两种形式：
+                - 单个 DataProject 对象（向后兼容，默认 iProgramType=0）
+                - 列表，每个元素为 (DataProject, iProgramType) 元组
+                  或 DataProject 对象（默认 iProgramType=0）
             output_path: 输出路径
-            iProgramType: 程序类型
-                0 - 可执行文件（Executable）
-                1 - 动态库（Shared Library）
-                2 - 静态库（Static Library）
             mode: 生成模式
-                'new' - 生成新解决方案（包含 CDFEG 库、third 和解决方案 CMake）
-                'add' - 添加到现有项目（在现有解决方案 CMake 中追加 add_subdirectory）
+                'new' - 生成新解决方案
+                'add' - 添加到现有项目
             sln_cmake_path: 现有解决方案 CMakeLists.txt 的路径（mode='add' 时必须提供）
+            sln_name: 解决方案名称（mode='new' 时使用，默认取第一个项目名称）
         """
-        self.project = project
+        if isinstance(projects, DataProject):
+            self.projects = [(projects, 0)]
+        else:
+            self.projects = []
+            for item in projects:
+                if isinstance(item, DataProject):
+                    self.projects.append((item, 0))
+                elif isinstance(item, (list, tuple)) and len(item) == 2:
+                    self.projects.append((item[0], item[1]))
+                else:
+                    raise ValueError(f"无效的项目配置: {item}")
+
         self.output_path = output_path
-        self.iProgramType = iProgramType
-        self.bNeedMain = self.iProgramType == 0
         self.mode = mode
         self.sln_cmake_path = sln_cmake_path
+        self.sln_name = sln_name if sln_name else self.projects[0][0].name
 
         if mode == 'new':
             self.sln_dir = output_path
-            self.project_subdir = project.name
-            self.project_output_path = os.path.join(output_path, project.name)
         else:
-            self.project_output_path = output_path
-
-        os.makedirs(self.project_output_path, exist_ok=True)
-
-        self.hFiles = []
-        self.cppFiles = []
+            self.sln_dir = None
 
         super().__init__()
-        os.makedirs(self.project_output_path, exist_ok=True)
 
-    def _build_render_data(self):
-        for idx, field in enumerate(self.project.fields):
+    def _get_project_output_path(self, project) -> str:
+        if self.mode == 'new':
+            return os.path.join(self.output_path, project.name)
+        else:
+            return self.output_path
+
+    @staticmethod
+    def _get_program_type_name(iProgramType: int) -> str:
+        types = {0: "Executable", 1: "Shared Library", 2: "Static Library"}
+        return types.get(iProgramType, "Executable")
+
+    # ========== 单项目内部生成方法 ==========
+
+    def _makeMain(self, project, output_path: str, iProgramType: int, file_lists: dict):
+        if iProgramType != 0:
+            return
+        femDataClassName = f"{project.name}Data"
+        context = {
+            "femDataClassName": femDataClassName,
+            "project": project
+        }
+        self.write2File("main.cpp.j2", "main.cpp", context, output_path=output_path)
+        file_lists["cpp"].append("main.cpp")
+
+    def _makeFEMData(self, project, output_path: str, file_lists: dict):
+        femDataClassName = f"{project.name}Data"
+        context = {
+            "femDataClassName": femDataClassName,
+            "headerGuard": f"{project.name.upper()}_DATA_H",
+            "project": project.toDict()
+        }
+        h_filename = f"{project.name}Data.h"
+        self.write2File("femdata.h.j2", h_filename, context, output_path=output_path)
+        file_lists["h"].append(h_filename)
+        cpp_filename = f"{project.name}Data.cpp"
+        self.write2File("femdata.cpp.j2", cpp_filename, context, output_path=output_path)
+        file_lists["cpp"].append(cpp_filename)
+
+    def _makePhyFieldData(self, project, field, output_path: str, file_lists: dict):
+        femDataClassName = f"{project.name}Data"
+        context = {
+            "field": field,
+            "headerGuard": f"{field.name.upper()}_FIELD_DATA_H",
+            "femDataClassName": femDataClassName
+        }
+        h_filename = f"{field.name}FieldData.h"
+        self.write2File("phyfielddata.h.j2", h_filename, context, output_path=output_path)
+        file_lists["h"].append(h_filename)
+        cpp_filename = f"{field.name}FieldData.cpp"
+        self.write2File("phyfielddata.cpp.j2", cpp_filename, context, output_path=output_path)
+        file_lists["cpp"].append(cpp_filename)
+
+    def _makeEleSub(self, project, field, ele, output_path: str, file_lists: dict):
+        base_class = self._get_ele_base_class(ele)
+        femDataClassName = f"{project.name}Data"
+        context = {
+            "ele": ele.toDict(),
+            "femDataClassName": femDataClassName,
+            "field": field,
+            "baseClass": base_class,
+            "headerGuard": f"{ele.name.upper()}_H",
+            "baseClassParam": f"{ele.nNodes}, pData",
+            "dim": project.dim
+        }
+        h_filename = f"{ele.name}.h"
+        self.write2File("elesub.h.j2", h_filename, context, output_path=output_path)
+        file_lists["h"].append(h_filename)
+        cpp_filename = f"{ele.name}.cpp"
+        self.write2File("elesub.cpp.j2", cpp_filename, context, output_path=output_path)
+        file_lists["cpp"].append(cpp_filename)
+
+    def _makeCMakeLists(self, project, output_path: str, iProgramType: int, file_lists: dict):
+        context = {
+            "project": project,
+            "projectName": project.name,
+            "iProgramType": iProgramType,
+            "hFiles": file_lists["h"],
+            "cppFiles": file_lists["cpp"]
+        }
+        self.write2File("cmake.j2", "CMakeLists.txt", context, output_path=output_path)
+
+    # ========== 多项目 / 解决方案级方法 ==========
+
+    def _build_render_data(self, project):
+        for idx, field in enumerate(project.fields):
             field.makeData()
             field.index = idx
             if not hasattr(field, 'dof2') or field.dof2 is None:
@@ -86,91 +171,40 @@ class MakerCpp(MakerBase):
             if not hasattr(field, 'eleResNames') or not field.eleResNames:
                 field.eleResNames = ["stress", "strain"]
 
-    def _get_cmake_target_type(self) -> str:
-        if self.iProgramType == 0:
-            return "exec"
-        elif self.iProgramType == 1:
-            return "shared"
-        else:
-            return "static"
+    def makeProject(self, project, output_path: str, iProgramType: int):
+        """
+        生成单个项目的全部文件
 
-    def _get_program_type_name(self) -> str:
-        types = {0: "Executable", 1: "Shared Library", 2: "Static Library"}
-        return types.get(self.iProgramType, "Executable")
+        Args:
+            project: DataProject 项目对象
+            output_path: 项目输出路径
+            iProgramType: 程序类型 (0=可执行, 1=动态库, 2=静态库)
+        """
+        os.makedirs(output_path, exist_ok=True)
+        self._build_render_data(project)
 
-    # ========== 文件生成方法框架 ==========
+        file_lists = {"h": [], "cpp": []}
 
-    def makeMain(self):
-        if not self.bNeedMain:
-            print("⚠️  跳过 main.cpp 生成（当前程序类型不需要 main 函数）")
-            return
+        if iProgramType == 0:
+            self._makeMain(project, output_path, iProgramType, file_lists)
+        print(f"\n📝 生成全局 FEMData 类...")
+        self._makeFEMData(project, output_path, file_lists)
+        for field in project.fields:
+            print(f"\n📝 生成场 '{field.name}' 的文件...")
+            self._makePhyFieldData(project, field, output_path, file_lists)
+            for ele in field.eleSubs:
+                self._makeEleSub(project, field, ele, output_path, file_lists)
 
-        output_filename = "main.cpp"
-        context = {
-            "femDataClassName": self.femDataClassName,
-            "project": self.project
-        }
-        self.write2File("main.cpp.j2", output_filename, context, output_path=self.project_output_path)
-        self.cppFiles.append(output_filename)
-
-    def makeFEMData(self):
-        context = {
-            "femDataClassName": self.femDataClassName,
-            "headerGuard": f"{self.project.name.upper()}_DATA_H",
-            "project": self.project.toDict()
-        }
-        h_filename = f"{self.project.name}Data.h"
-        self.write2File("femdata.h.j2", h_filename, context, output_path=self.project_output_path)
-        self.hFiles.append(h_filename)
-        cpp_filename = f"{self.project.name}Data.cpp"
-        self.write2File("femdata.cpp.j2", cpp_filename, context, output_path=self.project_output_path)
-        self.cppFiles.append(cpp_filename)
-
-    def makePhyFieldData(self, field):
-        context = {
-            "field": field,
-            "headerGuard": f"{field.name.upper()}_FIELD_DATA_H",
-            "femDataClassName": self.femDataClassName
-        }
-        h_filename = f"{field.name}FieldData.h"
-        self.write2File("phyfielddata.h.j2", h_filename, context, output_path=self.project_output_path)
-        self.hFiles.append(h_filename)
-        cpp_filename = f"{field.name}FieldData.cpp"
-        self.write2File("phyfielddata.cpp.j2", cpp_filename, context, output_path=self.project_output_path)
-        self.cppFiles.append(cpp_filename)
-
-    def makeEleSub(self, field, ele):
-        base_class = self._get_ele_base_class(ele)
-        context = {
-            "ele": ele.toDict(),
-            "femDataClassName": self.femDataClassName,
-            "field": field,
-            "baseClass": base_class,
-            "headerGuard": f"{ele.name.upper()}_H",
-            "baseClassParam": f"{ele.nNodes}, pData",
-            "dim": self.project.dim
-        }
-        h_filename = f"{ele.name}.h"
-        self.write2File("elesub.h.j2", h_filename, context, output_path=self.project_output_path)
-        self.hFiles.append(h_filename)
-        cpp_filename = f"{ele.name}.cpp"
-        self.write2File("elesub.cpp.j2", cpp_filename, context, output_path=self.project_output_path)
-        self.cppFiles.append(cpp_filename)
-
-    def makeCMakeLists(self):
-        context = {
-            "project": self.project,
-            "projectName": self.project.name,
-            "iProgramType": self.iProgramType,
-            "hFiles": self.hFiles,
-            "cppFiles": self.cppFiles
-        }
-        self.write2File("cmake.j2", "CMakeLists.txt", context, output_path=self.project_output_path)
+        print(f"\n📄 生成项目 CMakeLists.txt...")
+        self._makeCMakeLists(project, output_path, iProgramType, file_lists)
 
     def makeSlnCMake(self):
+        """
+        生成解决方案级 CMakeLists.txt
+        """
         context = {
-            "slnName": self.project.name,
-            "projects": [{"dir": self.project.name}]
+            "slnName": self.sln_name,
+            "projects": [{"dir": p.name} for p, _ in self.projects]
         }
         self.write2File("cmakeSln.j2", "CMakeLists.txt", context, output_path=self.sln_dir)
 
@@ -188,7 +222,7 @@ class MakerCpp(MakerBase):
         shutil.copytree(THIRD_DIR, dst)
         print(f"✅ 已复制 third 目录到: {dst}")
 
-    def _add_to_existing_sln(self):
+    def _add_to_existing_sln(self, project_output_path: str):
         if not self.sln_cmake_path:
             print("⚠️  未提供 sln_cmake_path，跳过追加 add_subdirectory")
             return
@@ -198,7 +232,7 @@ class MakerCpp(MakerBase):
             print(f"⚠️  解决方案 CMakeLists.txt 不存在: {cmake_file}")
             return
 
-        sub_dir = os.path.relpath(self.project_output_path, os.path.dirname(cmake_file)).replace("\\", "/")
+        sub_dir = os.path.relpath(project_output_path, os.path.dirname(cmake_file)).replace("\\", "/")
         add_line = f"add_subdirectory({sub_dir})"
 
         with open(cmake_file, 'r', encoding='utf-8') as f:
@@ -213,15 +247,11 @@ class MakerCpp(MakerBase):
         print(f"✅ 已追加 add_subdirectory({sub_dir}) 到: {cmake_file}")
 
     def makeAll(self):
-        self.hFiles.clear()
-        self.cppFiles.clear()
-        self.femDataClassName = f"{self.project.name}Data"
-
+        """
+        生成所有项目的全部文件
+        """
         print(f"\n🚀 开始生成 C++ 代码...")
-        print(f"📁 输出路径: {self.project_output_path}")
-        print(f"📦 项目名称: {self.project.name}")
-        print(f"🔧 程序类型: {self._get_program_type_name()}")
-        print(f"📊 场数量: {len(self.project.fields)}")
+        print(f"📦 项目数量: {len(self.projects)}")
         print(f"📋 生成模式: {'新解决方案' if self.mode == 'new' else '添加到现有项目'}")
 
         if self.mode == 'new':
@@ -230,41 +260,29 @@ class MakerCpp(MakerBase):
             print(f"\n📦 复制 third 依赖目录...")
             self._copy_third()
 
-        if self.bNeedMain:
-            self.makeMain()
-        print(f"\n📝 生成全局 FEMData 类...")
-        self.makeFEMData()
-        for field in self.project.fields:
-            print(f"\n📝 生成场 '{field.name}' 的文件...")
-            self.makePhyFieldData(field)
-            for ele in field.eleSubs:
-                self.makeEleSub(field, ele)
+        for project, iProgramType in self.projects:
+            project_output_path = self._get_project_output_path(project)
+            print(f"\n{'='*50}")
+            print(f"📦 项目名称: {project.name}")
+            print(f"📁 输出路径: {project_output_path}")
+            print(f"🔧 程序类型: {self._get_program_type_name(iProgramType)}")
+            print(f"📊 场数量: {len(project.fields)}")
+            print(f"{'='*50}")
+            self.makeProject(project, project_output_path, iProgramType)
 
-        print(f"\n📄 生成项目 CMakeLists.txt...")
-        self.makeCMakeLists()
+            if self.mode == 'add':
+                self._add_to_existing_sln(project_output_path)
 
         if self.mode == 'new':
             print(f"\n📄 生成解决方案 CMakeLists.txt...")
             self.makeSlnCMake()
-        else:
-            print(f"\n📄 追加到现有解决方案 CMakeLists.txt...")
-            self._add_to_existing_sln()
 
         print(f"\n✅ 代码生成完成！")
+
     # ========== 辅助方法 ==========
     def _get_ele_base_class(self, ele: DataEleSub) -> str:
-        """
-        根据单元类型返回基类名称
-        Args:
-            ele: DataEleSub 对象
-
-        Returns:
-            基类名称："IsoEleBase" 或 "EleSubBase"
-        """
-        if ele.baseClass!="":
+        if ele.baseClass != "":
             return ele.baseClass
-
-        # 这里可以根据实际情况调整
         if ele.type >= 2:
             return "IsoEleBase"
         else:
