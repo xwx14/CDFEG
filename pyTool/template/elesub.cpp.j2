@@ -56,9 +56,9 @@ std::vector<double> {{ele.name}}::shapeFun(
 {% if ele.shapeFuns is defined and ele.shapeFuns|length > 0 %}
     double fval;
 {% for i in range(dim) %}
-    double x{{i+1}} = refc[{{i}}];
+    double {{project.coordVars[i]}} = refc[{{i}}];
 {% endfor %}
-{% for sf in ele.shapeFuns %}
+{% for sf in shapeFuns %}
     fval = {{sf}};
     shapes.push_back(fval);
 {% endfor %}

@@ -64,8 +64,8 @@ ele2.shapeFuns=[
 field.addEleSub(ele2)
 project.addField(field)
 # 生成器
-outPath="El2D"
-maker=MakerCpp(project,outPath)
+outPath="sample/El2D"
+maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
 maker.makeAll()
 gidMaker=MakerGidFile(project,outPath+"/gid")
 gidMaker.makeAll()

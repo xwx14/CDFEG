@@ -23,7 +23,24 @@ import shutil
 
 CDFEG_LIB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "FEMproject", "CDFEG")
 THIRD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "FEMproject", "third")
-
+# 两种模式的使用示例：
+# # 模式1：生成新解决方案
+# maker = MakerCpp(project, "MySolution", mode='new')
+# maker.makeAll()
+# # 输出结构：
+# # MySolution/
+# # ├── CMakeLists.txt          (解决方案级)
+# # ├── CDFEG/                  (基础库)
+# # ├── third/                  (依赖)
+# # └── Truss2D/                (项目代码)
+# #     ├── CMakeLists.txt
+# #     ├── main.cpp
+# #     └── ...
+# # 模式2：添加到现有项目
+# maker = MakerCpp(project, "sample/Truss2D", mode='add', sln_cmake_path="FEMproject/CMakeLists.txt")
+# maker.makeAll()
+# # 在 FEMproject/CMakeLists.txt 末尾追加: add_subdirectory(sample/Truss2D)
+# mode='new' 保持向后兼容，仍是默认行为。现有的测试代码 MakerCpp(project, outPath) 无需修改即可正常工作。
 
 class MakerCpp(MakerBase):
     """
@@ -128,18 +145,24 @@ class MakerCpp(MakerBase):
         cpp_filename = f"{field.name}FieldData.cpp"
         self.write2File("phyfielddata.cpp.j2", cpp_filename, context, output_path=output_path)
         file_lists["cpp"].append(cpp_filename)
-
+    def _replaceCoordVars(self, shapeFun: str, coordVars: list) -> str:
+        for i, var in enumerate(coordVars):
+            shapeFun = shapeFun.replace(f"x[{i+1}]", var)
+        return shapeFun
     def _makeEleSub(self, project, field, ele, output_path: str, file_lists: dict):
         base_class = self._get_ele_base_class(ele)
         femDataClassName = f"{project.name}Data"
+        shapefuns = [self._replaceCoordVars(x, project.coordVars) for x in ele.shapeFuns] if hasattr(ele, 'shapeFuns') else []
         context = {
             "ele": ele.toDict(),
+            "project": project,
             "femDataClassName": femDataClassName,
             "field": field,
             "baseClass": base_class,
             "headerGuard": f"{ele.name.upper()}_H",
             "baseClassParam": f"{ele.nNodes}, pData",
-            "dim": project.dim
+            "dim": project.dim,
+            "shapeFuns": shapefuns
         }
         h_filename = f"{ele.name}.h"
         self.write2File("elesub.h.j2", h_filename, context, output_path=output_path)

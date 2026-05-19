@@ -46,7 +46,7 @@ class DataEleSub:
         self.initCode=""          # 构造函数初始化代码
         self.shapeFunCode=""      # 形函数代码（等参单元）
         self.coordTransFunCode="" # 坐标转换函数代码（等参单元）
-        self.baseClass="EleSubBase"         # 基类名称："EleSubBase" 或 "IsoEleBase"
+        self.baseClass="ElementBase"         # 基类名称："EleSubBase" 或 "IsoEleBase"
         self.baseClassParam = f"{self.nNodes}, pData"
         # 根据需要改变
         self.calMatrix=['eload','estif','emass','edamp']

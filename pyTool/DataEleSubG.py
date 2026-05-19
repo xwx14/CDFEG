@@ -23,6 +23,7 @@ class DataEleSubG(DataEleSub):
             gaussOrder: 高斯积分阶数，默认为 2
         """
         super().__init__(name, nNode)
+        self.baseClass="IsoEleBase" 
         # 高斯积分阶数
         self.gaussOrder = gaussOrder
         # 积分点坐标列表，格式为 [[xi,eta,...], ...]
