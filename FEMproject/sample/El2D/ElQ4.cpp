@@ -55,4 +55,3 @@ std::vector<double> ElQ4::shapeFun(
     shapes.push_back(fval);
     return shapes;
 }
-

@@ -52,9 +52,46 @@ void CDFEG::FEMData::addNodeEnd()
 
 void CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType)
 {
-
 	int i = _elePt.size() - 1;
-	_eleIdMap[id] = i;
+	if (_eleIdMap.find(id) == _eleIdMap.end()) {
+		_eleIdMap[id] = i;
+		_nElem = _eleIdMap.size();
+		for (int id : nodeIds)
+		{
+			_eleNodes.push_back(_nodeIdMap[id]);
+		}
+		_elePt.push_back(_eleNodes.size());
+	}
+	//条件判断 _elePt[_eleIdMap[id] + 1] - _elePt[_eleIdMap[id]] 计算的是原单元的节点个数，
+	//当 nodeIds.size() 与之不一致时才重新添加（递归调用）。如果节点数一致则作为edge边添加。
+	else if (nodeIds.size() != _elePt[_eleIdMap[id] + 1] - _elePt[_eleIdMap[id]])
+	{
+		return addEle(id, nodeIds, eleType);
+	}
+
+	VTKCellType iEleType;
+	if (eleType != "")
+	{
+		for (PhyFieldData* p : _phyDatas)
+		{
+			for (ElementBase* pEle : p->_eleSubs)
+			{
+				if (pEle->_types.find(eleType) != pEle->_types.end())
+				{
+					pEle->_eleIds.push_back(i);
+					iEleType = pEle->_vtkCellType;
+					break;
+				}
+			}
+		}
+	}
+	_eleTypes.push_back(iEleType);
+}
+
+void CDFEG::FEMData::addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType)
+{
+	int i = _elePt.size() - 1;
+	_edgeIdMap[i]=_eleIdMap[id];
 	_nElem = _eleIdMap.size();
 	for (int id : nodeIds)
 	{

@@ -63,6 +63,15 @@ namespace CDFEG {
 		 */
 		void addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType);
 		/**
+ * @brief 添加edge
+ * @param id 单元id
+ * @param nodeIds edge节点id列表
+ * @return
+ * @author Xie Wenxi
+ * @date 2025-3-17
+ */
+		void addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType);
+		/**
 		 * @brief 设置单元材料号
 		 * @param eleId 单元id
 		 * @param id 材料号
@@ -128,6 +137,8 @@ namespace CDFEG {
 		int _nElem = 0;
 		// first为文件中单元号，second为程序中单元号
 		std::map<int, int> _eleIdMap;
+		// first为edge单元号，second为edge所在的单元号（均为程序中）
+		std::map<int, int> _edgeIdMap;
 
 	};
 };
