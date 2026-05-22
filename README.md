@@ -5,7 +5,6 @@
 ## 项目结构
 
 ```
-课程/
 ├── FEMproject/          # C++ 有限元程序
 │   ├── CDFEG/         # 有限元程序核心库 (DLL)
 │   │   ├── EleSubBase.h        # 单元子程序基类
@@ -15,13 +14,19 @@
 │   │   ├── PhyFieldData.h   # 物理场数据基类
 │   │   ├── FemData.h        # 有限元空间数据基类
 │   │   └── gidProPost.h    # GID前后处理接口
-│   ├── truss1D/       # 一维桁架示例
 │   └── sample/        # 示例程序
 ├── pyTool/            # Python 代码生成工具
     ├── MakerBase.py          # 代码生成器基类
+    ├── MakerCpp.py           # C++ 代码生成器（CMake）
+    ├── MakerGidFile.py       # GID 文件生成器
+    ├── DataProject.py        # 项目数据结构
+    ├── DataField.py          # 物理场数据结构
     ├── DataEleSub.py         # 单元数据结构
+    ├── DataEleSubG.py        # 高斯积分单元数据结构
+    ├── DataSch.py            # 求解方案数据结构
     ├── vtkCellType.py        # VTK单元类型
-    └── template/            # Jinja2 模板
+    ├── test/                 # 测试用例
+    └── template/             # Jinja2 模板
 
 ```
 
@@ -180,11 +185,16 @@ int main() {
 
 ### CMake
 
-（待完善）
+使用 `MakerCpp`（`mode='new'`）生成的项目自带 CMakeLists.txt，编译方式：
 
-### Visual Studio
+```bash
+mkdir build && cd build
+cmake .. -G "MinGW Makefiles"   # 或其他生成器
+cmake --build .
+```
 
-打开 `FEMproject/CDFEG.sln`，或使用 `.vcxproj` 文件。
+也可通过 `mode='add'` 将新项目追加到现有解决方案的 CMakeLists.txt 中。
+
 
 ## Python 代码生成工具
 

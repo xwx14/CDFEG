@@ -1,0 +1,80 @@
+{
+    "name": "ElasticT3",
+    "dim": 2,
+    "coordVars": [
+        "x",
+        "y"
+    ],
+    "eleType": [],
+    "fields": [
+        {
+            "name": "Elastic2DDisp",
+            "eleSubs": [
+                {
+                    "name": "ElT3",
+                    "dim": 2,
+                    "coordVars": [
+                        "x",
+                        "y"
+                    ],
+                    "nNodes": 3,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [
+                        "Sxx",
+                        "Syy",
+                        "Sxy"
+                    ],
+                    "paramNames": [
+                        "E",
+                        "nu",
+                        "fx",
+                        "fy"
+                    ],
+                    "paramValues": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "bBC": false,
+                    "index": 1,
+                    "type": 1,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "ElementBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ]
+                }
+            ],
+            "eleTypes": [],
+            "pdeType": 1,
+            "dispNames": [
+                "u",
+                "v"
+            ],
+            "index": 0,
+            "bDynamic": false,
+            "sch": {},
+            "fieldDataClassName": "Elastic2DDispFieldData",
+            "dof": 2,
+            "dof2": 2,
+            "headerGuard": "ELASTIC2DDISP_FIELD_DATA_H",
+            "eleResNames": [
+                "Sxx",
+                "Syy",
+                "Sxy"
+            ]
+        }
+    ],
+    "caculateCode": ""
+}

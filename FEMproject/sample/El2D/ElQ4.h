@@ -23,10 +23,10 @@ public:
         const std::vector<double>& refc
     ) override;
 
-    virtual std::vector<double> coordTransFun(
-        const std::vector<double>& refc,
-        const std::vector<double>& coords
-    ) override;
+    //virtual std::vector<double> coordTransFun(
+    //    const std::vector<double>& refc,
+    //    const std::vector<double>& coords
+    //) override;
 };
 
 #endif

@@ -18,3 +18,5 @@ add_subdirectory(sample/truss2D)
 add_subdirectory(sample/truss3D)
 
 add_subdirectory(sample/El2D)
+
+add_subdirectory(sample/ElT3)

@@ -35,7 +35,7 @@ class DataProject:
     def addField(self,field0):
         if type(field0) == str:
             field = DataField(field0)
-        elif type(field0) == DataField:
+        elif isinstance(field0, DataField):
             field=field0
         else:
             return None

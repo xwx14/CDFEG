@@ -15,7 +15,7 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef GID_PREPOST2_H
 #define GID_PREPOST2_H
-// 将用于读取旧文件
+// 将用于读取旧文件格式的GidPrePost类
 #include "Processor.h"
 namespace CDFEG{
 	class GidPrePost2 :

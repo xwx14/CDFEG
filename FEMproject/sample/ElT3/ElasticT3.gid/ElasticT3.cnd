@@ -1,4 +1,4 @@
-CONDITION: volume-Elastic2DElastic2DDisp
+CONDITION: volume-ElasticT3Elastic2DDisp
 CONDTYPE: over volumes
 CONDMESHTYPE: over nodes
 QUESTION: u-I
@@ -10,7 +10,7 @@ VALUE: -1
 QUESTION: v-D
 VALUE: 0.0
 END CONDITION
-CONDITION: surface-Elastic2DElastic2DDisp
+CONDITION: surface-ElasticT3Elastic2DDisp
 CONDTYPE: over surfaces
 CONDMESHTYPE: over nodes
 QUESTION: u-I
@@ -22,7 +22,7 @@ VALUE: -1
 QUESTION: v-D
 VALUE: 0.0
 END CONDITION
-CONDITION: line-Elastic2DElastic2DDisp
+CONDITION: line-ElasticT3Elastic2DDisp
 CONDTYPE: over lines
 CONDMESHTYPE: over nodes
 QUESTION: u-I
@@ -34,7 +34,7 @@ VALUE: -1
 QUESTION: v-D
 VALUE: 0.0
 END CONDITION
-CONDITION: point-Elastic2DElastic2DDisp
+CONDITION: point-ElasticT3Elastic2DDisp
 CONDTYPE: over points
 CONDMESHTYPE: over nodes
 QUESTION: u-I
@@ -46,13 +46,8 @@ VALUE: -1
 QUESTION: v-D
 VALUE: 0.0
 END CONDITION
-CONDITION: Line-ElT3
-CONDTYPE: over Lines
-QUESTION: mate_Num
-VALUE: 1
-END CONDITION
-CONDITION: Line-ElQ4
-CONDTYPE: over Lines
+CONDITION: element-ElT3
+CONDTYPE: over surfaces
 QUESTION: mate_Num
 VALUE: 1
 END CONDITION

@@ -35,7 +35,8 @@ namespace CDFEG {
 
 	void GidProPost::setFilePath(const std::string& parentPath, const std::string& name)
 	{
-		std::string path= parentPath + "\\" + name + ".gid\\";
+		//std::string path= parentPath + "\\" + name + ".gid\\";
+		std::string path = parentPath+"\\";
 		_datFn =path +name + ".dat";
 		_gidMshFn = path + name + ".post.msh";
 		_gidResFn = path + name + ".post.res";

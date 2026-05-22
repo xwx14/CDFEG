@@ -1,11 +1,11 @@
-#ifndef ELQ4_H
-#define ELQ4_H
-#include "CDFEG/IsoEleBase.h"
+#ifndef ELT3_H
+#define ELT3_H
+#include "CDFEG/ElementBase.h"
 
-class ElQ4 : public CDFEG::IsoEleBase {
+class ElT3 : public CDFEG::ElementBase {
 public:
-    ElQ4(CDFEG::PhyFieldData* pData);
-    ~ElQ4();
+    ElT3(CDFEG::PhyFieldData* pData);
+    ~ElT3();
 
     virtual CDFEG::EleSubResult& run(
         const std::vector<double>& r,
@@ -17,15 +17,6 @@ public:
         const std::vector<double>& r,
         const std::map<std::string, std::vector<double>>& coef,
         const std::map<std::string, double>& matParams
-    ) override;
-
-    virtual std::vector<double> shapeFun(
-        const std::vector<double>& refc
-    ) override;
-
-    virtual std::vector<double> coordTransFun(
-        const std::vector<double>& refc,
-        const std::vector<double>& coords
     ) override;
 };
 

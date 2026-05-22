@@ -41,9 +41,11 @@ class MakerGidFile(MakerBase):
             if arg3 is None:
                 arg3=arg1
             self._initFromParams(arg1, arg2, arg3)
-    def _initFromProject(self,pro:DataProject,path):
+    def _initFromProject(self,pro:DataProject,path0:str):
         """从 DataProject 对象初始化"""
         # 确保输出目录存在
+        os.makedirs(path0, exist_ok=True)
+        path=path0+"/"+pro.name+".gid/"
         os.makedirs(path, exist_ok=True)
 
         self.data={"name":pro.name,

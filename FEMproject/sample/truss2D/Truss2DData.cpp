@@ -34,7 +34,6 @@ int Truss2DData::caculate() {
     f->uPhy();
     f->_equSys.calRightVals();
     return 1;
-    return 1;
 }
 
 int Truss2DData::main() {

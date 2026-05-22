@@ -86,6 +86,8 @@ class MakerCpp(MakerBase):
         self.mode = mode
         self.sln_cmake_path = sln_cmake_path
         self.sln_name = sln_name if sln_name else self.projects[0][0].name
+        # 主函数形式，0，使用makeData生成数据；1，使用GiD数据文件
+        self.mainMode=0
 
         if mode == 'new':
             self.sln_dir = output_path
@@ -115,7 +117,10 @@ class MakerCpp(MakerBase):
             "femDataClassName": femDataClassName,
             "project": project
         }
-        self.write2File("main.cpp.j2", "main.cpp", context, output_path=output_path)
+        if self.mainMode==0:
+            self.write2File("main.cpp.j2", "main.cpp", context, output_path=output_path)
+        elif self.mainMode==1:
+            self.write2File("mainGid.cpp.j2", "main.cpp", context, output_path=output_path)
         file_lists["cpp"].append("main.cpp")
 
     def _makeFEMData(self, project, output_path: str, file_lists: dict):
