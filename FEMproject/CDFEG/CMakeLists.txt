@@ -6,7 +6,7 @@ set(SOURCES
     ElementBase.cpp
     EquationSystem.cpp
     FemData.cpp
-    GaussEleBase.cpp
+
     GidPrePost2.cpp
     gidProPost.cpp
     inpReader.cpp
@@ -23,7 +23,7 @@ set(HEADERS
     ElementBase.h
     EquationSystem.h
     FemData.h
-    GaussEleBase.h
+
     GidPrePost2.h
     gidProPost.h
     InpDataStructures.h
