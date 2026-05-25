@@ -15,6 +15,9 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <map>
 #include "Truss3DDispFieldData.h"
 #include "Truss3DData.h"
 
@@ -94,5 +97,43 @@ int main() {
     Truss3DData data;
     makeData(data);
     data.caculate();
+
+    Truss3DDispFieldData* phy = static_cast<Truss3DDispFieldData*>(data._phyDatas[0]);
+
+    std::map<int, int> nodeProgToFile;
+    for (const auto& it : data._nodeIdMap)
+        nodeProgToFile[it.second] = it.first;
+
+    std::ofstream fout("Truss3D.txt");
+    fout << std::setprecision(6) << std::fixed;
+    fout << "========== 节点位移 ==========" << std::endl;
+    fout << "节点ID\t\tx\t\ty\t\tz\t\tu\t\tv\t\tw" << std::endl;
+    for (int i = 0; i < data._nPts; ++i) {
+        int fileId = nodeProgToFile[i];
+        double x = data._nodes[i * 3];
+        double y = data._nodes[i * 3 + 1];
+        double z = data._nodes[i * 3 + 2];
+        double u = phy->_nodeRes["u"][i];
+        double v = phy->_nodeRes["v"][i];
+        double w = phy->_nodeRes["w"][i];
+        fout << fileId << "\t\t" << x << "\t\t" << y << "\t\t" << z << "\t\t"
+             << u << "\t\t" << v << "\t\t" << w << std::endl;
+    }
+
+    std::map<int, int> eleProgToFile;
+    for (const auto& it : data._eleIdMap)
+        eleProgToFile[it.second] = it.first;
+
+    fout << std::endl;
+    fout << "========== 单元内力 ==========" << std::endl;
+    fout << "单元ID\t\t轴力T\t\t应力sigma" << std::endl;
+    for (int i = 0; i < data._nElem; ++i) {
+        int fileId = eleProgToFile[i];
+        double T = phy->_elemRes["T"][i];
+        double sigma = phy->_elemRes["sigma"][i];
+        fout << fileId << "\t\t" << T << "\t\t" << sigma << std::endl;
+    }
+    fout.close();
+
     return 0;
 }
