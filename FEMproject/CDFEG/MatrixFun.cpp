@@ -278,4 +278,118 @@ namespace CDFEG {
 		return rt;
 	}
 
+	std::vector<std::vector<double>> multiplyTAT(
+		const std::vector<std::vector<double>>& T,
+		const std::vector<std::vector<double>>& A
+	) {
+		auto Tt = transpose(T);
+		auto TtA = multiply(Tt, A);
+		return multiply(TtA, T);
+	}
+
+	std::vector<double> multiplyT(
+		const std::vector<std::vector<double>>& T,
+		const std::vector<double>& v
+	) {
+		auto Tt = transpose(T);
+		return multiply(Tt, v);
+	}
+
+	std::vector<std::vector<double>> computeTransformMatrix(
+		int k, int n, int m,
+		const std::vector<std::vector<double>>& r
+	) {
+		if (m <= 1) {
+			std::vector<std::vector<double>> z(k, std::vector<double>(k, 0.0));
+			for (int i = 0; i < k; ++i) {
+				z[i][i] = 1.0;
+			}
+			return z;
+		}
+
+		std::vector<double> r1(k);
+		for (int i = 0; i < k; ++i) {
+			r1[i] = r[i][0];
+		}
+
+		std::vector<std::vector<double>> r_rel(k, std::vector<double>(m));
+		for (int i = 0; i < k; ++i) {
+			for (int j = 0; j < m; ++j) {
+				r_rel[i][j] = r[i][j] - r1[i];
+			}
+		}
+
+		int nk = m - 1;
+		if (nk > k - 1) nk = k - 1;
+
+		std::vector<std::vector<double>> z(k, std::vector<double>(k, 0.0));
+
+		for (int i = 0; i < nk; ++i) {
+			for (int l = 0; l < k; ++l) {
+				z[l][i] = r_rel[l][i];
+			}
+
+			for (int j = 0; j < i; ++j) {
+				double c = 0.0;
+				for (int l = 0; l < k; ++l) {
+					c += r_rel[l][i] * z[l][j];
+				}
+				for (int l = 0; l < k; ++l) {
+					z[l][i] -= c * z[l][j];
+				}
+			}
+
+			double c = 0.0;
+			for (int l = 0; l < k; ++l) {
+				c += z[l][i] * z[l][i];
+			}
+			c = std::sqrt(c);
+			for (int l = 0; l < k; ++l) {
+				z[l][i] /= c;
+			}
+		}
+
+		if ((nk == 1) && (k == 2)) {
+			z[0][1] = -z[1][0];
+			z[1][1] = z[0][0];
+		}
+
+		if ((nk == 1) && (k == 3)) {
+			if (z[1][0] * z[1][0] > 0.4) {
+				z[0][1] = -z[1][0];
+				z[1][1] = z[0][0];
+				z[2][1] = 0.0;
+			}
+			else {
+				z[0][1] = -z[2][0];
+				z[1][1] = 0.0;
+				z[2][1] = z[0][0];
+			}
+
+			double c = 0.0;
+			for (int i = 0; i < k; ++i) {
+				c += z[i][1] * z[i][1];
+			}
+			c = std::sqrt(c);
+			for (int i = 0; i < k; ++i) {
+				z[i][1] /= c;
+			}
+
+			z[0][2] = z[1][0] * z[2][1] - z[2][0] * z[1][1];
+			z[1][2] = z[2][0] * z[0][1] - z[0][0] * z[2][1];
+			z[2][2] = z[0][0] * z[1][1] - z[1][0] * z[0][1];
+
+			c = 0.0;
+			for (int i = 0; i < k; ++i) {
+				c += z[i][2] * z[i][2];
+			}
+			c = std::sqrt(c);
+			for (int i = 0; i < k; ++i) {
+				z[i][2] /= c;
+			}
+		}
+
+		return z;
+	}
+
 }

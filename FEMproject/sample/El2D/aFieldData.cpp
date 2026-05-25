@@ -1,11 +1,27 @@
+// SPDX-License-Identifier: GPL-3.0
+// This file is part of CDFEG.
+//
+// CDFEG is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// CDFEG is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
+
 #include "aFieldData.h"
 #include "elData.h"
 #include "a1eq4g2.h"
 #include "a2ll2.h"
 #include <cmath>
 
-aFieldData::aFieldData(SIFEG::FEMData* femData)
-    : SIFEG::PhyFieldData(2, femData) {
+aFieldData::aFieldData(CDFEG::FEMData* femData)
+    : CDFEG::PhyFieldData(2, femData) {
     _dispNames = { "u", "v" };
     _eleResNames = { "sigmaXX" ,"sigmaYY","sigmaXY","vonMises","volume"};
     _dof2 = 2;
@@ -13,8 +29,6 @@ aFieldData::aFieldData(SIFEG::FEMData* femData)
     _eleSubs.push_back(new a2ll2(this));
     _name = "a";
     _resForm = "Vector OnNodes";
-    _gidOutForm.push_back({"unod0","Vector OnNodes","u","v"});
-    _gidOutForm.push_back({ "unodb0","Matrix OnNodes","sigmaXX","sigmaYY","sigmaXY" });
 }
 
 aFieldData::~aFieldData() {
@@ -22,17 +36,14 @@ aFieldData::~aFieldData() {
 }
 
 int aFieldData::uPhy() {
-    // 初始化节点位移结果
     for (const std::string& disp : _dispNames)
     {
         _nodeRes[disp].resize(_femData->_nPts);
     }
-    // 初始化单元结果
     for (const std::string& str : _eleResNames)
     {
         _elemRes[str].resize(_femData->_nElem);
     }
-    // 提取节点位移
     for (size_t iDof = 0; iDof < _dof; iDof++)
     {
         std::string& dispName = _dispNames[iDof];
@@ -42,7 +53,6 @@ int aFieldData::uPhy() {
         }
     }
 
-    // 节点应力累积（带权重）
     std::vector<std::string> stressNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
     std::map<std::string, std::vector<double>> nodeStressSum;
     std::vector<double> nodeWeightSum(_femData->_nPts, 0.0);
@@ -55,9 +65,8 @@ int aFieldData::uPhy() {
     int nEleSub = _eleSubs.size();
     for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
     {
-        SIFEG::EleSubBase* eleSub = _eleSubs[iEleSub];
+        CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
         int nNode = eleSub->getnNodesPerEle();
-        int k = nNode * _dof;
         const std::vector<int>& eleIds = eleSub->getEleIds();
         for (int eleID : eleSub->_eleIds)
         {
@@ -80,16 +89,14 @@ int aFieldData::uPhy() {
                 }
             }
             const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
-            SIFEG::uResult res = eleSub->uEle(r, coef, matParams);
+            CDFEG::uResult res = eleSub->uEle(r, coef, matParams);
 
-            // 存储单元结果
             for (const auto& it : res.eleResult)
             {
                 const std::string& resName = it.first;
                 _elemRes[resName][eleID] = it.second;
             }
 
-            // 累积节点应力（带权重）
             if (res.nodeResult.find("weight") != res.nodeResult.end())
             {
                 const std::vector<double>& weights = res.nodeResult.at("weight");
@@ -109,7 +116,6 @@ int aFieldData::uPhy() {
         }
     }
 
-    // 计算节点平均应力
     for (const std::string& name : stressNames)
     {
         _nodeRes[name].resize(_femData->_nPts);
@@ -126,7 +132,6 @@ int aFieldData::uPhy() {
         }
     }
 
-    // 计算节点 Von Mises 应力（平面应力状态）
     _nodeRes["vonMises"].resize(_femData->_nPts);
     for (size_t iNode = 0; iNode < _femData->_nPts; ++iNode)
     {

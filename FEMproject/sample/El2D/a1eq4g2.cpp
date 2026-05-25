@@ -1,102 +1,157 @@
+// SPDX-License-Identifier: GPL-3.0
+// This file is part of CDFEG.
+//
+// CDFEG is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// CDFEG is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
+
 #include "a1eq4g2.h"
 #include "elData.h"
 #include "aFieldData.h"
+#include "CDFEG/MatrixFun.h"
 
-a1eq4g2::a1eq4g2(SIFEG::PhyFieldData* pData)
-    : SIFEG::Q4g(2, pData) {
-    _name="a1eq4g2";
+a1eq4g2::a1eq4g2(CDFEG::PhyFieldData* pData)
+    : CDFEG::IsoEleBase(4, pData) {
+    _name = "a1eq4g2";
     _dispNames = { "u", "v" };
-    _paramNames ={ "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _paramNames = { "pe", "pv", "fu", "fv", "rou", "alpha" };
     _types.insert("a1eq4g2");
+
+    _dim = 2;
+    _nGaus = 4;
+    _nDisp = 2;
+    _nRefc = 2;
+    _nCoor = 2;
+    _nVar = 8;
+    _nNode = 4;
+    _gaus.resize(4);
+    _refc.resize(8);
+    _gaus[0] = 1.0;
+    _refc[0] = 0.5773502692;
+    _refc[1] = 0.5773502692;
+    _gaus[1] = 1.0;
+    _refc[2] = 0.5773502692;
+    _refc[3] = -0.5773502692;
+    _gaus[2] = 1.0;
+    _refc[4] = -0.5773502692;
+    _refc[5] = 0.5773502692;
+    _gaus[3] = 1.0;
+    _refc[6] = -0.5773502692;
+    _refc[7] = -0.5773502692;
+    caculateShapeCoef(2);
+    _result.emass.resize(_nVar);
+    _result.eload.resize(_nVar);
+    _result.estif.resize(_nVar * _nVar);
+    _result.edamp.resize(_nVar * _nVar);
+    _vtkCellType = VTK_QUAD;
 }
 
 a1eq4g2::~a1eq4g2() {
 
 }
 
-SIFEG::EleSubResult& a1eq4g2::run(
+std::vector<double> a1eq4g2::shapeFun(const std::vector<double>& refc) {
+    std::vector<double> rt;
+    double rx = refc[0];
+    double ry = refc[1];
+    double fval = (1. - rx) / 2. * (1. - ry) / 2.;
+    rt.push_back(fval);
+    fval = (1. + rx) / 2. * (1. - ry) / 2.;
+    rt.push_back(fval);
+    fval = (1. + rx) / 2. * (1. + ry) / 2.;
+    rt.push_back(fval);
+    fval = (1. - rx) / 2. * (1. + ry) / 2.;
+    rt.push_back(fval);
+    return rt;
+}
+
+CDFEG::EleSubResult& a1eq4g2::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-	std::vector<double> refcoor(2);
-	std::fill(_result.eload.begin(), _result.eload.end(), 0.0);
-	std::fill(_result.estif.begin(), _result.estif.end(), 0.0);
-	std::fill(_result.emass.begin(), _result.emass.end(), 0.0);
-	double pe = matParams.at("pe");
-	double pv = matParams.at("pv");
-	double fu = matParams.at("fu");
-	double fv = matParams.at("fv");
-	double rou = matParams.at("rou");
-	double alpha = matParams.at("alpha");
-	double vol = 1.0;
-	double fact = pe / (1.0 + pv) / (1.0 - pv * 2.0) * vol;
+    std::vector<double> refcoor(2);
+    std::fill(_result.eload.begin(), _result.eload.end(), 0.0);
+    std::fill(_result.estif.begin(), _result.estif.end(), 0.0);
+    std::fill(_result.emass.begin(), _result.emass.end(), 0.0);
+    double pe = matParams.at("pe");
+    double pv = matParams.at("pv");
+    double fu = matParams.at("fu");
+    double fv = matParams.at("fv");
+    double vol = 1.0;
+    double fact = pe / (1.0 + pv) / (1.0 - pv * 2.0) * vol;
     double shear = 0.5 - pv;
-	for (int iGaus = 0; iGaus < _nGaus; ++iGaus)
-	{
-		for (int i = 0; i < _nRefc; ++i)
-		{
-			refcoor[i] = _refc[_dim * iGaus + i];
-		}
-		std::vector<std::vector<double>> rctr;
-		std::vector<double> coor;
-		dcoor(r, iGaus, coor, rctr);
-		std::vector<std::vector<double>> crtr;
-		double det = SIFEG::inverse(rctr, crtr);
-		std::vector<std::vector<double>> cu;
-		shapn(iGaus, coor, crtr, cu);
-		std::vector<std::vector<double>> cv = cu;
-		double weight = _gaus[iGaus] * det;
-		std::vector<double> eexx(8, 0.0);
-		std::vector<double> eeyy(8, 0.0);
-		std::vector<double> eexy(8, 0.0);
-		int i1, i2;
+    for (int iGaus = 0; iGaus < _nGaus; ++iGaus)
+    {
+        for (int i = 0; i < _nRefc; ++i)
+        {
+            refcoor[i] = _refc[_dim * iGaus + i];
+        }
+        std::vector<std::vector<double>> rctr;
+        std::vector<double> coor;
+        dcoor(r, iGaus, coor, rctr);
+        std::vector<std::vector<double>> crtr;
+        double det = CDFEG::inverse(rctr, crtr);
+        std::vector<std::vector<double>> cu;
+        shapn(iGaus, coor, crtr, cu);
+        std::vector<std::vector<double>> cv = cu;
+        double weight = _gaus[iGaus] * det;
+        std::vector<double> eexx(8, 0.0);
+        std::vector<double> eeyy(8, 0.0);
+        std::vector<double> eexy(8, 0.0);
+        int i1, i2;
 
-		//eexx={ du1/dx,0.0, du2/dx,0.0, du3/dx, 0.0, du4/dx,   0.0 };
-		//eeyy={ 0.0, dv1/dy, 0.0, dv2/dy,0.0, dv3/dy, 0.0, dv4/dy };
-		//eexy={ du1/dy, dv1/dx, du2/dy, dv2/dx, du3/dy, dv3/dx, du4/dy, dv4/dx };
-		for (int i = 0; i < 4; ++i)
-		{
-			i1 = i * 2;
-			i2 = i * 2 + 1;
-			eexx[i1] = +cu[i][1];
-			eeyy[i2] = +cv[i][2];
-			eexy[i1] += cu[i][2];
-			eexy[i2] += cv[i][1];
-		}
-		double stif;
-		int ii = -1;
-		for (int i = 0; i < 4; ++i)
-		{
-			stif = cu[i][0] * fu * vol;
-			_result.eload[2 * i] += stif * weight;
-			stif = cv[i][0] * fv * vol;
-			_result.eload[2 * i + 1] += stif * weight;
-		}
-		for (int i = 0; i < 8; ++i)
-		{
-			for (int j = 0; j < 8; ++j)
-			{
-				stif = +eexx[i] * eexx[j] * (1. - pv) * fact
-					+ eexx[i] * eeyy[j] * pv * fact
-					+ eeyy[i] * eexx[j] * pv * fact
-					+ eeyy[i] * eeyy[j] * (1. - pv) * fact
-					+ eexy[i] * eexy[j] * shear * fact;
-				_result.estif[++ii] += stif * weight;
-			}
-		}
-	}
+        for (int i = 0; i < 4; ++i)
+        {
+            i1 = i * 2;
+            i2 = i * 2 + 1;
+            eexx[i1] = +cu[i][1];
+            eeyy[i2] = +cv[i][2];
+            eexy[i1] += cu[i][2];
+            eexy[i2] += cv[i][1];
+        }
+        double stif;
+        int ii = -1;
+        for (int i = 0; i < 4; ++i)
+        {
+            stif = cu[i][0] * fu * vol;
+            _result.eload[2 * i] += stif * weight;
+            stif = cv[i][0] * fv * vol;
+            _result.eload[2 * i + 1] += stif * weight;
+        }
+        for (int i = 0; i < 8; ++i)
+        {
+            for (int j = 0; j < 8; ++j)
+            {
+                stif = +eexx[i] * eexx[j] * (1. - pv) * fact
+                    + eexx[i] * eeyy[j] * pv * fact
+                    + eeyy[i] * eexx[j] * pv * fact
+                    + eeyy[i] * eeyy[j] * (1. - pv) * fact
+                    + eexy[i] * eexy[j] * shear * fact;
+                _result.estif[++ii] += stif * weight;
+            }
+        }
+    }
 
     if (_bSaveResult) _results.push_back(_result);
     return _result;
 }
 
-SIFEG::uResult a1eq4g2::uEle(
+CDFEG::uResult a1eq4g2::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    SIFEG::uResult res;
+    CDFEG::uResult res;
 
     double pe = matParams.at("pe");
     double pv = matParams.at("pv");
@@ -107,12 +162,10 @@ SIFEG::uResult a1eq4g2::uEle(
     const std::vector<double>& u = coef.at("u");
     const std::vector<double>& vDisp = coef.at("v");
 
-    // 节点应力和权重
     std::vector<double> nodeSigmaXX(4, 0.0), nodeSigmaYY(4, 0.0);
     std::vector<double> nodeSigmaXY(4, 0.0);
     std::vector<double> nodeWeight(4, 0.0);
 
-    // 单元平均应力
     double sigmaXX = 0.0, sigmaYY = 0.0, sigmaXY = 0.0;
     double totalWeight = 0.0;
 
@@ -122,7 +175,7 @@ SIFEG::uResult a1eq4g2::uEle(
         std::vector<double> coor;
         dcoor(r, iGaus, coor, rctr);
         std::vector<std::vector<double>> crtr;
-        double det = SIFEG::inverse(rctr, crtr);
+        double det = CDFEG::inverse(rctr, crtr);
         std::vector<std::vector<double>> cu;
         shapn(iGaus, coor, crtr, cu);
         std::vector<std::vector<double>> cv = cu;
@@ -146,7 +199,6 @@ SIFEG::uResult a1eq4g2::uEle(
         sigmaYY += gSigmaYY * weight;
         sigmaXY += gSigmaXY * weight;
 
-        // 将高斯点应力分配到节点，按形函数值加权
         for (int i = 0; i < 4; ++i)
         {
             double N = cu[i][0];
@@ -158,7 +210,6 @@ SIFEG::uResult a1eq4g2::uEle(
         }
     }
 
-    // 单元平均应力
     if (totalWeight > 0.0)
     {
         sigmaXX /= totalWeight;
@@ -171,7 +222,6 @@ SIFEG::uResult a1eq4g2::uEle(
     res.eleResult["sigmaXY"] = sigmaXY;
     res.eleResult["volume"] = totalWeight;
 
-    // 节点应力（带权重）
     res.nodeResult["sigmaXX"] = nodeSigmaXX;
     res.nodeResult["sigmaYY"] = nodeSigmaYY;
     res.nodeResult["sigmaXY"] = nodeSigmaXY;

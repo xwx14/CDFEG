@@ -183,5 +183,20 @@ namespace CDFEG {
 	 * @date 2026-4-26
 	 */
 	CDFEG_API std::array<double, 4> calcDir3D2(const std::vector<double>& r);
+
+	CDFEG_API std::vector<std::vector<double>> multiplyTAT(
+		const std::vector<std::vector<double>>& T,
+		const std::vector<std::vector<double>>& A
+	);
+
+	CDFEG_API std::vector<double> multiplyT(
+		const std::vector<std::vector<double>>& T,
+		const std::vector<double>& v
+	);
+
+	CDFEG_API std::vector<std::vector<double>> computeTransformMatrix(
+		int k, int n, int m,
+		const std::vector<std::vector<double>>& r
+	);
 }
 #endif
