@@ -14,28 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "aFieldData.h"
+#include "ElDispFieldData.h"
 #include "elData.h"
-#include "a1eq4g2.h"
-#include "a2ll2.h"
+#include "ElQ4g.h"
+#include "StressBL2g.h"
 #include <cmath>
 
-aFieldData::aFieldData(CDFEG::FEMData* femData)
+ElDispFieldData::ElDispFieldData(CDFEG::FEMData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _dispNames = { "u", "v" };
     _eleResNames = { "sigmaXX" ,"sigmaYY","sigmaXY","vonMises","volume"};
     _dof2 = 2;
-    _eleSubs.push_back(new a1eq4g2(this));
-    _eleSubs.push_back(new a2ll2(this));
-    _name = "a";
+    _eleSubs.push_back(new ElQ4g(this));
+    _eleSubs.push_back(new StressBL2g(this));
+    _name = "ElDisp";
     _resForm = "Vector OnNodes";
 }
 
-aFieldData::~aFieldData() {
+ElDispFieldData::~ElDispFieldData() {
 
 }
 
-int aFieldData::uPhy() {
+int ElDispFieldData::uPhy() {
     for (const std::string& disp : _dispNames)
     {
         _nodeRes[disp].resize(_femData->_nPts);

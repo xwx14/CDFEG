@@ -5,16 +5,16 @@ project(El2D LANGUAGES CXX)
 set(SOURCES
     elMain.cpp
     elData.cpp
-    aFieldData.cpp
-    a1eq4g2.cpp
-    a2ll2.cpp
+    ElDispFieldData.cpp
+    ElQ4g.cpp
+    StressBL2g.cpp
 )
 
 set(HEADERS
     elData.h
-    aFieldData.h
-    a1eq4g2.h
-    a2ll2.h
+    ElDispFieldData.h
+    ElQ4g.h
+    StressBL2g.h
 )
 
 add_executable(el ${SOURCES} ${HEADERS})

@@ -14,17 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "a1eq4g2.h"
+#include "ElQ4g.h"
 #include "elData.h"
-#include "aFieldData.h"
+#include "ElDispFieldData.h"
 #include "CDFEG/MatrixFun.h"
 
-a1eq4g2::a1eq4g2(CDFEG::PhyFieldData* pData)
+ElQ4g::ElQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
-    _name = "a1eq4g2";
+    _name = "ElQ4g";
     _dispNames = { "u", "v" };
     _paramNames = { "pe", "pv", "fu", "fv", "rou", "alpha" };
-    _types.insert("a1eq4g2");
+    _types.insert("ElQ4g");
 
     _dim = 2;
     _nGaus = 4;
@@ -55,11 +55,11 @@ a1eq4g2::a1eq4g2(CDFEG::PhyFieldData* pData)
     _vtkCellType = VTK_QUAD;
 }
 
-a1eq4g2::~a1eq4g2() {
+ElQ4g::~ElQ4g() {
 
 }
 
-std::vector<double> a1eq4g2::shapeFun(const std::vector<double>& refc) {
+std::vector<double> ElQ4g::shapeFun(const std::vector<double>& refc) {
     std::vector<double> rt;
     double rx = refc[0];
     double ry = refc[1];
@@ -74,7 +74,7 @@ std::vector<double> a1eq4g2::shapeFun(const std::vector<double>& refc) {
     return rt;
 }
 
-CDFEG::EleSubResult& a1eq4g2::run(
+CDFEG::EleSubResult& ElQ4g::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
@@ -146,7 +146,7 @@ CDFEG::EleSubResult& a1eq4g2::run(
     return _result;
 }
 
-CDFEG::uResult a1eq4g2::uEle(
+CDFEG::uResult ElQ4g::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams

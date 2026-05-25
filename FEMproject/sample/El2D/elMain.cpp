@@ -15,14 +15,14 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
-#include "aFieldData.h"
+#include "ElDispFieldData.h"
 #include "elData.h"
 #include "CDFEG/gidProPost.h"
 
 int main() {
     elData data;
 	CDFEG::GidProPost pre(&data);
-	pre.setFilePath("E:\\SQGenFEM\\test\\el2dData", "el");
+	pre.setFilePath("E:\\myProject\\CDFEG\\FEMproject\\test\\el2dData\\el.gid", "el");
 	pre.pre();
     data.caculate();
     pre.post();

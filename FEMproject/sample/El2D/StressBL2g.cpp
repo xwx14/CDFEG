@@ -14,17 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "a2ll2.h"
+#include "StressBL2g.h"
 #include "elData.h"
-#include "aFieldData.h"
+#include "ElDispFieldData.h"
 #include "CDFEG/MatrixFun.h"
 
-a2ll2::a2ll2(CDFEG::PhyFieldData* pData)
+StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(2, pData) {
-    _name = "a2ll2";
+    _name = "StressBL2g";
     _dispNames = { "u", "v" };
     _paramNames = { "fu", "fv" };
-    _types.insert("a2ll2");
+    _types.insert("StressBL2g");
     _vtkCellType = ::VTK_LINE;
 
     _dim = 1;
@@ -47,11 +47,11 @@ a2ll2::a2ll2(CDFEG::PhyFieldData* pData)
     _result.edamp.resize(_nVar * _nVar);
 }
 
-a2ll2::~a2ll2() {
+StressBL2g::~StressBL2g() {
 
 }
 
-std::vector<double> a2ll2::shapeFun(const std::vector<double>& refc) {
+std::vector<double> StressBL2g::shapeFun(const std::vector<double>& refc) {
     double xi = refc[0];
     std::vector<double> rt(2);
     rt[0] = 0.5 * (1.0 - xi);
@@ -59,7 +59,7 @@ std::vector<double> a2ll2::shapeFun(const std::vector<double>& refc) {
     return rt;
 }
 
-CDFEG::EleSubResult& a2ll2::run(
+CDFEG::EleSubResult& StressBL2g::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
@@ -132,7 +132,7 @@ CDFEG::EleSubResult& a2ll2::run(
     return _result;
 }
 
-void a2ll2::run1D(
+void StressBL2g::run1D(
     const std::vector<double>& yy,
     double fu,
     double fv,
@@ -187,7 +187,7 @@ void a2ll2::run1D(
     }
 }
 
-CDFEG::uResult a2ll2::uEle(
+CDFEG::uResult StressBL2g::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams

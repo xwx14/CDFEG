@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef A1EQ4G2_H
-#define A1EQ4G2_H
+#ifndef EL_Q4G_H
+#define EL_Q4G_H
 #include "CDFEG/IsoEleBase.h"
 
-class a1eq4g2 : public CDFEG::IsoEleBase {
+class ElQ4g : public CDFEG::IsoEleBase {
 public:
-    a1eq4g2(CDFEG::PhyFieldData* pData);
-    ~a1eq4g2();
+    ElQ4g(CDFEG::PhyFieldData* pData);
+    ~ElQ4g();
 
     virtual CDFEG::EleSubResult& run(
         const std::vector<double>& r,

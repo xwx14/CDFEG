@@ -245,7 +245,7 @@ namespace CDFEG {
 
 	int GidProPost::gidMsh()
 	{
-		// 将网格数据写入"./heat.gid/heat.post.msh"
+		// 将网格数据写入
 		std::ofstream outFile;
 		outFile.open(_gidMshFn, std::ios::out); // 使用ios::out模式打开文件
 		int dim = _femData->_dim;

@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef A2LL2_H
-#define A2LL2_H
+#ifndef STRESS_BL2G_H
+#define STRESS_BL2G_H
 #include "CDFEG/IsoEleBase.h"
 #include <vector>
 #include <map>
 
-class a2ll2 : public CDFEG::IsoEleBase {
+class StressBL2g : public CDFEG::IsoEleBase {
 public:
-    a2ll2(CDFEG::PhyFieldData* pData);
-    ~a2ll2();
+    StressBL2g(CDFEG::PhyFieldData* pData);
+    ~StressBL2g();
 
     virtual CDFEG::EleSubResult& run(
         const std::vector<double>& r,

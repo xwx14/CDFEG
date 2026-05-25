@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef A_FIELD_DATA_H
-#define A_FIELD_DATA_H
+#ifndef EL_DISP_FIELD_DATA_H
+#define EL_DISP_FIELD_DATA_H
 #include "CDFEG/PhyFieldData.h"
 
-class aFieldData : public CDFEG::PhyFieldData {
+class ElDispFieldData : public CDFEG::PhyFieldData {
 public:
-    aFieldData(CDFEG::FEMData* femData);
-    ~aFieldData();
+    ElDispFieldData(CDFEG::FEMData* femData);
+    ~ElDispFieldData();
 
     virtual int uPhy() override;
 };

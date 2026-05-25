@@ -15,11 +15,11 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "elData.h"
-#include "aFieldData.h"
+#include "ElDispFieldData.h"
 
 elData::elData() {
     _dim = 2;
-    _phyDatas.push_back(new aFieldData(this));
+    _phyDatas.push_back(new ElDispFieldData(this));
 }
 
 elData::~elData() {
@@ -27,7 +27,7 @@ elData::~elData() {
 }
 
 int elData::caculate() {
-    aFieldData* aField = static_cast<aFieldData*>(_phyDatas[0]);
+    ElDispFieldData* aField = static_cast<ElDispFieldData*>(_phyDatas[0]);
     aField->initMatrix();
     aField->eProgram_el();
     aField->solve();
