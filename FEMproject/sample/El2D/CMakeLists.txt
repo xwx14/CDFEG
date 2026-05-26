@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(El2D LANGUAGES CXX)
+project(el LANGUAGES CXX)
+
+# 使用父级CMakeLists.txt中定义的Eigen目录
+message(STATUS "el Eigen include directory: ${EIGEN_INCLUDE_DIR}")
 
 set(SOURCES
-    elMain.cpp
+    main.cpp
     elData.cpp
     ElDispFieldData.cpp
     ElQ4g.cpp
+    ElT3g.cpp
     StressBL2g.cpp
 )
 
@@ -14,14 +18,18 @@ set(HEADERS
     elData.h
     ElDispFieldData.h
     ElQ4g.h
+    ElT3g.h
     StressBL2g.h
 )
 
-add_executable(el ${SOURCES} ${HEADERS})
+# 创建可执行文件
+add_executable(el2d ${SOURCES} ${HEADERS})
 
-target_link_libraries(el PRIVATE CDFEG)
+# 链接CDFEG库
+target_link_libraries(el2d PRIVATE CDFEG)
 
-target_include_directories(el PRIVATE
+# 添加包含目录
+target_include_directories(el2d PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${EIGEN_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}

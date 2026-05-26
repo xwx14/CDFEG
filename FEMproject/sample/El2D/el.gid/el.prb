@@ -1,0 +1,12 @@
+PROBLEM DATA
+QUESTION: TimeStep
+VALUE: 0.1
+QUESTION: TotalTime
+VALUE: 1.0
+QUESTION: ElQ4g(pe,pv,fu,fv,rou,alpha)
+VALUE: #N# 6  0.0 0.0 0.0 0.0 0.0 0.0
+QUESTION: ElT3g(pe,pv,fu,fv,rou,alpha)
+VALUE: #N# 6  0.0 0.0 0.0 0.0 0.0 0.0
+QUESTION: StressBL2g(fu,fv)
+VALUE: #N# 2  0.0 0.0
+END PROBLEM DATA

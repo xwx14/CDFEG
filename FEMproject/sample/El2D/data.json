@@ -1,0 +1,235 @@
+{
+    "name": "el",
+    "dim": 2,
+    "coordVars": [
+        "x",
+        "y"
+    ],
+    "eleType": [],
+    "fields": [
+        {
+            "name": "ElDisp",
+            "eleSubs": [
+                {
+                    "name": "ElQ4g",
+                    "dim": 2,
+                    "coordVars": [
+                        "x",
+                        "y"
+                    ],
+                    "nNodes": 4,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [
+                        "sigmaXX",
+                        "sigmaYY",
+                        "sigmaXY",
+                        "volume"
+                    ],
+                    "paramNames": [
+                        "pe",
+                        "pv",
+                        "fu",
+                        "fv",
+                        "rou",
+                        "alpha"
+                    ],
+                    "paramValues": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "bBC": false,
+                    "index": 1,
+                    "type": 2,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            0.5773502691896258,
+                            0.5773502691896258
+                        ],
+                        [
+                            0.5773502691896258,
+                            -0.5773502691896258
+                        ],
+                        [
+                            -0.5773502691896258,
+                            0.5773502691896258
+                        ],
+                        [
+                            -0.5773502691896258,
+                            -0.5773502691896258
+                        ]
+                    ],
+                    "gaussWeights": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "shapeFuns": [
+                        "(1. - x[1]) / 2. * (1. - x[2]) / 2.",
+                        "(1. + x[1]) / 2. * (1. - x[2]) / 2.",
+                        "(1. + x[1]) / 2. * (1. + x[2]) / 2.",
+                        "(1. - x[1]) / 2. * (1. + x[2]) / 2."
+                    ]
+                },
+                {
+                    "name": "ElT3g",
+                    "dim": 2,
+                    "coordVars": [
+                        "x",
+                        "y"
+                    ],
+                    "nNodes": 3,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [
+                        "sigmaXX",
+                        "sigmaYY",
+                        "sigmaXY",
+                        "volume"
+                    ],
+                    "paramNames": [
+                        "pe",
+                        "pv",
+                        "fu",
+                        "fv",
+                        "rou",
+                        "alpha"
+                    ],
+                    "paramValues": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "bBC": false,
+                    "index": 1,
+                    "type": 2,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            0.3333333333333333,
+                            0.3333333333333333
+                        ]
+                    ],
+                    "gaussWeights": [
+                        0.5
+                    ],
+                    "shapeFuns": [
+                        "1. - x[1] - x[2]",
+                        "x[1]",
+                        "x[2]"
+                    ]
+                },
+                {
+                    "name": "StressBL2g",
+                    "dim": 1,
+                    "coordVars": [
+                        "x"
+                    ],
+                    "nNodes": 2,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [],
+                    "paramNames": [
+                        "fu",
+                        "fv"
+                    ],
+                    "paramValues": [
+                        0.0,
+                        0.0
+                    ],
+                    "bBC": true,
+                    "index": 1,
+                    "type": 1,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            -0.5773502691896258
+                        ],
+                        [
+                            0.5773502691896258
+                        ]
+                    ],
+                    "gaussWeights": [
+                        1.0,
+                        1.0
+                    ],
+                    "shapeFuns": [
+                        "0.5 * (1.0 - x[1])",
+                        "0.5 * (1.0 + x[1])"
+                    ]
+                }
+            ],
+            "eleTypes": [],
+            "pdeType": 1,
+            "dispNames": [
+                "u",
+                "v"
+            ],
+            "index": 0,
+            "bDynamic": false,
+            "sch": {},
+            "fieldDataClassName": "ElDispFieldData",
+            "dof": 2,
+            "dof2": 2,
+            "headerGuard": "ELDISP_FIELD_DATA_H",
+            "eleResNames": [
+                "sigmaXX",
+                "sigmaYY",
+                "sigmaXY",
+                "volume"
+            ]
+        }
+    ],
+    "caculateCode": ""
+}

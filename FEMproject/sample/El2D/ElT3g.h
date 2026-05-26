@@ -1,11 +1,11 @@
-#ifndef {{headerGuard}}
-#define {{headerGuard}}
-#include "CDFEG/{{baseClass}}.h"
+#ifndef ELT3G_H
+#define ELT3G_H
+#include "CDFEG/IsoEleBase.h"
 
-class {{ele.name}} : public CDFEG::{{baseClass}} {
+class ElT3g : public CDFEG::IsoEleBase {
 public:
-    {{ele.name}}(CDFEG::PhyFieldData* pData);
-    ~{{ele.name}}();
+    ElT3g(CDFEG::PhyFieldData* pData);
+    ~ElT3g();
 
     virtual CDFEG::EleSubResult& run(
         const std::vector<double>& r,
@@ -18,12 +18,15 @@ public:
         const std::map<std::string, std::vector<double>>& coef,
         const std::map<std::string, double>& matParams
     ) override;
-{% if baseClass == "IsoEleBase" %}
 
     virtual std::vector<double> shapeFun(
         const std::vector<double>& refc
     ) override;
-{% endif %}
+
+    virtual std::vector<double> coordTransFun(
+        const std::vector<double>& refc,
+        const std::vector<double>& coords
+    ) override;
 };
 
 #endif

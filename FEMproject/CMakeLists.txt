@@ -16,7 +16,6 @@ add_subdirectory(CDFEG)
 add_subdirectory(sample/truss1D)
 add_subdirectory(sample/truss2D)
 add_subdirectory(sample/truss3D)
-
 add_subdirectory(sample/El2D)
-
 add_subdirectory(sample/ElT3)
+add_subdirectory(sample/El2D0)
