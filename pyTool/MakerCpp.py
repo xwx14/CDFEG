@@ -157,6 +157,8 @@ class MakerCpp(MakerBase):
     def _makeEleSub(self, project, field, ele, output_path: str, file_lists: dict):
         base_class = self._get_ele_base_class(ele)
         femDataClassName = f"{project.name}Data"
+        if ele.vtkCellType is None:
+            ele.inferVTKCellType()
         shapefuns = [self._replaceCoordVars(x, project.coordVars) for x in ele.shapeFuns] if hasattr(ele, 'shapeFuns') else []
         context = {
             "ele": ele.toDict(),

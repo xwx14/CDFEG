@@ -8,15 +8,37 @@
     _dispNames = { {% for name in ele.dispNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
     _paramNames ={ {% for name in ele.paramNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
     _types.insert("{{ele.name}}");
-{% if ele.vtkCellType %}
-    _vtkCellType = VTKCellType::{{ele.vtkCellType}};
-{% else %}
-    // TODO: 设置 VTK 单元类型
-    // _vtkCellType = VTKCellType::VTK_<TYPE>;
-{% endif %}
 {{ele.initCode}}
 {% if baseClass == "IsoEleBase" %}
-
+{% set nGaus = ele.gaussPoints|length %}
+{% set nDisp = ele.dispNames|length %}
+{% set nVar = ele.nNodes * nDisp %}
+    _dim = {{ ele.dim }};
+    _nGaus = {{ nGaus }};
+    _nDisp = {{ nDisp }};
+    _nRefc = {{ ele.dim }};
+    _nCoor = {{ dim }};
+    _nVar = {{ nVar }};
+    _nNode = {{ ele.nNodes }};
+    _gaus.resize({{ nGaus }});
+    _refc.resize({{ nGaus * ele.dim }});
+{% for i in range(nGaus) %}
+    _gaus[{{ i }}] = {{ ele.gaussWeights[i] }};
+{% for j in range(ele.dim) %}
+    _refc[{{ i * ele.dim + j }}] = {{ ele.gaussPoints[i][j] }};
+{% endfor %}
+{% endfor %}
+    caculateShapeCoef({{ dim }});
+    _result.emass.resize(_nVar);
+    _result.eload.resize(_nVar);
+    _result.estif.resize(_nVar * _nVar);
+    _result.edamp.resize(_nVar * _nVar);
+{% endif %}
+{% if ele.vtkCellType %}
+    _vtkCellType = VTK_{{ele.vtkCellType}};
+{% else %}
+    // TODO: 设置 VTK 单元类型
+    // _vtkCellType = VTK_<TYPE>;
 {% endif %}
 }
 {#### Destructor function ####}

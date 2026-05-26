@@ -57,9 +57,11 @@ ele2.dispNames = ["u", "v"]
 ele2.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY", "volume"]
 ele2.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
 ele2.gaussPoints = [
-    [1.0 / 3.0, 1.0 / 3.0]
+    [2.0 / 3.0, 1.0 / 6.0],
+    [1.0 / 6.0, 2.0 / 3.0],
+    [1.0 / 6.0, 1.0 / 6.0]
 ]
-ele2.gaussWeights = [0.5]
+ele2.gaussWeights = [1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0]
 ele2.shapeFuns = [
     "1. - x[1] - x[2]",
     "x[1]",
