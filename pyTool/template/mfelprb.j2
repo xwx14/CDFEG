@@ -1,8 +1,10 @@
 PROBLEM DATA
+{%if bDynamic%}
 QUESTION: TimeStep
 VALUE: 0.1
 QUESTION: TotalTime
 VALUE: 1.0
+{%endif%}
 {%for mat in materials%}
 QUESTION: {{mat.name}}({{mat.strParams}})
 VALUE: #N# {{mat.nParams}} {%for p in mat.defaultParams%} {{p}}{%endfor%}

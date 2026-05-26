@@ -49,7 +49,7 @@ class MakerGidFile(MakerBase):
         os.makedirs(path, exist_ok=True)
 
         self.data={"name":pro.name,
-        "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[]}
+        "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"bDynamic":False}
         for field in pro.fields:
             # 添加场
             dof=len(field.dispNames)
@@ -60,6 +60,8 @@ class MakerGidFile(MakerBase):
             "dispNames":field.dispNames,
             "bDynamic":field.bDynamic,
             "index":index}
+            if field.bDynamic:
+                self.data["bDynamic"] = True
             self.data["fields"].append(field1)
             for ele in field.eleSubs:
                 # 添加单元
