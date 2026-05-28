@@ -16,7 +16,7 @@
 // 
 #ifndef GID_PROPOST_H
 #define GID_PROPOST_H
-#include "CDFEG.h"
+#include "GidResItem.h"
 #include "Processor.h"
 #include <string>
 #include <map>
@@ -32,6 +32,7 @@
  * @date 2025-3-27
  */
 namespace CDFEG {
+
 	class ElementBase;
 	class CDFEG_API GidProPost :public Processor
 	{
@@ -50,6 +51,7 @@ namespace CDFEG {
 		int gidMsh();
 		int writeNodes(std::ofstream& outFile, int dim);
 		virtual int post(int it = 0);
+		virtual int post2(int it = 0);
 	public:
 		// 网格文件
 		std::string _datFn;
@@ -62,6 +64,7 @@ namespace CDFEG {
 		std::vector<ElementBase*> _mshOutEle;
 		std::map< ElementBase*, int> _matStartID2;
 		std::vector<ElementBase*> _mshOutEle2;
+		std::vector<GidResItem> _resItems;
 	};
 }
 #endif

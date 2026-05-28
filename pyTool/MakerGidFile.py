@@ -93,6 +93,7 @@ class MakerGidFile(MakerBase):
         self.basFn=path+"\\"+pro.name+".bas"
         self.prbFn=path+"\\"+pro.name+".prb"
         self.cndFn=path+"\\"+pro.name+".cnd"
+        self.batFn=path+"\\"+pro.name+".bat"
 
     def _initFromParams(self,name:str,dim:int,proName):
         """从参数初始化"""
@@ -149,12 +150,16 @@ class MakerGidFile(MakerBase):
     # write2File 方法已移至基类 MakerBase
 
     def makeBas(self):
-        self.write2File('mfelbas.j2',self.basFn,self.data)
+        self.write2File('gidbas.j2',self.basFn,self.data)
     def makePrb(self):
-        self.write2File('mfelprb.j2',self.prbFn,self.data)
+        self.write2File('gidprb.j2',self.prbFn,self.data)
     def makeCnd(self):
-        self.write2File('mfelcnd.j2',self.cndFn,self.data)
+        self.write2File('gidcnd.j2',self.cndFn,self.data)
+    def makebat(self):
+        self.write2File('gidbat.j2',self.batFn,self.data)
+
     def makeAll(self):
         self.makeBas()
         self.makePrb()
         self.makeCnd()
+        self.makebat()

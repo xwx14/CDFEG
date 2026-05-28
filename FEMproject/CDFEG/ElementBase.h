@@ -107,7 +107,7 @@ namespace CDFEG {
 		int _nCoor;
 		// 单元子程序所需的材料参数名称
 		std::vector<std::string> _paramNames;
-
+		bool _bOutMsh = true;
 	};
 
 }

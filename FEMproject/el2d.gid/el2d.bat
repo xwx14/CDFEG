@@ -2,4 +2,4 @@
 echo project: %1
 echo project directory: %2
 echo problem directory: %3
-%3\{{name}}.exe %1 %2
+%3\el2d.exe %1 %2

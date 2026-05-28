@@ -30,6 +30,7 @@
                     "paramNames": [
                         "E",
                         "nu",
+                        "t",
                         "fx",
                         "fy"
                     ],
@@ -37,11 +38,12 @@
                         0.0,
                         0.0,
                         0.0,
+                        0.0,
                         0.0
                     ],
                     "bBC": false,
                     "index": 1,
-                    "type": 1,
+                    "type": 2,
                     "runCode": "",
                     "uCode": "",
                     "initCode": "",
@@ -53,7 +55,8 @@
                         "estif",
                         "emass",
                         "edamp"
-                    ]
+                    ],
+                    "vtkCellType": "TRIANGLE"
                 }
             ],
             "eleTypes": [],

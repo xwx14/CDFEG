@@ -35,7 +35,7 @@
     _result.edamp.resize(_nVar * _nVar);
 {% endif %}
 {% if ele.vtkCellType %}
-    _vtkCellType = VTK_{{ele.vtkCellType}};
+    _vtkCellType =VTKCellType::VTK_{{ele.vtkCellType}};
 {% else %}
     // TODO: 设置 VTK 单元类型
     // _vtkCellType = VTK_<TYPE>;

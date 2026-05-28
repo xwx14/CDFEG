@@ -8,6 +8,7 @@ set(SOURCES
     FemData.cpp
 
     GidPrePost2.cpp
+    GidResItem.cpp
     gidProPost.cpp
     inpReader.cpp
     IsoEleBase.cpp
@@ -25,6 +26,7 @@ set(HEADERS
     FemData.h
 
     GidPrePost2.h
+    GidResItem.h
     gidProPost.h
     InpDataStructures.h
     inpReader.h

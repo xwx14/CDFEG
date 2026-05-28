@@ -25,7 +25,7 @@ from DataEleSubG import DataEleSubG
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 
-project = DataProject("el", 2)
+project = DataProject("el2d", 2)
 field = DataField("ElDisp")
 s = 1 / (3**0.5)
 

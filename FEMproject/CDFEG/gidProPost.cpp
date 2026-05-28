@@ -23,9 +23,92 @@
 #include "PhyFieldData.h"
 #include "ElementBase.h"
 namespace CDFEG {
+
+	static std::string vtkCellTypeToGidElemType(VTKCellType type)
+	{
+		switch (type)
+		{
+		case VTK_VERTEX:
+			return "Point";
+		case VTK_LINE:
+		case VTK_POLY_LINE:
+		case VTK_QUADRATIC_EDGE:
+		case VTK_CUBIC_LINE:
+		case VTK_HIGHER_ORDER_EDGE:
+		case VTK_PARAMETRIC_CURVE:
+		case VTK_LAGRANGE_CURVE:
+		case VTK_BEZIER_CURVE:
+			return "Line";
+		case VTK_TRIANGLE:
+		case VTK_TRIANGLE_STRIP:
+		case VTK_QUADRATIC_TRIANGLE:
+		case VTK_BIQUADRATIC_TRIANGLE:
+		case VTK_HIGHER_ORDER_TRIANGLE:
+		case VTK_PARAMETRIC_TRI_SURFACE:
+		case VTK_LAGRANGE_TRIANGLE:
+		case VTK_BEZIER_TRIANGLE:
+			return "Triangle";
+		case VTK_QUAD:
+		case VTK_PIXEL:
+		case VTK_QUADRATIC_QUAD:
+		case VTK_BIQUADRATIC_QUAD:
+		case VTK_QUADRATIC_LINEAR_QUAD:
+		case VTK_QUADRATIC_POLYGON:
+		case VTK_HIGHER_ORDER_QUAD:
+		case VTK_PARAMETRIC_QUAD_SURFACE:
+		case VTK_LAGRANGE_QUADRILATERAL:
+		case VTK_BEZIER_QUADRILATERAL:
+			return "Quadrilateral";
+		case VTK_TETRA:
+		case VTK_QUADRATIC_TETRA:
+		case VTK_HIGHER_ORDER_TETRAHEDRON:
+		case VTK_PARAMETRIC_TETRA_REGION:
+		case VTK_LAGRANGE_TETRAHEDRON:
+		case VTK_BEZIER_TETRAHEDRON:
+			return "Tetrahedra";
+		case VTK_HEXAHEDRON:
+		case VTK_VOXEL:
+		case VTK_QUADRATIC_HEXAHEDRON:
+		case VTK_TRIQUADRATIC_HEXAHEDRON:
+		case VTK_BIQUADRATIC_QUADRATIC_HEXAHEDRON:
+		case VTK_HIGHER_ORDER_HEXAHEDRON:
+		case VTK_PARAMETRIC_HEX_REGION:
+		case VTK_LAGRANGE_HEXAHEDRON:
+		case VTK_BEZIER_HEXAHEDRON:
+			return "Hexahedra";
+		case VTK_WEDGE:
+		case VTK_QUADRATIC_WEDGE:
+		case VTK_QUADRATIC_LINEAR_WEDGE:
+		case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
+		case VTK_HIGHER_ORDER_WEDGE:
+		case VTK_LAGRANGE_WEDGE:
+		case VTK_BEZIER_WEDGE:
+		case VTK_PENTAGONAL_PRISM:
+		case VTK_HEXAGONAL_PRISM:
+			return "Prism";
+		case VTK_PYRAMID:
+		case VTK_QUADRATIC_PYRAMID:
+		case VTK_TRIQUADRATIC_PYRAMID:
+		case VTK_HIGHER_ORDER_PYRAMID:
+		case VTK_LAGRANGE_PYRAMID:
+		case VTK_BEZIER_PYRAMID:
+			return "Pyramid";
+		case VTK_POLYGON:
+		case VTK_HIGHER_ORDER_POLYGON:
+			return "Polygon";
+		default:
+			return "Triangle";
+		}
+	}
 	GidProPost::GidProPost(FEMData* data) :Processor(data,nullptr)
 	{
-
+		for (PhyFieldData* f : _femData->_phyDatas)
+		{
+			for (ElementBase* e : f->_eleSubs)
+			{
+				if (e->_bOutMsh)_mshOutEle.push_back(e);
+			}
+		}
 	}
 	GidProPost::~GidProPost()
 	{
@@ -261,7 +344,7 @@ namespace CDFEG {
 		for (ElementBase* eleSub : _mshOutEle)
 		{
 			iMatStart = _matStartID2[eleSub];
-			outFile << "Mesh \"" << eleSub->_name << "\" Dimension " << dim << " Elemtype Quadrilateral Nnode  " << eleSub->_nNode << std::endl;
+			outFile << "Mesh \"" << eleSub->_name << "\" Dimension " << dim << " Elemtype " << vtkCellTypeToGidElemType(eleSub->_vtkCellType) << " Nnode  " << eleSub->_nNode << std::endl;
 			outFile << "Coordinates" << std::endl;
 			if (bFirst)
 			{
@@ -330,7 +413,7 @@ namespace CDFEG {
 			if (phyData->_nodeRes.size() == 0)continue;
 			dof = phyData->_dof;
 			outFile << "Result \""<<phyData->_name<<"\" \"Load Analysis\"  ";
-			outFile << std::setw(10) << it << " ";
+			outFile << std::setw(10) << it+1 << " ";
 			outFile << phyData->_resForm << std::endl;
 			outFile << "ComponentNames ";
 			for (const std::string& disp : phyData->_dispNames)
@@ -360,7 +443,52 @@ namespace CDFEG {
 		return 1;
 	}
 
-
-
-
+	int GidProPost::post2(int it)
+	{
+		std::ofstream outFile;
+		gidMsh();
+		if (it == 0)
+		{
+			outFile.open(_gidResFn, std::ios::out);
+			if (!outFile.is_open())return 0;
+			outFile << "GID Post Results File 1.0" << std::endl;
+		}
+		else
+		{
+			outFile.open(_gidResFn, std::ios::app);
+			if (!outFile.is_open())return 0;
+		}
+		int nNodes = _femData->_nPts;
+		for (GidResItem& item : _resItems)
+		{
+			outFile << "Result \"" << item._name << "\" \"Load Analysis\"  ";
+			outFile << std::setw(10) << it + 1 << " ";
+			outFile << gidResultTypeToStr(item._type) << " OnNodes" << std::endl;
+			outFile << "ComponentNames ";
+			for (const std::string& vn : item._ValNames)
+			{
+				outFile << "\"" << vn << "\" ";
+			}
+			outFile << std::endl;
+			outFile << "Values" << std::endl;
+			std::vector<std::vector<double>*> valPtrs;
+			valPtrs.reserve(item._iFields.size());
+			for (size_t iv = 0; iv < item._iFields.size(); ++iv)
+			{
+				valPtrs.push_back(&(_femData->_phyDatas[item._iFields[iv]]->_nodeRes[item._ValNames[iv]]));
+			}
+			for (int iNode = 0; iNode < nNodes; ++iNode)
+			{
+				outFile << std::setw(10) << iNode + 1;
+				outFile << std::setw(16) << std::scientific << std::setprecision(7);
+				for (auto* pv : valPtrs)
+				{
+					outFile << " " << (*pv)[iNode];
+				}
+				outFile << std::endl;
+			}
+			outFile << "End Values" << std::endl;
+		}
+		return 1;
+	}
 }
