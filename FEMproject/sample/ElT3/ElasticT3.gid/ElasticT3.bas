@@ -2,7 +2,7 @@
 *npoin  *nelem 
 ** name=time,structure="F64"
 *GenData(TimeStep) *GenData(TotalTime)
-** name=mat_ElT3,structure="F64**4",type="mat",index=0
+** name=mat_ElT3,structure="F64**5",type="mat",index=0
 *set var N=GenData(ElT3,int)
 *for(i=1;i<=N;i=i+5)
 *GenData(ElT3,*operation(i+0)) *GenData(ElT3,*operation(i+1)) *GenData(ElT3,*operation(i+2)) *GenData(ElT3,*operation(i+3)) *GenData(ElT3,*operation(i+4)) 
@@ -29,7 +29,7 @@
 *NodesNum *cond(2) *cond(4)
 *end  
 ** name=ElT3,structure="I32**5",type="elem",index=1
-*set cond element-ElT3 *elems
+*set cond Surface-ElT3 *elems
 *loop elems *OnlyIncond
 *ElemsNum *elemsConec *cond(1)
 *format "%10i %10i %10i %10i %10i "
