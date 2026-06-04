@@ -211,3 +211,7 @@ ele.paramNames = ["E", "A"]
 maker = MakerBase()
 maker.write2File("element.cpp.j2", "Truss2D.cpp", ele.toDict())
 ```
+
+# 联系方式
+
+<img src="picture\weixin.png" style="zoom: 33%;" />

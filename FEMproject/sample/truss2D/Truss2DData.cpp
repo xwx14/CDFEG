@@ -31,8 +31,8 @@ int Truss2DData::caculate() {
     f->initMatrix();
     f->eProgram();
     f->solve();
-    f->uPhy();
     f->_equSys.calRightVals();
+    f->uPhy();
     return 1;
 }
 

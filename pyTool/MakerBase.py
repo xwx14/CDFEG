@@ -25,7 +25,8 @@ MakerBase.py - 代码生成器基类
 作者：系统自动生成
 日期：2025-01-06
 """
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, DictLoader
+import sqlite3
 import os
 from abc import ABC, abstractmethod
 
@@ -45,19 +46,22 @@ class MakerBase(ABC):
         Args:
             template_dir: 模板目录路径（如果为 None，使用默认的 template 目录）
         """
-        # 获取当前脚本所在目录
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # 确定模板目录
         if template_dir is None:
             template_dir = os.path.join(self.current_dir, "template")
 
-        # 初始化 Jinja2 环境
+        db_path = os.path.join(template_dir, "templates.db")
+        conn = sqlite3.connect(db_path)
+        rows = conn.execute("SELECT name, content FROM CppTemplates").fetchall()
+        conn.close()
+        templates_dict = dict(rows)
+
         self.env = Environment(
-            loader=FileSystemLoader(template_dir),
-            trim_blocks=True,      # 移除模板空白行
-            lstrip_blocks=True,     # 移除模板行首空白
-            autoescape=False        # 不自动转义（用于生成代码）
+            loader=DictLoader(templates_dict),
+            trim_blocks=True,
+            lstrip_blocks=True,
+            autoescape=False
         )
         
 

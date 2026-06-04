@@ -37,6 +37,7 @@ project.addField(field)
 # 生成器
 outPath="sample/ElT3"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
+maker.mainMode=1
 maker.makeAll()
 gidMaker=MakerGidFile(project,outPath+"/gid")
 gidMaker.makeAll()

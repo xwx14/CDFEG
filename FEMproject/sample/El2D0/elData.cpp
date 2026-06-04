@@ -29,7 +29,7 @@ elData::~elData() {
 int elData::caculate() {
     ElDispFieldData* aField = static_cast<ElDispFieldData*>(_phyDatas[0]);
     aField->initMatrix();
-    aField->eProgram_el();
+    aField->eProgram();
     aField->solve();
     aField->uPhy();
     aField->_equSys.calRightVals();
