@@ -15,8 +15,8 @@
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-sys.path.append("./")
-sys.path.append("../")
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from DataProject import DataProject
 from DataField import DataField
 from DataEleSub import DataEleSub
@@ -34,6 +34,8 @@ ele.paramNames=["E","A"]
 field.addEleSub(ele)
 # 添加场
 project.addField(field)
+# 求解步骤
+project.cmds.append(("imp",0))
 # 生成器
 outPath="truss1D"
 maker=MakerCpp(project,outPath)

@@ -1,0 +1,6 @@
+	{{PhyClassName}}* phy{{PhyIndex}} = static_cast<{{PhyClassName}}*>(_phyDatas[{{PhyIndex}}]);
+	phy{{PhyIndex}}->initMatrix();
+	phy{{PhyIndex}}->eProgram();
+	phy{{PhyIndex}}->solve();
+	phy{{PhyIndex}}->uPhy();
+	phy{{PhyIndex}}->_equSys.calRightVals();

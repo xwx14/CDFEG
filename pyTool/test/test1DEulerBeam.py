@@ -15,8 +15,8 @@
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-sys.path.append("./")
-sys.path.append("../")
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from DataProject import DataProject
 from DataField import DataField
 from DataEleSub import DataEleSub

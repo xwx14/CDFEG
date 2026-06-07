@@ -125,10 +125,12 @@ class MakerCpp(MakerBase):
 
     def _makeFEMData(self, project, output_path: str, file_lists: dict):
         femDataClassName = f"{project.name}Data"
+        project.caculateCode=self.parseCmds(project)
         context = {
             "femDataClassName": femDataClassName,
             "headerGuard": f"{project.name.upper()}_DATA_H",
-            "project": project.toDict()
+            "project": project.toDict(),
+
         }
         h_filename = f"{project.name}Data.h"
         self.write2File("femdata.h.j2", h_filename, context, output_path=output_path)
@@ -275,7 +277,29 @@ class MakerCpp(MakerBase):
         with open(cmake_file, 'a', encoding='utf-8') as f:
             f.write(f"\n{add_line}\n")
         print(f"✅ 已追加 add_subdirectory({sub_dir}) 到: {cmake_file}")
+    def parseCmds(self,project):
+        """
+        解析求解步骤命令列表，生成计算代码字符串
 
+        Args:
+            project: DataProject 项目对象
+
+        Returns:
+            生成的计算代码字符串
+        """
+        code_lines=""
+        for cmd in project.cmds:
+            pIndex = cmd[1]
+            phyClassName = project.fields[pIndex].fieldDataClassName 
+            dict0={"PhyClassName":phyClassName,"PhyIndex":pIndex}
+            if len(cmd)>2:
+                for i in range(2,len(cmd)):
+                    pIndex2=cmd[i]
+                    phyClassName2 = project.fields[pIndex2].fieldDataClassName
+                    dict0[f"PhyClassName{i}"]=phyClassName2
+                    dict0[f"PhyIndex{i}"]=pIndex2
+            code_lines += self.write2String(f"{cmd[0]}.cmd.j2", dict0) + "\n"
+        return code_lines
 
     def makeAll(self):
         """

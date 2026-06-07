@@ -53,7 +53,11 @@ class MakerBase(ABC):
 
         db_path = os.path.join(template_dir, "templates.db")
         conn = sqlite3.connect(db_path)
-        rows = conn.execute("SELECT name, content FROM CppTemplates").fetchall()
+
+        tableNames = [row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+        rows = []
+        for tableName in tableNames:
+            rows += conn.execute(f"SELECT name, content FROM {tableName}").fetchall()
         conn.close()
         templates_dict = dict(rows)
 
@@ -63,7 +67,22 @@ class MakerBase(ABC):
             lstrip_blocks=True,
             autoescape=False
         )
-        
+    def write2String(self, template_name: str, context: dict) -> str:
+        """
+        使用模板生成字符串
+
+        Args:
+            template_name: 模板文件名（如 "main.cpp.j2"）
+            context: 额外的模板上下文
+            """
+        try:
+            template = self.env.get_template(template_name)
+            output = template.render(**context)
+            return output
+        except Exception as e:
+            print(f"❌ 模板渲染失败: {template_name}")
+            print(f"   错误信息: {str(e)}")
+            raise
 
     def write2File(self, template_name: str, output_filename: str, context: dict , output_path: str = None):
         """
