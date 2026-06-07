@@ -212,6 +212,8 @@ maker = MakerBase()
 maker.write2File("element.cpp.j2", "Truss2D.cpp", ele.toDict())
 ```
 
+想获得商业授权或更多帮助，请联系作者。
+
 # 联系方式
 
 <img src="picture\weixin.png" style="zoom: 33%;" />
