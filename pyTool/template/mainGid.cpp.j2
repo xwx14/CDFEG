@@ -3,7 +3,7 @@
 #include "{{field.fieldDataClassName}}.h"
 {% endfor %}
 #include "{{project.name}}Data.h"
-#include "CDFEG/gidProPost.h"
+#include "CDFEG/gidPrePost.h"
 
 int main(int argc, char* argv[]) {
 	if (argc < 3) {
@@ -13,9 +13,9 @@ int main(int argc, char* argv[]) {
     std::string project = argv[1];
 	std::string path = argv[2];
     {{femDataClassName}} data;
-    CDFEG::GidProPost gidProPost(&data);
-	gidProPost.setFilePath(path, project);
+    CDFEG::GidPrePost gidPrePost(&data);
+	gidPrePost.setFilePath(path, project);
     data.caculate();
-    gidProPost.post();
+    gidPrePost.post();
     return 0;
 }

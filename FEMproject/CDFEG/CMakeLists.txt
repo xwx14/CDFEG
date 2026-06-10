@@ -9,7 +9,7 @@ set(SOURCES
 
     GidPrePost2.cpp
     GidResItem.cpp
-    gidProPost.cpp
+    gidPrePost.cpp
     inpReader.cpp
     IsoEleBase.cpp
     MatrixFun.cpp
@@ -27,7 +27,7 @@ set(HEADERS
 
     GidPrePost2.h
     GidResItem.h
-    gidProPost.h
+    gidPrePost.h
     InpDataStructures.h
     inpReader.h
     IsoEleBase.h

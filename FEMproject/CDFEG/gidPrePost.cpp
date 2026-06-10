@@ -18,7 +18,7 @@
 #include <sstream>
 #include <map>
 #include <iomanip>
-#include "gidProPost.h"
+#include "gidPrePost.h"
 #include "FemData.h"
 #include "PhyFieldData.h"
 #include "ElementBase.h"
@@ -100,7 +100,7 @@ namespace CDFEG {
 			return "Triangle";
 		}
 	}
-	GidProPost::GidProPost(FEMData* data) :Processor(data,nullptr)
+	GidPrePost::GidPrePost(FEMData* data) :Processor(data,nullptr)
 	{
 		for (PhyFieldData* f : _femData->_phyDatas)
 		{
@@ -110,13 +110,13 @@ namespace CDFEG {
 			}
 		}
 	}
-	GidProPost::~GidProPost()
+	GidPrePost::~GidPrePost()
 	{
 	}
 
 
 
-	void GidProPost::setFilePath(const std::string& parentPath, const std::string& name)
+	void GidPrePost::setFilePath(const std::string& parentPath, const std::string& name)
 	{
 		//std::string path= parentPath + "\\" + name + ".gid\\";
 		std::string path = parentPath+"\\";
@@ -125,7 +125,7 @@ namespace CDFEG {
 		_gidResFn = path + name + ".post.res";
 	}
 
-	int GidProPost::pre()
+	int GidPrePost::pre()
 	{
 		_datReader.setFilePath(_datFn);
 		if (!_datReader.open()) return -1;
@@ -165,7 +165,7 @@ namespace CDFEG {
 	}
 
 
-	int GidProPost::readMate(const std::map<std::string, std::string>& params)
+	int GidPrePost::readMate(const std::map<std::string, std::string>& params)
 	{
 		std::string name = params.at("name");
 		ElementBase* curEle = nullptr;
@@ -197,7 +197,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readTime(const std::string& line)
+	int GidPrePost::readTime(const std::string& line)
 	{
 		std::vector<double> vals = TextReader::splitDoubles(line, " ,");
 		switch (vals.size())
@@ -216,7 +216,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readBaseData(const std::string& line)
+	int GidPrePost::readBaseData(const std::string& line)
 	{
 		std::vector<int> vals = TextReader::splitInts(line, " ,");
 		_nPts = vals[0];
@@ -224,7 +224,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readCoord(const std::map<std::string, std::string>& params)
+	int GidPrePost::readCoord(const std::map<std::string, std::string>& params)
 	{
 		int id = -1;
 		const std::string& line = _datReader.getCurrentLine();
@@ -255,7 +255,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readElement(const std::map<std::string, std::string>& params)
+	int GidPrePost::readElement(const std::map<std::string, std::string>& params)
 	{
 		int id = -1;
 		int mateId = -1;
@@ -277,7 +277,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readID(const std::map<std::string, std::string>& params)
+	int GidPrePost::readID(const std::map<std::string, std::string>& params)
 	{
 		int nodeIdIn = -1;
 		std::string FieldName = params.at("name").substr(2);
@@ -301,7 +301,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::readUBF(const std::map<std::string, std::string>& params)
+	int GidPrePost::readUBF(const std::map<std::string, std::string>& params)
 	{
 		std::string FieldName = params.at("name").substr(3);
 		PhyFieldData* curField = nullptr;
@@ -326,7 +326,7 @@ namespace CDFEG {
 		return 0;
 	}
 
-	int GidProPost::gidMsh()
+	int GidPrePost::gidMsh()
 	{
 		// 将网格数据写入
 		std::ofstream outFile;
@@ -370,7 +370,7 @@ namespace CDFEG {
 		return 1;
 	}
 
-	int GidProPost::writeNodes(std::ofstream& outFile, int dim)
+	int GidPrePost::writeNodes(std::ofstream& outFile, int dim)
 	{
 		int nNode = _femData->_nodeIdMap.size();
 		int iVal = -1;
@@ -388,7 +388,7 @@ namespace CDFEG {
 		return 1;
 	}
 
-	int GidProPost::post(int it)
+	int GidPrePost::post(int it)
 	{
 		std::ofstream outFile;
 		gidMsh();
@@ -443,7 +443,7 @@ namespace CDFEG {
 		return 1;
 	}
 
-	int GidProPost::post2(int it)
+	int GidPrePost::post2(int it)
 	{
 		std::ofstream outFile;
 		gidMsh();

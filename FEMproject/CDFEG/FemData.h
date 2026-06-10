@@ -63,13 +63,13 @@ namespace CDFEG {
 		 */
 		void addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType);
 		/**
- * @brief 添加edge
- * @param id 单元id
- * @param nodeIds edge节点id列表
- * @return
- * @author Xie Wenxi
- * @date 2025-3-17
- */
+		* @brief 添加edge
+		* @param id 单元id
+		* @param nodeIds edge节点id列表
+		* @return
+		* @author Xie Wenxi
+		* @date 2025-3-17
+		*/
 		void addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType);
 		/**
 		 * @brief 设置单元材料号

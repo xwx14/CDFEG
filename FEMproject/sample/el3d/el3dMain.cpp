@@ -1,11 +1,11 @@
 #include <iostream>
 #include "aFieldData.h"
 #include "el3dData.h"
-#include "SIFEG\gidProPost.h"
+#include "SIFEG\gidPrePost.h"
 #include "SIFEG\inpReader.h"
 int testGID(el3dData& data) {
     // TODO: 添加测试数据
-	SIFEG::GidProPost pre(&data);
+	SIFEG::GidPrePost pre(&data);
 	pre.setFilePath("D:\\", "el3d1");
 	pre.pre();
 	data.caculate();
