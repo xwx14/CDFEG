@@ -56,3 +56,6 @@ Thumbs.db
 /plans
 /FEMproject/test
 /*.code-workspace
+/.cursor/rules
+/.vscode
+/FEMproject/el2d.gid/el2d.exe

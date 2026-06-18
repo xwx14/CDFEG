@@ -7,6 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EIGEN_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third CACHE PATH "Eigen include directory")
 
+# 源文件为 UTF-8 编码（含中文注释），强制 MSVC 按 UTF-8 解析，避免按系统代码页(GBK)解码导致乱码编译错误
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/output)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
@@ -18,3 +23,4 @@ add_subdirectory(sample/truss2D)
 add_subdirectory(sample/truss3D)
 add_subdirectory(sample/El2D)
 add_subdirectory(sample/ElT3)
+add_subdirectory(sample/DEl2D)

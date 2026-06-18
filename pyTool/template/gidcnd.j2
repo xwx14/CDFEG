@@ -16,7 +16,7 @@ END CONDITION
 {% endfor %}
 {%- if field.bDynamic %}
 {# 动态问题边界条件 #}
-{# 动态问题边界条件-速度 #}
+{# 动态问题边界条件-初位移 #}
 {% for cond_type in cond_types %}
 CONDITION: {{cond_type}}-D1{{field.fullname}}
 CONDTYPE: over {{cond_type}}s
@@ -27,13 +27,24 @@ VALUE: 0.0
 {% endfor %}
 END CONDITION
 {% endfor %}
-{# 动态问题边界条件-加速度 #}
+{# 动态问题边界条件-初速度 #}
 {% for cond_type in cond_types %}
 CONDITION: {{cond_type}}-D2{{field.fullname}}
 CONDTYPE: over {{cond_type}}s
 CONDMESHTYPE: over nodes
 {% for disp in field.dispNames %}
 QUESTION: {{disp}}-D2
+VALUE: 0.0
+{% endfor %}
+END CONDITION
+{% endfor %}
+{# 动态问题边界条件-初加速度 #}
+{% for cond_type in cond_types %}
+CONDITION: {{cond_type}}-D3{{field.fullname}}
+CONDTYPE: over {{cond_type}}s
+CONDMESHTYPE: over nodes
+{% for disp in field.dispNames %}
+QUESTION: {{disp}}-D3
 VALUE: 0.0
 {% endfor %}
 END CONDITION

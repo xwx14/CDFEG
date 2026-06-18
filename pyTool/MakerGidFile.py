@@ -64,31 +64,10 @@ class MakerGidFile(MakerBase):
                 self.data["bDynamic"] = True
             self.data["fields"].append(field1)
             for ele in field.eleSubs:
-                # 添加单元
-                idType="elemsConec"
-                if ele.bBC:
-                    idType="globalnodes"
-                self.data['elems'].append({
-                    "name":ele.name,
-                    "nNodes":ele.nNodes,
-                    "type":getEleTypeName(ele.type),
-                    "idType":idType,
-                    "index":ele.index
-                    })
-                # 添加材料
-                nd=len(ele.paramValues)
-                nParams=len(ele.paramNames)
-                if nd<nParams:
-                    for i in range(nParams-nd):
-                        ele.paramValues.append(0.0)
-                self.data["materials"].append( {
-                    "name":ele.name,
-                    "nParams":nParams,
-                    "params":ele.paramNames,
-                    "defaultParams":ele.paramValues,
-                    "strParams":",".join(ele.paramNames),
-                    "index":index
-                    })
+                # 添加单元（index 用 ele.index）
+                self.addElem(ele.name, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
+                # 添加材料（index 用 field.index）
+                self.addMaterial(ele.name, ele.paramNames, ele.paramValues, index)
 
         self.basFn=path+"\\"+pro.name+".bas"
         self.prbFn=path+"\\"+pro.name+".prb"

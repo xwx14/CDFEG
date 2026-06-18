@@ -25,10 +25,56 @@ MakerBase.py - 代码生成器基类
 作者：系统自动生成
 日期：2025-01-06
 """
-from jinja2 import Environment, DictLoader
-import sqlite3
+from jinja2 import Environment, FileSystemLoader
 import os
+import sys
 from abc import ABC, abstractmethod
+
+
+# 当标准输出无法编码 emoji 时（如 Windows GBK/cp936 控制台）的降级映射：
+# 状态类保留语义（ASCII 标签），装饰类（日志前缀）直接剔除。
+_EMOJI_FALLBACK = {
+    "✅": "[OK]", "❌": "[ERR]", "⚠️": "[!]", "⚠": "[!]",
+    "🚀": "", "📦": "", "📄": "", "📝": "", "📋": "",
+    "📁": "", "🔧": "", "📊": "",
+}
+
+
+def _stdoutSupportsEmoji() -> bool:
+    """检测标准输出流能否编码 emoji。
+    GBK/cp936 等 CJK 控制台无法编码 emoji 返回 False；
+    UTF-8 终端或设置 PYTHONUTF8=1 / PYTHONIOENCODING=utf-8 时返回 True。
+    """
+    enc = getattr(sys.stdout, "encoding", None)
+    if not enc:
+        return False
+    try:
+        "✅".encode(enc)
+        return True
+    except (UnicodeEncodeError, LookupError):
+        return False
+
+
+# 模块加载时检测一次，缓存结果（运行期 stdout 通常不变）
+_CAN_EMOJI = _stdoutSupportsEmoji()
+
+
+def _stripEmoji(msg: str) -> str:
+    """stdout 不支持 emoji 时按映射降级或剔除；支持时原样返回。"""
+    if _CAN_EMOJI:
+        return msg
+    for em, fb in _EMOJI_FALLBACK.items():
+        msg = msg.replace(em, fb)
+    return msg
+
+
+def safePrint(*args, **kwargs):
+    """print 包装：自动降级 stdout 无法编码的 emoji，避免 UnicodeEncodeError。"""
+    if _CAN_EMOJI:
+        print(*args, **kwargs)
+    else:
+        args = tuple(_stripEmoji(a) if isinstance(a, str) else a for a in args)
+        print(*args, **kwargs)
 
 
 class MakerBase(ABC):
@@ -51,18 +97,8 @@ class MakerBase(ABC):
         if template_dir is None:
             template_dir = os.path.join(self.current_dir, "template")
 
-        db_path = os.path.join(template_dir, "templates.db")
-        conn = sqlite3.connect(db_path)
-
-        tableNames = [row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        rows = []
-        for tableName in tableNames:
-            rows += conn.execute(f"SELECT name, content FROM {tableName}").fetchall()
-        conn.close()
-        templates_dict = dict(rows)
-
         self.env = Environment(
-            loader=DictLoader(templates_dict),
+            loader=FileSystemLoader(template_dir),
             trim_blocks=True,
             lstrip_blocks=True,
             autoescape=False
@@ -80,7 +116,7 @@ class MakerBase(ABC):
             output = template.render(**context)
             return output
         except Exception as e:
-            print(f"❌ 模板渲染失败: {template_name}")
+            safePrint(f"❌ 模板渲染失败: {template_name}")
             print(f"   错误信息: {str(e)}")
             raise
 
@@ -112,10 +148,10 @@ class MakerBase(ABC):
             with open(final_path, 'w', encoding='utf-8') as f:
                 f.write(output)
 
-            print(f"✅ 已生成: {output_filename}")
+            safePrint(f"✅ 已生成: {output_filename}")
 
         except Exception as e:
-            print(f"❌ 生成失败: {output_filename}")
+            safePrint(f"❌ 生成失败: {output_filename}")
             print(f"   错误信息: {str(e)}")
             raise
 

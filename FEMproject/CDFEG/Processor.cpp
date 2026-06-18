@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 #include "Processor.h"
+#include "PhyFieldData.h"
 #include "FemData.h"
 namespace CDFEG {
 	Processor::Processor(FEMData* data, PhyFieldData* fieldData)

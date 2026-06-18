@@ -55,6 +55,5 @@ namespace CDFEG {
 		int _nEles = 0;
 	};
 }
-#include "PhyFieldData.h"
-#include "FemData.h"
+
 #endif

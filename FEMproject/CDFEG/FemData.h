@@ -21,10 +21,10 @@
 #include "CDFEG.h"
 #include "ElementBase.h"
 #include "EquationSystem.h"
-
 namespace CDFEG {
 	class PhyFieldData;
 	class ElementBase;
+	class Processor;
 	// 有限元空间数据
 	class CDFEG_API FEMData {
 	public:
@@ -139,7 +139,8 @@ namespace CDFEG {
 		std::map<int, int> _eleIdMap;
 		// first为edge单元号，second为edge所在的单元号（均为程序中）
 		std::map<int, int> _edgeIdMap;
-
+		// 前后处理
+		std::vector<Processor*> _processors;
 	};
 };
 #endif

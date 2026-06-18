@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-from MakerBase import MakerBase
+from MakerBase import MakerBase, safePrint
 from DataProject import DataProject
 from DataField import DataField
 from DataEleSub import DataEleSub
@@ -219,15 +219,15 @@ class MakerCpp(MakerBase):
 
         if iProgramType == 0:
             self._makeMain(project, output_path, iProgramType, file_lists)
-        print(f"\n📝 生成全局 FEMData 类...")
+        safePrint(f"\n📝 生成全局 FEMData 类...")
         self._makeFEMData(project, output_path, file_lists)
         for field in project.fields:
-            print(f"\n📝 生成场 '{field.name}' 的文件...")
+            safePrint(f"\n📝 生成场 '{field.name}' 的文件...")
             self._makePhyFieldData(project, field, output_path, file_lists)
             for ele in field.eleSubs:
                 self._makeEleSub(project, field, ele, output_path, file_lists)
 
-        print(f"\n📄 生成项目 CMakeLists.txt...")
+        safePrint(f"\n📄 生成项目 CMakeLists.txt...")
         self._makeCMakeLists(project, output_path, iProgramType, file_lists)
 
     def makeSlnCMake(self):
@@ -245,23 +245,23 @@ class MakerCpp(MakerBase):
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(CDFEG_LIB_DIR, dst)
-        print(f"✅ 已复制 CDFEG 库到: {dst}")
+        safePrint(f"✅ 已复制 CDFEG 库到: {dst}")
 
     def _copy_third(self):
         dst = os.path.join(self.sln_dir, "third")
         if os.path.exists(dst):
             shutil.rmtree(dst)
         shutil.copytree(THIRD_DIR, dst)
-        print(f"✅ 已复制 third 目录到: {dst}")
+        safePrint(f"✅ 已复制 third 目录到: {dst}")
 
     def _add_to_existing_sln(self, project_output_path: str):
         if not self.sln_cmake_path:
-            print("⚠️  未提供 sln_cmake_path，跳过追加 add_subdirectory")
+            safePrint("⚠️  未提供 sln_cmake_path，跳过追加 add_subdirectory")
             return
 
         cmake_file = os.path.abspath(self.sln_cmake_path)
         if not os.path.isfile(cmake_file):
-            print(f"⚠️  解决方案 CMakeLists.txt 不存在: {cmake_file}")
+            safePrint(f"⚠️  解决方案 CMakeLists.txt 不存在: {cmake_file}")
             return
 
         sub_dir = os.path.relpath(project_output_path, os.path.dirname(cmake_file)).replace("\\", "/")
@@ -271,12 +271,12 @@ class MakerCpp(MakerBase):
             content = f.read()
 
         if add_line in content:
-            print(f"⚠️  add_subdirectory({sub_dir}) 已存在，跳过追加")
+            safePrint(f"⚠️  add_subdirectory({sub_dir}) 已存在，跳过追加")
             return
 
         with open(cmake_file, 'a', encoding='utf-8') as f:
             f.write(f"\n{add_line}\n")
-        print(f"✅ 已追加 add_subdirectory({sub_dir}) 到: {cmake_file}")
+        safePrint(f"✅ 已追加 add_subdirectory({sub_dir}) 到: {cmake_file}")
     def parseCmds(self,project):
         """
         解析求解步骤命令列表，生成计算代码字符串
@@ -305,34 +305,34 @@ class MakerCpp(MakerBase):
         """
         生成所有项目的全部文件
         """
-        print(f"\n🚀 开始生成 C++ 代码...")
-        print(f"📦 项目数量: {len(self.projects)}")
-        print(f"📋 生成模式: {'新解决方案' if self.mode == 'new' else '添加到现有项目'}")
+        safePrint(f"\n🚀 开始生成 C++ 代码...")
+        safePrint(f"📦 项目数量: {len(self.projects)}")
+        safePrint(f"📋 生成模式: {'新解决方案' if self.mode == 'new' else '添加到现有项目'}")
 
         if self.mode == 'new':
-            print(f"\n📦 复制 CDFEG 基础库...")
+            safePrint(f"\n📦 复制 CDFEG 基础库...")
             self._copy_cdfeg_lib()
-            print(f"\n📦 复制 third 依赖目录...")
+            safePrint(f"\n📦 复制 third 依赖目录...")
             self._copy_third()
 
         for project, iProgramType in self.projects:
             project_output_path = self._get_project_output_path(project)
-            print(f"\n{'='*50}")
-            print(f"📦 项目名称: {project.name}")
-            print(f"📁 输出路径: {project_output_path}")
-            print(f"🔧 程序类型: {self._get_program_type_name(iProgramType)}")
-            print(f"📊 场数量: {len(project.fields)}")
-            print(f"{'='*50}")
+            safePrint(f"\n{'='*50}")
+            safePrint(f"📦 项目名称: {project.name}")
+            safePrint(f"📁 输出路径: {project_output_path}")
+            safePrint(f"🔧 程序类型: {self._get_program_type_name(iProgramType)}")
+            safePrint(f"📊 场数量: {len(project.fields)}")
+            safePrint(f"{'='*50}")
             self.makeProject(project, project_output_path, iProgramType)
 
             if self.mode == 'add':
                 self._add_to_existing_sln(project_output_path)
 
         if self.mode == 'new':
-            print(f"\n📄 生成解决方案 CMakeLists.txt...")
+            safePrint(f"\n📄 生成解决方案 CMakeLists.txt...")
             self.makeSlnCMake()
 
-        print(f"\n✅ 代码生成完成！")
+        safePrint(f"\n✅ 代码生成完成！")
 
     # ========== 辅助方法 ==========
     def _get_ele_base_class(self, ele: DataEleSub) -> str:

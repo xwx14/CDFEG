@@ -1,7 +1,9 @@
 ** name=baseData,structure="I32"
 *npoin  *nelem 
+{%if bDynamic%}
 ** name=time,structure="F64"
 *GenData(TimeStep) *GenData(TotalTime)
+{% endif %}
 {%for mat in materials%}** name=mat_{{mat.name}},structure="F64**{{mat.nParams}}",type="mat",index={{mat.index}}
 *set var N=GenData({{mat.name}},int)
 *for(i=1;i<=N;i=i+{{mat.nParams}})
@@ -32,6 +34,35 @@
 *NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
 
 *end  
+{%- if field.bDynamic %}
+** name=D1{{field.name}},structure="I32**1 F64**{{field.dof}}",type="initVal",index={{field.index}}
+*Set Cond volume-D1{{field.fullname}} *nodes
+*Add Cond surface-D1{{field.fullname}} *nodes
+*Add Cond line-D1{{field.fullname}} *nodes
+*Add Cond point-D1{{field.fullname}} *nodes
+*loop nodes *OnlyInCond
+*NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
+
+*end  
+** name=D2{{field.name}},structure="I32**1 F64**{{field.dof}}",type="initVal",index={{field.index}}
+*Set Cond volume-D2{{field.fullname}} *nodes
+*Add Cond surface-D2{{field.fullname}} *nodes
+*Add Cond line-D2{{field.fullname}} *nodes
+*Add Cond point-D2{{field.fullname}} *nodes
+*loop nodes *OnlyInCond
+*NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
+
+*end  
+** name=D3{{field.name}},structure="I32**1 F64**{{field.dof}}",type="initVal",index={{field.index}}
+*Set Cond volume-D3{{field.fullname}} *nodes
+*Add Cond surface-D3{{field.fullname}} *nodes
+*Add Cond line-D3{{field.fullname}} *nodes
+*Add Cond point-D3{{field.fullname}} *nodes
+*loop nodes *OnlyInCond
+*NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
+
+*end  
+{% endif -%}
 {% endfor %}
 {%- for bc in dbcs %}** name=bc{{bc.name}},structure="F64**{{bc.n}}",type="dbc",index={{bc.index}}
 *Set Cond volume-{{bc.name}} *nodes

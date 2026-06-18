@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
     {{femDataClassName}} data;
     CDFEG::GidPrePost gidPrePost(&data);
 	gidPrePost.setFilePath(path, project);
+	gidPrePost.pre();
     data.caculate();
     gidPrePost.post();
     return 0;
