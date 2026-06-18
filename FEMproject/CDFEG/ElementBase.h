@@ -108,6 +108,8 @@ namespace CDFEG {
 		// 单元子程序所需的材料参数名称
 		std::vector<std::string> _paramNames;
 		bool _bOutMsh = true;
+		// 需要从前处理输入的参数，每组参数第一个为此参数的组名，后面为参数名
+		std::vector<std::vector<std::string>> _addParams;
 	};
 
 }

@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-06-18T15:43:22+08:00",
+  "generator": "init-architect",
+  "rootClaude": "CLAUDE.md",
+  "truncated": false,
+  "stats": {
+    "estimatedTotalFiles": 622,
+    "scannedFiles": 38,
+    "coveragePercent": 6.1,
+    "noteCoverage": "覆盖率按"非第三方/非生成物/非二进制"的可读源文件计实际更高；核心库头文件全部读取，关键 cpp 与 pyTool 数据结构/Maker 全部抽样，示例 main.cpp 抽样 4/7。Eigen 第三方 ~1500 头文件与 build/__pycache__/.codegraph 不计入扫描。"
+  },
+  "ignored": {
+    "source": ".gitignore + 默认规则",
+    "topDirs": [
+      { "path": "FEMproject/third/Eigen", "reason": "第三方库（header-only），不入文档" },
+      { "path": "FEMproject/build", "reason": ".gitignore 忽略 + 构建产物" },
+      { "path": "pyTool/__pycache__", "reason": "Python 缓存" },
+      { "path": "pyTool/test/truss1D", "reason": ".gitignore 忽略（生成物）" },
+      { "path": "pyTool/test/truss2D", "reason": ".gitignore 忽略（生成物）" },
+      { "path": "FEMproject/test", "reason": ".gitignore 忽略（测试数据）" },
+      { "path": "DevTool", "reason": ".gitignore 忽略（开发工具）" }
+    ],
+    "binaries": [
+      "FEMproject/el2d.gid/CDFEG.dll",
+      "FEMproject/el2d.gid/el2d.exe",
+      "pyTool/template/templates.db"
+    ]
+  },
+  "modules": [
+    {
+      "name": "CDFEG 核心库",
+      "path": "FEMproject/CDFEG/",
+      "language": "C++",
+      "claudeMd": "FEMproject/CDFEG/CLAUDE.md",
+      "entry": "无（DLL 库）",
+      "keyInterfaces": [
+        "CDFEG::FEMData (FemData.h)",
+        "CDFEG::PhyFieldData (PhyFieldData.h)",
+        "CDFEG::ElementBase / IsoEleBase (ElementBase.h / IsoEleBase.h)",
+        "CDFEG::EquationSystem (EquationSystem.h)",
+        "CDFEG::MatrixFun 自由函数 (MatrixFun.h)",
+        "CDFEG::GidPrePost / Processor / vtkPost / inpReader"
+      ],
+      "tests": "无独立单元测试；依赖 sample 示例与 FEMproject/test/el2dData（被 gitignore）",
+      "config": "CMakeLists.txt (C++14, CDFEG_EXPORTS, CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS)",
+      "dependencies": ["Eigen 3.4.0 (FEMproject/third/Eigen)"],
+      "coverage": "全部 15 头文件 + 部分 cpp 抽样",
+      "gaps": ["各 .cpp 实现细节未逐行读取", "FEMproject/include/CDFEG 与本目录头文件的同步状态未核验"]
+    },
+    {
+      "name": "sample 示例集",
+      "path": "FEMproject/sample/",
+      "language": "C++",
+      "claudeMd": "FEMproject/sample/CLAUDE.md",
+      "entry": "各子目录 main.cpp",
+      "subProjects": [
+        { "name": "truss1D", "inRootCMake": true, "entryForm": "makeData", "byPyTool": true },
+        { "name": "truss2D", "inRootCMake": true, "entryForm": "GiD/makeData", "byPyTool": true },
+        { "name": "truss3D", "inRootCMake": true, "entryForm": "—", "byPyTool": true },
+        { "name": "El2D", "inRootCMake": true, "entryForm": "GiD", "byPyTool": true, "pde": "静力平面应力" },
+        { "name": "ElT3", "inRootCMake": true, "entryForm": "—", "byPyTool": true },
+        { "name": "DEl2D", "inRootCMake": true, "entryForm": "GiD", "byPyTool": false, "pde": "Newmark 动力学", "overrideEProgram": true }
+      ],
+      "tests": "无（示例本身即回归基线）",
+      "coverage": "main.cpp 抽样 3/6（truss1D/El2D/DEl2D），各派生类头文件部分抽样",
+      "gaps": ["truss2D/truss3D/ElT3 的 main 与数据类未读", "El2D 的 ElQ4g/ElT3g/StressBL2g 实现未读"]
+    },
+    {
+      "name": "pyTool 代码生成工具",
+      "path": "pyTool/",
+      "language": "Python",
+      "claudeMd": "pyTool/CLAUDE.md",
+      "entry": "test/test*.py（既是测试也是生成入口）",
+      "keyInterfaces": [
+        "DataProject / DataField / DataEleSub / DataEleSubG / DataSch",
+        "MakerBase / MakerCpp (mode=new/add) / MakerGidFile",
+        "vtkCellType"
+      ],
+      "tests": "test/test*.py (8 个，无 pytest 断言，为生成器)",
+      "config": "无构建文件；依赖 jinja2（无 requirements.txt）",
+      "dependencies": ["Jinja2"],
+      "coverage": "全部数据结构 + 全部 Maker 源码读取；testEl2D.py 抽样；模板仅列清单未读内容",
+      "gaps": ["template/*.j2 模板内容未读取（仅列清单）", "其余 7 个 test 脚本未读", "pack_templates.py 未读"]
+    },
+    {
+      "name": "DevTool",
+      "path": "DevTool/",
+      "language": "Python",
+      "claudeMd": null,
+      "note": "单文件 add_license_header.py；被 .gitignore 忽略（/DevTool）；未生成模块文档",
+      "coverage": "未扫描"
+    },
+    {
+      "name": "FEMproject/el2d.gid",
+      "path": "FEMproject/el2d.gid/",
+      "language": "GiD 配置 + 二进制",
+      "claudeMd": null,
+      "note": "GiD 问题类型打包目录：CDFEG.dll + el2d.exe + .bas/.prb/.cnd/.bat；含二进制，仅记录路径",
+      "coverage": "仅列文件清单"
+    }
+  ],
+  "gapsList": [
+    "FEMproject/CDFEG/*.cpp 实现细节（仅读头文件）",
+    "pyTool/template/*.j2 模板内容（仅列清单）",
+    "pyTool/test 其余 7 个脚本",
+    "sample/truss2D / truss3D / ElT3 的 main 与派生类",
+    "sample/El2D 的 ElQ4g/ElT3g/StressBL2g 单元实现",
+    "FEMproject/include/CDFEG 与 FEMproject/CDFEG 头文件同步状态",
+    "DevTool/add_license_header.py 功能"
+  ],
+  "nextSteps": [
+    "深度补扫 FEMproject/CDFEG/PhyFieldData.cpp 与 EquationSystem.cpp（理解总刚组装与边界施加的完整实现，尤其 _bSavedData0 缓存机制）",
+    "读取 pyTool/template/femdata.cpp.j2 与 elesub.cpp.j2（理解生成的 caculate/ run 代码骨架，对齐手写示例）",
+    "补扫 sample/El2D/ElQ4g.cpp（等参元 run 标准实现，作为派生 ElementBase 的参考样板）",
+    "补扫 pyTool/test/testDEL2D.py 与 testHeat2D.py（确认生成器对动力学/热传导的支持范围）"
+  ]
+}

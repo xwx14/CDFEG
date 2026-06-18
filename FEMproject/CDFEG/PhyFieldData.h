@@ -147,6 +147,8 @@ namespace CDFEG {
 		int _dof = 1;
 		// 2类边值自由度
 		int _dof2 = 1;
+		// 需要从前处理输入的参数，每组参数第一个为此参数的组名，后面为参数名
+		std::vector<std::vector<std::string>> _addParams;
 	};
 }
 #endif
