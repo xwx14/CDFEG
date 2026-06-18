@@ -34,6 +34,8 @@ class DataField:
         self.bDynamic=False
         # 求解方案
         self.sch = DataSch()
+        # 结构为多个{"name":"pr1","params":[]}
+        self.preParams=[]
     def addEleSub(self,ele0):
         if isinstance(ele0, DataEleSub):
             ele=ele0

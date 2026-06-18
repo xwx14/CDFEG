@@ -11,6 +11,9 @@
 | 时间 | 说明 |
 | --- | --- |
 | 2026-06-18 15:43:22 | init-architect 首次生成模块文档 |
+| 2026-06-18 | 深挖补充 | 新增第九节「核心实现细节」：梳理 `PhyFieldData.cpp` / `EquationSystem.cpp` 的总刚组装、自由度编号、划行列法边界施加、`_bSavedData0` 基线机制与求解/后处理实现 |
+| 2026-06-18 | 深挖修正 | §9.3 修正单刚存储顺序描述：`adda` 列主序读取 vs 示例 `ElQ4g` 行主序填充，二者相反、靠单刚对称性掩盖（派生非对称单刚需注意） |
+| 2026-06-18 | 修复 | `adda` 单刚读取改为行主序（`estifn[j*nd+i]`→`estifn[i*nd+j]`），与所有单元的行主序填充统一；消除"靠对称性掩盖"的潜在非对称单刚错误（现有示例单刚均对称，结果不变） |
 
 ---
 
@@ -105,7 +108,7 @@
 | `convert2Eigen()` | 转 Eigen 矩阵 |
 | `calRightVals()` | 计算右值 |
 
-> **重要陷阱（动力学必读）**：`applyFirstBCs` 内有缓存基线机制（`_bSavedData0`），首次调用保存 `_data0/_f0`，后续恢复。动力学每步 `_f` 变化，必须**每步装配后强制 `_equSys._bSavedData0 = false`** 再施加边界，否则后续步载荷被恢复成首步值（详见 `sample/DEl2D/升级说明.md` 5.2 节）。
+> **重要陷阱（动力学必读）**：`applyFirstBCs` 内有缓存基线机制（`_bSavedData0`），首次调用保存 `_data0/_f0`，后续恢复。动力学每步 `_f` 变化，必须**每步装配后强制 `_equSys._bSavedData0 = false`** 再施加边界，否则后续步载荷被恢复成首步值（详见 `sample/DEl2D/升级说明.md` 5.2 节）。完整机制见 §9.4。
 
 ### 3.4 矩阵工具 `MatrixFun`（MatrixFun.h/.cpp）
 
@@ -186,3 +189,75 @@
 架构说明（人工）：`../程序说明.md`
 
 > 备注：`FEMproject/include/CDFEG/` 下有同名头文件副本（15 个），维护时注意同步。
+
+## 九、核心实现细节（总刚组装 / 边界施加 / 求解）
+
+> 本节基于 `PhyFieldData.cpp` 与 `EquationSystem.cpp` 源码梳理，供理解计算链路、以及派生动力学/非线性问题时参考。
+
+### 9.1 稀疏矩阵存储格式（自定义 CSR 变体）
+
+`EquationSystem` 不直接使用 Eigen 内部格式，而维护四个并行数组：
+
+| 成员 | 含义 |
+| --- | --- |
+| `_numCol` | 行指针：`_numCol[i]` = 第 i 行非零元在 `_colId/_data` 的起始下标，末元素 = 非零元总数（长度 = 行数 + 1） |
+| `_colId` | 列号数组（每个非零元的列索引） |
+| `_data` | 数值数组（组装与边界施加在此原地修改） |
+| `_colMap` | `_colMap[row] = {列号 → 在 _colId/_data 中的下标}`，O(log n) 定位 `_data[row,col]` |
+
+`init(mht)` 由每行列集合 `mht`（`vector<set<int>>`）填充上述结构；`convert2Eigen()` 用 `Eigen::Map<...RowMajor>` 零拷贝映射到 Eigen 稀疏矩阵，受 `_bEigenConverted` 缓存（矩阵变动后需置 `false`）。
+
+### 9.2 自由度编号（`initMatrix`）
+
+`initMatrix()` 遍历所有单元，**仅当节点某自由度出现在「单元子程序的 `_dispNames`」中**时才分配方程号（首次遇到即 `_ida[iDof] = ++nEq`）。因此：
+
+- `_ida[i] == -1`：该自由度无单元参与（被约束或本场不涉及）→ 不进方程组；
+- `_ida[i] >= 0`：方程号；`_neq` = 实际方程数（≤ `_kVar = nPts*_dof`）。
+
+同时构建稀疏骨架 `mht`：单元内所有自由度编号两两配对，形成非零位置。
+
+### 9.3 总刚组装（`eProgram_el` + `adda`）
+
+`eProgram_el()` 流程：
+1. 遍历每个单元子程序的每个单元：取节点坐标 `r`、材料参数（`getElemMatParams`）→ 调 `eleSub->run(r,coef,matParams)` 得单刚 `estif`；
+2. 构建单元定位向量 `lm`：单元节点自由度经 `_ida` 映射为方程号；
+3. `_equSys.adda(estif, lm)` 组装；
+4. 全部单元完成后：`applyFirstBCs` + `applySecondBCs`。
+
+`adda(estifn, equIds)` 关键细节：
+- **单刚按行主序存储**：`estif` 以 `index = i*nd + j`（`i`=行、`j`=列，外循环行、内循环列）存储，`adda` 按 `estifn[i*nd + j]` 读取，与所有单元（`ElQ4g`/`ElT3g`/`NewmarkQ4g`/truss 等）的行主序填充一致。派生单元填充 `EleSubResult.estif` 时按行展开即可。
+- `equIds < 0`（无方程的自由度）被跳过。
+- `adda` 是**累加（`+=`）**，不清零 `_data`。
+
+### 9.4 第一类边界 —— 划行列法 + 基线缓存（`_bSavedData0`）
+
+`applyFirstBCs(bc1s, ida)`（及单条 `addFirstBC`）采用**划行（列）修改法**，配合基线缓存保证幂等：
+
+1. **首次调用**（`_bSavedData0 == false`）：快照纯净总刚 `_data0 = _data`、`_f0 = _f`，置 `_bSavedData0 = true`；
+2. **每次调用**：先从基线恢复 `_data = _data0; _f = _f0;`，再对 `_firstBCMap` 中**全部**一类边界重新施加：
+   - 边界方程行：对角元置 1，该行其余非零元置 0；
+   - 其余方程的边界列：`_f[i] -= a_ij * bcVal`（`a_ij` 取自 `_data0`），矩阵元素清零；
+   - 右端项 `_f[bcEquId] = bcVal`；
+3. 置 `_bEigenConverted = false`。
+
+**设计意图**：划行列法会破坏性修改 `_data`（不可逆），故每次从 `_data0` 干净重来，使「重复施加 / 修改边界值」结果幂等且正确。
+
+> **⚠️ 动力学/多步陷阱**：`_bSavedData0` 只在首次为 false 时保存基线，之后恒为 true。若后续步总刚 `_data` 发生变化（动力学每步重装、非线性迭代、有效矩阵 `K+a0M+a1C` 更新），**必须手动 `_equSys._bSavedData0 = false`** 强制刷新基线，否则 `applyFirstBCs` 会从首步过时的 `_data0` 恢复，导致载荷/刚度错误。此外 `adda` 累加不清零，多步组装前需先清零 `_data`。详见 `sample/DEl2D/升级说明.md`。
+
+### 9.5 第二类边界
+
+`applySecondBCs(bc2s, ida)` / `addSecondBC`：仅右端项叠加 `_f[equId] += val`（节点力），**不修改矩阵**，不涉及基线。
+
+### 9.6 求解（`solve`）
+
+`solve()`：`convert2Eigen()` → `Eigen::SimplicialLDLT<SpMat>(_eigenMat)` 分解 → `chol.solve(_f)` → 结果写入 `_rhs`。`_rhs` 即节点位移解（按方程号排列）。
+
+### 9.7 后处理（`uPhy`）
+
+`uPhy()`：
+1. 把 `_rhs[id]`（`id = _ida[...]`）回填 `_nodeRes[dispName][node]`（节点位移）；`_ida == -1` 的自由度（一类边界节点）未被填入，保持初值；
+2. 逐单元以节点位移为 `coef` 调 `eleSub->uEle(r,coef,matParams)`，将其 `eleResult` / `nodeResult` 写入 `_elemRes`。
+
+### 9.8 节点力 / 反力（`calRightVals`）
+
+`calRightVals()` 用**未经划行处理的原始总刚 `_data0`** 乘以位移解：`_rightVals[i] = Σ_j _data0[i,j] * _rhs[j]`。这是 `_data0` 基线的第二个用途——计算节点力（含支座反力）必须用纯净总刚，而非被划行修改后的 `_data`。

@@ -31,6 +31,8 @@ class DataProject:
         self.cmds=[]
         # caculate代码
         self.caculateCode = ""
+        # 结构为多个{"name":"pr1","params":[]}
+        self.preParams=[]
 
     def addField(self,field0):
         if type(field0) == str:

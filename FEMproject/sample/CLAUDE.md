@@ -12,6 +12,8 @@
 | --- | --- |
 | 2026-06-18 15:43:22 | init-architect 首次生成模块文档 |
 | 2026-06-18 | 删除遗留示例 el3d，示例数 7→6 |
+| 2026-06-18 | 深挖补充 | 新增第六节「等参元派生参考（以 ElQ4g 为样板）」，梳理构造/shapeFun/run/uEle 要点与单刚存储顺序陷阱 |
+| 2026-06-18 | 同步 | §6.3 单刚存储顺序描述更新：核心库 `adda` 已改为行主序读取，约定统一 |
 
 ---
 
@@ -70,7 +72,50 @@ int main(int argc, char* argv[]) {
 
 DEl2D（动力学）差异：`caculate` 内含时间步循环，每步 `eProgram→solve→uPhy→post2(it)`，且 `eProgram`/`uPhy` 被物理场子类重写。
 
-## 六、常见问题 (FAQ)
+## 六、等参元派生参考（以 `ElQ4g` 为样板）
+
+> 以 `sample/El2D/ElQ4g.*`（4 节点四边形、平面应力）为样板，梳理派生一个等参元的完整步骤。同样适用于 `ElT3g`、`NewmarkQ4g` 等 `IsoEleBase` 派生类。
+
+### 6.1 构造函数：设置元信息 + 积分参数
+
+- 继承 `CDFEG::IsoEleBase(nNode, pData)`；
+- 设 `_name`（须与 dat 的 elem name、`mat_<name>` 一致）、`_dispNames`、`_paramNames`、`_types`；
+- 设维度/积分参数：`_dim` / `_nNode` / `_nDisp` / `_nVar(=_nNode*_nDisp)` / `_nGaus` / `_nRefc` / `_nCoor`；
+- 填 `_gaus`（权重）、`_refc`（积分点参考坐标，按 `[iGaus][dim]` 平铺），**调 `caculateShapeCoef(dim)`** 预算形函数数值差分表；
+- resize 结果：`_result.estif(_nVar²)` / `edamp(_nVar²)` / `emass(_nVar)` / `eload(_nVar)`，设 `_vtkCellType`。
+
+### 6.2 `shapeFun(refc)`（纯虚，必须实现）
+
+返回各节点形函数在参考坐标 `refc` 处的值（Q4 为 4 个双线性形函数），顺序对应节点编号约定。
+
+### 6.3 `run(r, coef, matParams)`（单刚组装核心）
+
+1. **清零** `_result.estif/eload/emass`（每次 `run` 必须清零，与核心库 `adda` 的累加配合）；
+2. 高斯积分循环：
+   - `dcoor(r, iGaus, coor, rctr)` 求坐标雅可比；
+   - `inverse(rctr, crtr)` 求逆 + 行列式 `det`；
+   - `shapn(iGaus, coor, crtr, cu)` 得 `cu[i][0..2]`（形函数值、∂N/∂x、∂N/∂y）；
+   - `weight = _gaus[iGaus] * det`，由 `cu` 构建 B 矩阵，累加 `K += BᵀDB·weight`、`eload += Nᵀf·weight`；
+3. 若 `_bSaveResult` 则 `_results.push_back(_result)`。
+
+> **单刚存储顺序**：`estif` 按**行主序**填充（`index = i*_nVar + j`，外循环行、内循环列），核心库 `adda` 已统一为行主序读取（`estifn[i*nd+j]`），二者一致。派生单元按行展开即可（详见核心库 CLAUDE.md §9.3）。
+
+### 6.4 `uEle(r, coef, matParams)`（后处理，可选）
+
+从 `coef`（物理场填入的节点位移）按高斯点求应力（平面应力 D 矩阵），再以形函数加权外推到节点；返回 `eleResult`（单元平均应力）+ `nodeResult`（节点应力与 `weight`）。
+
+### 6.5 物理场派生（`ElDispFieldData`）扩展点
+
+| 扩展点 | El2D 做法 | 说明 |
+| --- | --- | --- |
+| 注册单元 | 构造函数 `push_back(new ElQ4g/ElT3g/StressBL2g(this))` | 一个物理场可注册多种单元 |
+| `eProgram` | **不重写**（基类 `eProgram_el` 静力组装） | 静力问题无需重写 |
+| `uPhy` | **重写**：节点应力按 `weight` 加权平均 + von Mises | 基类 `uPhy` 仅回填位移，应力后处理需派生 |
+| 结果配置 | `_eleResNames` / `_resForm="Vector OnNodes"` | 供 GidPrePost 输出 |
+
+> 派生模式：**静力等参元 = 单元派生(`IsoEleBase`) + 物理场重写 `uPhy`(应力外推) + 数据类派生(`FEMData`，从 GiD 读网格)**。动力学(DEl2D) 另需重写 `eProgram`（Newmark 有效矩阵）并每步重置 `_bSavedData0`。
+
+## 七、常见问题 (FAQ)
 
 1. **Q: 修改某示例后编译报"标识符未声明"？**  
    A: 多为 UTF-8 中文注释被 MSVC 按 GBK 解码。根 CMake 已加 `/utf-8`，确认未绕过该配置。
@@ -81,7 +126,7 @@ DEl2D（动力学）差异：`caculate` 内含时间步循环，每步 `eProgram
 3. **Q: GiD 数据文件格式？**  
    A: `.dat` 由 `GidPrePost` 解析，含 `coord`/`element`/`mate`/`time`/边界段，详见 `TextReader` 与 `gidPrePost.cpp`。材料段名必须为 `mat_<单元_name>`。
 
-## 七、相关文件清单
+## 八、相关文件清单
 
 构建：各子目录 `CMakeLists.txt`（6 个）
 升级说明：`DEl2D/升级说明.md`（Newmark 动力学升级，含 12 个易错点）  

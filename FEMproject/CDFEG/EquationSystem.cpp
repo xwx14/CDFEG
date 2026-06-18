@@ -92,7 +92,7 @@ void CDFEG::EquationSystem::adda(const std::vector <double>& estifn, const std::
 			int equId2 = equIds[j];
 			if (equId2 < 0)continue;
 			int e = _colMap[equId1][equId2];
-			_data[e] += estifn[j * nd + i];
+			_data[e] += estifn[i * nd + j];
 		}
 	}
 }

@@ -12,6 +12,7 @@
 | 时间 | 说明 |
 | --- | --- |
 | 2026-06-18 15:43:22 | init-architect 首次生成模块文档 |
+| 2026-06-18 | 深挖补充 | 新增第十节「生成器能力边界」：梳理模板骨架、命令流（仅 `imp`）、与手写示例的对齐度；修正 `testHeat2D.py` 为空文件、`imp.cmd.j2` 描述 |
 
 ---
 
@@ -72,7 +73,7 @@ makeAll()
 └── mode='new': makeSlnCMake()                       # cmakeSln.j2
 ```
 
-`parseCmds(project)` 把 `project.cmds`（命令列表，每条 `[cmdName, phyIndex, ...]`）渲染为 `caculate` 方法体内的 C++ 代码字符串，模板为 `<cmdName>.cmd.j2`。
+`parseCmds(project)` 把 `project.cmds`（命令列表，每条 `[cmdName, phyIndex, ...]`）渲染为 `caculate` 方法体内的 C++ 代码字符串，模板为 `<cmdName>.cmd.j2`。**目前 template 下仅 `imp.cmd.j2` 一种命令**（渲染完整 `initMatrix→eProgram→solve→uPhy→calRightVals` 流程）；`template/cppCode/` 目录为空（历史遗留）。
 
 ### 3.4 辅助
 
@@ -96,9 +97,11 @@ makeAll()
 | `cmake.j2` / `cmakeSln.j2` | 项目级 / 解决方案级 CMakeLists.txt |
 | `gidbas.j2` / `gidprb.j2` / `gidcnd.j2` / `gidbat.j2` | GiD `.bas/.prb/.cnd/.bat` |
 | `vcxproj.j2` / `vcxproj.filters.j2` | VS 工程文件（备用） |
-| `imp.cmd.j2` | GiD 导入命令 |
+| `imp.cmd.j2` | caculate 命令流模板：渲染 `initMatrix→eProgram→solve→uPhy→calRightVals` 完整流程（命令名 `imp`，目前唯一命令模板） |
 | `pack_templates.py` | 打包模板到 `templates.db` |
 | `templates.db` | 打包后的模板库（二进制） |
+
+> `template/cppCode/` 子目录当前为**空**（历史遗留，命令模板现已合并到 template 根，仅剩 `imp.cmd.j2`）。
 
 ## 六、数据模型
 
@@ -106,7 +109,7 @@ makeAll()
 
 ## 七、测试与质量
 
-- `test/test*.py`（7 个）：`test1DTruss` / `test2DTruss` / `test1DEulerBeam` / `Test1DTimoshenkobeam` / `testEl2D` / `testElT3` / `testDEL2D` / `testHeat2D`。
+- `test/test*.py`（8 个文件，其中 `testHeat2D.py` 为 **0 字节空文件**——热传导生成器未实现）：`test1DTruss` / `test2DTruss` / `test1DEulerBeam` / `Test1DTimoshenkobeam` / `testEl2D` / `testElT3` / `testDEL2D` / `testHeat2D`(空)。
 - **重要**：这些"测试"是**代码生成器**，运行会**覆盖** `FEMproject/sample/` 下对应示例的手写 C++ 源码。修改手写示例前务必确认是否由 pyTool 生成（见 `sample/DEl2D/升级说明.md` 5.11 节：DEl2D 是手写的，运行 testDEL2D.py 会用 `ElQ4g` 名覆盖）。
 - 无 pytest 断言式单测。
 
@@ -127,3 +130,40 @@ makeAll()
 生成器：`MakerBase.py` / `MakerCpp.py` / `MakerGidFile.py`  
 模板：`template/*.j2`（17 个）+ `template/pack_templates.py` + `template/templates.db`  
 测试/入口：`test/test*.py`（8 个）
+
+## 十、生成器能力边界（深挖补充）
+
+> 基于 `template/*.j2` 与 `test/testDEL2D.py` 源码梳理。**核心结论：pyTool 是"项目脚手架"，生成类结构与构建配置；计算逻辑与后处理仍需人工填充。**
+
+### 10.1 能自动生成
+
+| 产物 | 来源模板 | 内容 |
+| --- | --- | --- |
+| FEMData 派生类 | `femdata.*.j2` | `_dim` + 注册物理场 + `caculate`（命令流渲染） |
+| PhyFieldData 派生类 | `phyfielddata.*.j2` | `_name/_dispNames/_dof2` + 注册单元 + `_eleResNames` |
+| 单元派生类 | `elesub.*.j2` | 构造（元信息 + 积分参数 + `caculateShapeCoef` + resize 结果）+ `shapeFun`（从字符串表达式）+ **空的 `run`/`uEle` 体** |
+| main 入口 | `main.cpp.j2` / `mainGid.cpp.j2` | GiD 文件入口：`setFilePath→pre→caculate→post` |
+| CMake | `cmake.j2` / `cmakeSln.j2` | 项目级（`iProgramType`: 0=exe / 1=dll / 2=static）+ 解决方案级（`add_subdirectory`） |
+| GiD 配置 | `gidbas/gidprb/gidcnd/gidbat.j2` | `.bas/.prb/.cnd/.bat` |
+| caculate 命令流 | `imp.cmd.j2` | 完整 `initMatrix→eProgram→solve→uPhy→calRightVals`（目前唯一命令） |
+
+### 10.2 不能生成（需人工填充）
+
+1. **单元计算逻辑**：`run()` 体（`ele.runCode`）、`uEle()` 体（`ele.uCode`）——高斯积分、B 矩阵、单刚组装、应力计算全部手写。`testDEL2D.py` 未设 `runCode`，故生成的 `ElQ4g` 是**空壳**。
+2. **物理场后处理**：模板**不生成 `uPhy` 重写**；应力外推、von Mises 等需人工补（对比手写 `ElDispFieldData::uPhy`）。
+3. **GiD 结果项**：生成 main 用 `post()`（非 `post2()`），**不注册 `GidResItem`**——结果输出可能不全（对比手写 El2D main）。
+4. **动力学**：数据结构有 `bDynamic`/`pdeType`/`sch` 字段，但**无代码生成**——Newmark 有效矩阵、时间步循环、`_bSavedData0` 管理全手写（见 `sample/DEl2D/升级说明.md`）。
+5. **热传导**：`testHeat2D.py` 为空文件，**未实现**。
+6. **细粒度命令流**：仅 `imp` 一种命令模板，无法组合自定义求解流程。
+
+### 10.3 对齐度（生成 vs 手写示例）
+
+| 对比项 | 手写 El2D/DEl2D | pyTool 生成 |
+| --- | --- | --- |
+| 单元构造 | 完整 | **对齐**（元信息 + 积分参数一致） |
+| `shapeFun` | 完整 | **对齐**（从 `shapeFuns` 字符串生成） |
+| `run`/`uEle` 体 | 完整计算逻辑 | **空壳**（仅 `{{runCode}}`/`{{uCode}}` 占位） |
+| `uPhy` 重写 | 应力外推 + von Mises | **不生成**（用基类，仅回填位移） |
+| main 结果输出 | `post2()` + 注册 `GidResItem` | `post()`，无注册 |
+
+> ⚠️ 这正是 `sample/DEl2D/升级说明.md` 5.11 节警告"勿运行 `testDEL2D.py`"的根因：它会用空壳 `ElQ4g` 覆盖手写的 `NewmarkQ4g` 动力学逻辑。

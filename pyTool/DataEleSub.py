@@ -50,6 +50,8 @@ class DataEleSub:
         self.baseClassParam = f"{self.nNodes}, pData"
         # 根据需要改变
         self.calMatrix=['eload','estif','emass','edamp']
+        # 结构为多个{"name":"pr1","params":[]}
+        self.preParams=[]
 
     def inferVTKCellType(self):
         """
