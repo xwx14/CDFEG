@@ -17,7 +17,11 @@
 #define GID_PREPOST2_H
 // 将用于读取旧文件格式的GidPrePost类
 #include "Processor.h"
+#include <string>
+#include <vector>
+#include <map>
 namespace CDFEG{
+	class ElementBase;
 	class GidPrePost2 :
 		public Processor
 	{
