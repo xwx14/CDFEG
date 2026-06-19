@@ -22,6 +22,7 @@
 #include "FemData.h"
 #include "PhyFieldData.h"
 #include "ElementBase.h"
+#include <set>
 namespace CDFEG {
 
 	static std::string vtkCellTypeToGidElemType(VTKCellType type)
@@ -129,6 +130,7 @@ namespace CDFEG {
 	{
 		_datReader.setFilePath(_datFn);
 		if (!_datReader.open()) return -1;
+		collectPreParamDecls();
 		const std::string& line = _datReader.getCurrentLine();
 		while (_datReader.readNextLine()) {
 			if (line[0] == '*') {
@@ -158,6 +160,10 @@ namespace CDFEG {
 				}
 				else if (typeLower == "elem") {
 					readElement(params);
+				}
+				else if (_preParamDecls.count(nameLower)) {
+					_datReader.readNextLine();
+					readPreParams(nameLower, line);
 				}
 			}
 		}
@@ -213,6 +219,42 @@ namespace CDFEG {
 		default:
 			break;
 		}
+		return 0;
+	}
+
+	void GidPrePost::collectPreParamDecls() {
+		static const std::set<std::string> reserved = { "time","basedata","coord","id","ubf","elem" };
+		auto addDecl = [&](auto* owner) {
+			for (auto& g : owner->_addParams) {
+				if (g.size() < 2) continue;
+				const std::string& groupName = g[0];
+				std::string gl = TextReader::toLowerCase(groupName);
+				if (reserved.count(gl)) {
+					std::cerr << "[GidPrePost] 跳过保留名参数组: " << groupName << std::endl;
+					continue;
+				}
+				if (_preParamDecls.count(gl))
+					std::cerr << "[GidPrePost] 参数组名重复(后者覆盖): " << groupName << std::endl;
+				_preParamDecls[gl] = { &(owner->_paramValues), g };
+			}
+		};
+		addDecl(_femData);
+		for (PhyFieldData* f : _femData->_phyDatas) {
+			addDecl(f);
+			for (ElementBase* e : f->_eleSubs) addDecl(e);
+		}
+	}
+
+	int GidPrePost::readPreParams(const std::string& group, const std::string& line) {
+		auto it = _preParamDecls.find(group);
+		if (it == _preParamDecls.end()) return -1;
+		std::vector<double> vals = TextReader::splitDoubles(line, " ,");
+		int nParams = (int)it->second.second.size() - 1;   // 参数名数 = 组行长度 - 1(组名)
+		int n = (int)vals.size();
+		if (n > nParams) n = nParams;
+		std::vector<double> trimmed(vals.begin(), vals.begin() + n);
+		const std::string& origName = it->second.second[0];   // 用原始组名回填，与 getParam 查询一致
+		(*it->second.first)[origName] = trimmed;
 		return 0;
 	}
 
