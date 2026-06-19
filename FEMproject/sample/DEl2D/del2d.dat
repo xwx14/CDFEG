@@ -1,0 +1,18 @@
+* name=baseData,structure="I32"
+4 1
+* name=time,structure="F64"
+0.1 1.0
+* name=newmark,structure="F64"
+0.5 0.25
+* name=mat_NewmarkQ4g,structure="F64*6",type="mat",index=1
+1000.0 0.3 0.0 0.0 1.0 0.05
+* name=coord,structure="I32*1 F64*2",type="coord",index=1
+1 0.0 0.0
+2 1.0 0.0
+3 1.0 1.0
+4 0.0 1.0
+* name=ubfNewmarkDisp,structure="I32*1 F64*2",type="ubf",index=1
+1 0.0 0.0
+4 0.0 0.0
+* name=NewmarkQ4g,structure="I32*6",type="elem",index=1
+1 1 2 3 4 1
