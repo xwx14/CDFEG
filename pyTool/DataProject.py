@@ -66,7 +66,9 @@ class DataProject:
             'coordVars': self.coordVars,
             'eleType': self.eleType,
             'fields': fields_data,
-            'caculateCode': self.caculateCode
+            'caculateCode': self.caculateCode,
+            # 预处理参数，结构为多个{"name":"pr1","params":[]}
+            'preParams': self.preParams
         }
 
     @classmethod
@@ -93,6 +95,9 @@ class DataProject:
 
         # 恢复caculateCode
         project.caculateCode = data.get('caculateCode', '')
+
+        # 恢复预处理参数（结构为多个{"name":"pr1","params":[]}）
+        project.preParams = data.get('preParams', [])
 
         return project
 

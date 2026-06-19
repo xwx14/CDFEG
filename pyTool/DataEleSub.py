@@ -93,7 +93,9 @@ class DataEleSub:
             'shapeFunCode': self.shapeFunCode,      # 形函数代码
             'coordTransFunCode': self.coordTransFunCode, # 坐标转换函数代码
             'baseClass': self.baseClass,       # 基类名称："EleSubBase" 或 "IsoEleBase"
-            'calMatrix':self.calMatrix
+            'calMatrix':self.calMatrix,
+            # 预处理参数，结构为多个{"name":"pr1","params":[]}
+            'preParams':self.preParams
         }
         # 如果设置了 vtkCellType，添加到字典中
         if self.vtkCellTypeName is not None:
@@ -133,6 +135,8 @@ class DataEleSub:
         ele.coordTransFunCode = data.get('coordTransFunCode', '')
         ele.baseClass = data.get('baseClass', '')
         ele.calMatrix=data.get('calMatrix', [])
+        # 恢复预处理参数（结构为多个{"name":"pr1","params":[]}）
+        ele.preParams=data.get('preParams', [])
 
         # 恢复 VTK 单元类型（如果有）
         if 'vtkCellType' in data:

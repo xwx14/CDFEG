@@ -94,7 +94,9 @@ class DataField:
             # 可选属性（由 MakerCpp 设置）
             'dof2': getattr(self, 'dof2', None),
             'headerGuard': getattr(self, 'headerGuard', None),
-            'eleResNames': getattr(self, 'eleResNames', None)
+            'eleResNames': getattr(self, 'eleResNames', None),
+            # 预处理参数，结构为多个{"name":"pr1","params":[]}
+            'preParams': self.preParams
             # 注意：femDataClassName 由 DataProject.toDict() 添加
         }
 
@@ -118,6 +120,7 @@ class DataField:
         field.dispNames = data.get('dispNames', [])
         field.index = data.get('index', 1)
         field.bDynamic = data.get('bDynamic', False)
+        field.preParams = data.get('preParams', [])
 
         # 恢复可选属性
         if 'dof2' in data and data['dof2'] is not None:
