@@ -25,6 +25,7 @@ x64/
 Debug/
 Release/
 *.obj
+*.o
 *.lib
 *.exp
 *.log
@@ -59,3 +60,5 @@ Thumbs.db
 /.cursor/rules
 /.vscode
 /FEMproject/el2d.gid/el2d.exe
+/FEMproject/t.dat
+/FEMproject/*.o
