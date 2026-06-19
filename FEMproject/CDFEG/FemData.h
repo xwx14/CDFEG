@@ -143,6 +143,10 @@ namespace CDFEG {
 		std::vector<Processor*> _processors;
 		// 需要从前处理输入的参数，每组参数第一个为此参数的组名，后面为参数名
 		std::vector<std::vector<std::string>> _addParams;
+		// 从前处理读回的参数值，key=组名，value 按该组 _addParams 参数名顺序对齐
+		std::map<std::string, std::vector<double>> _paramValues;
+		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
+		double getParam(const std::string& group, const std::string& param) const;
 	};
 };
 #endif
