@@ -41,13 +41,20 @@ int NewmarkData::caculate() {
     // 一次方程编号 + 稀疏骨架初始化（稀疏结构全程不变）
     aField->initMatrix();
 
-    // 传递 Newmark 参数：dt/tmax 来自 dat 的 time 段（FEMData 持有），gamma/beta 默认 0.5/0.25
+    // dt/tmax 来自 dat 的 time 段（FEMData 持有）；gamma/beta 来自 dat 的 newmark 段（物理场 _addParams 声明）
     if (_dt <= 0.0)
     {
         std::cerr << "[NewmarkData] dt <= 0, 请检查 dat 文件 time 段" << std::endl;
         return -1;
     }
-    aField->setNewmarkParams(0.5, 0.25, _dt);
+    double gamma = aField->getParam("newmark","gamma");
+    double beta  = aField->getParam("newmark","beta");
+    if (beta <= 0.0)
+    {
+        std::cerr << "[NewmarkData] beta <= 0, 请检查 dat 文件 newmark 段" << std::endl;
+        return -1;
+    }
+    aField->setNewmarkParams(gamma, beta, _dt);
 
     int nStep = static_cast<int>(_tMax / _dt + 0.5);
     double time = 0.0;

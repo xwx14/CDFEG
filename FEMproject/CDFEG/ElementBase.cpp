@@ -35,3 +35,19 @@ CDFEG::uResult CDFEG::ElementBase::uEle(const std::vector<double>& r, const std:
 	uResult res;
 	return res;
 }
+
+// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
+double CDFEG::ElementBase::getParam(const std::string& group, const std::string& param) const {
+	for (const auto& g : _addParams) {
+		if (g.size() < 2 || g[0] != group) continue;
+		for (size_t i = 1; i < g.size(); ++i) {
+			if (g[i] == param) {
+				auto it = _paramValues.find(group);
+				if (it == _paramValues.end() || (i - 1) >= it->second.size()) return 0.0;
+				return it->second[i - 1];
+			}
+		}
+		return 0.0;
+	}
+	return 0.0;
+}

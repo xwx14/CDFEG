@@ -31,6 +31,8 @@ NewmarkDispFieldData::NewmarkDispFieldData(CDFEG::FEMData* femData)
     // 应力恢复结果名
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
     _resForm = "Vector OnNodes";
+    // 声明从前处理读取的 Newmark 积分参数组（gamma/beta）
+    _addParams = { {"newmark","gamma","beta"} };
 }
 
 NewmarkDispFieldData::~NewmarkDispFieldData() {

@@ -23,6 +23,8 @@
 #include <fstream>
 #include <vector>
 #include "TextReader.h"
+#include <utility>
+#include <set>
 /**
  * @class GidPrePost
  * @brief Gid前后处理器
@@ -43,6 +45,8 @@ namespace CDFEG {
 		virtual int pre();
 		int readMate(const std::map<std::string, std::string>& params);
 		int readTime(const std::string& line);
+		int readPreParams(const std::string& group, const std::string& line);
+		void collectPreParamDecls();
 		int readBaseData(const std::string& line);
 		int readCoord(const std::map<std::string, std::string>& params);
 		int readElement(const std::map<std::string, std::string>& params);
@@ -65,6 +69,10 @@ namespace CDFEG {
 		std::map< ElementBase*, int> _matStartID2;
 		std::vector<ElementBase*> _mshOutEle2;
 		std::vector<GidResItem> _resItems;
+		// 额外参数声明表：组名(小写) → {目标层 _paramValues 指针, 该组 _addParams 行(首元素为原始组名)}
+		// 注意：持有的 _paramValues 裸指针仅在 pre() 执行期间有效（owner 对象生命周期长于 GidPrePost）；
+		//       pre() 结束时会 clear()，避免常驻悬垂指针。
+		std::map<std::string, std::pair<std::map<std::string,std::vector<double>>*, std::vector<std::string>>> _preParamDecls;
 	};
 }
 #endif
