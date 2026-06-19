@@ -4,6 +4,10 @@
 ** name=time,structure="F64"
 *GenData(TimeStep) *GenData(TotalTime)
 {% endif %}
+{% for pp in preParams %}** name={{ pp.name }},structure="F64"
+{% for p in pp.params %}*GenData({{ p }}) {% endfor %}
+
+{% endfor %}
 {%for mat in materials%}** name=mat_{{mat.name}},structure="F64**{{mat.nParams}}",type="mat",index={{mat.index}}
 *set var N=GenData({{mat.name}},int)
 *for(i=1;i<=N;i=i+{{mat.nParams}})

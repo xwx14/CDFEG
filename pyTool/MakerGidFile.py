@@ -49,7 +49,7 @@ class MakerGidFile(MakerBase):
         os.makedirs(path, exist_ok=True)
 
         self.data={"name":pro.name,
-        "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"bDynamic":False}
+        "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"bDynamic":False,"preParams":[]}
         for field in pro.fields:
             # 添加场
             dof=len(field.dispNames)
@@ -74,10 +74,29 @@ class MakerGidFile(MakerBase):
         self.cndFn=path+"\\"+pro.name+".cnd"
         self.batFn=path+"\\"+pro.name+".bat"
 
+        # 收集 project/field/ele 三层 preParams，按组名去重，补全 defaults
+        seen = set()
+        preParams = []
+        srcs = [pro]
+        srcs += list(pro.fields)
+        srcs += [e for f in pro.fields for e in f.eleSubs]
+        for src in srcs:
+            for pp in getattr(src, 'preParams', []):
+                name = pp.get('name')
+                if name is None or name in seen:
+                    continue
+                seen.add(name)
+                params = list(pp.get('params', []))
+                defaults = list(pp.get('defaults', []))
+                if len(defaults) < len(params):
+                    defaults += [0.0] * (len(params) - len(defaults))
+                preParams.append({'name': name, 'params': params, 'defaults': defaults})
+        self.data['preParams'] = preParams
+
     def _initFromParams(self,name:str,dim:int,proName):
         """从参数初始化"""
         self.data={"name":name,
-        "dim":dim,"fields":[],"elems":[],"dbcs":[],"materials":[]}
+        "dim":dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"preParams":[]}
         self.basFn=proName+".bas"
         self.prbFn=proName+".prb"
         self.cndFn=proName+".cnd"
