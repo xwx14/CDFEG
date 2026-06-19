@@ -42,7 +42,7 @@
 | truss3D | `sample/truss3D/` | 3D | 桁架静力 | `Truss3D` | — | 否 | 是 | 含 `calcDir3D` |
 | El2D | `sample/El2D/` | 2D | 平面应力静力 | `ElQ4g`(Q4) / `ElT3g`(T3) / `StressBL2g`(边界线) | GiD | 否 | 是（testEl2D.py，mainMode=1） | 静力升级参考样板 |
 | ElT3 | `sample/ElT3/` | 2D | 弹性力学 | `ElT3` | — | 否 | 是 | 含 `.gid` 子目录与 bat |
-| DEl2D | `sample/DEl2D/` | 2D | Newmark-β 动力学 | `NewmarkQ4g` | GiD | **是**（必须，组合有效矩阵 K+a0M+a1C） | **否（手写）** | 见 `升级说明.md`，记录 12 个易错点 |
+| DEl2D | `sample/DEl2D/` | 2D | Newmark-β 动力学 | `NewmarkQ4g` | GiD | **是**（必须，组合有效矩阵 K+a0M+a1C） | **否（手写）** | 见 `升级说明.md`（12 易错点）；`gamma/beta` 经 `_addParams` 从 dat `newmark` 段读取（5.13，机制见核心库 §5.5） |
 
 ## 四、关键依赖与配置
 

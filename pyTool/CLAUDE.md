@@ -48,6 +48,8 @@ DataProject（项目：name, dim, coordVars, fields[], cmds[]）
 
 > 所有数据类提供 `toDict()` / `fromDict()` 用于 JSON 序列化（`testEl2D.py` 末尾会写 `data.json`）。
 
+> 三层（`DataProject` / `DataField` / `DataEleSub`）均有 `preParams: list`（结构 `{name:组名, params:[参数名], defaults:[默认值]}`），声明要从 GiD 前处理读取的额外参数组；由 `MakerGidFile._initFromProject` 收集（按组名去重、defaults 补 0.0）并经 `gidbas.j2`/`gidprb.j2` 生成 dat 段与 QUESTION。对应 C++ 核心库 `_addParams` 机制（见核心库 CLAUDE.md §5.5），DEl2D Newmark gamma/beta 为首个应用。
+
 ### 3.2 生成器层（MakerBase 体系）
 
 | 文件 | 类 | 职责 |
@@ -95,7 +97,7 @@ makeAll()
 | `phyfielddata.h.j2` / `phyfielddata.cpp.j2` | `<Field>FieldData.h/.cpp`（派生 PhyFieldData） |
 | `elesub.h.j2` / `elesub.cpp.j2` | `<Ele>.h/.cpp`（派生 ElementBase/IsoEleBase） |
 | `cmake.j2` / `cmakeSln.j2` | 项目级 / 解决方案级 CMakeLists.txt |
-| `gidbas.j2` / `gidprb.j2` / `gidcnd.j2` / `gidbat.j2` | GiD `.bas/.prb/.cnd/.bat` |
+| `gidbas.j2` / `gidprb.j2` / `gidcnd.j2` / `gidbat.j2` | GiD `.bas/.prb/.cnd/.bat`（`gidbas`/`gidprb` 支持由 `preParams` 生成额外参数的项目级 GenData 段；`gidcnd` 不涉及） |
 | `vcxproj.j2` / `vcxproj.filters.j2` | VS 工程文件（备用） |
 | `imp.cmd.j2` | caculate 命令流模板：渲染 `initMatrix→eProgram→solve→uPhy→calRightVals` 完整流程（命令名 `imp`，目前唯一命令模板） |
 | `pack_templates.py` | 打包模板到 `templates.db` |
