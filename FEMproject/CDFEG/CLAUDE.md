@@ -14,6 +14,8 @@
 | 2026-06-18 | 深挖补充 | 新增第九节「核心实现细节」：梳理 `PhyFieldData.cpp` / `EquationSystem.cpp` 的总刚组装、自由度编号、划行列法边界施加、`_bSavedData0` 基线机制与求解/后处理实现 |
 | 2026-06-18 | 深挖修正 | §9.3 修正单刚存储顺序描述：`adda` 列主序读取 vs 示例 `ElQ4g` 行主序填充，二者相反、靠单刚对称性掩盖（派生非对称单刚需注意） |
 | 2026-06-18 | 修复 | `adda` 单刚读取改为行主序（`estifn[j*nd+i]`→`estifn[i*nd+j]`），与所有单元的行主序填充统一；消除"靠对称性掩盖"的潜在非对称单刚错误（现有示例单刚均对称，结果不变） |
+| 2026-06-19 | 新增 | 三层 `_addParams`/`_paramValues`/`getParam` 额外参数前处理机制：各层声明参数组，`gidPrePost::pre()` 收集声明表、读 dat 按组名回填 `_paramValues`，`getParam(组名,参数名)` 取值。DEl2D Newmark gamma/beta 为首个应用。新增 `testPreParam` 回归测试（详见 §5.5、§6） |
+| 2026-06-19 | 清理 | 删除 `FEMproject/include/CDFEG/` 历史头文件副本（15 个，无构建/示例引用）；修复 `GidPrePost2.h`/`vtkPost.cpp` 头文件自包含缺陷，使 MinGW 完整 CMake 构建可用 |
 
 ---
 
@@ -24,7 +26,7 @@
 ## 二、入口与启动
 
 - 无可执行入口；本库编译为目标 `CDFEG`（SHARED）。
-- 使用方通过 `target_link_libraries(示例 PRIVATE CDFEG)` 链接，并在源码中 `#include "CDFEG/FemData.h"` 等头文件（注意：根 CMake 设 `${CMAKE_SOURCE_DIR}` 为包含目录，所以引用路径为 `CDFEG/xxx.h`；另有 `FEMproject/include/CDFEG/` 是历史公共头副本）。
+- 使用方通过 `target_link_libraries(示例 PRIVATE CDFEG)` 链接，并在源码中 `#include "CDFEG/FemData.h"` 等头文件（根 CMake 设 `${CMAKE_SOURCE_DIR}` 为包含目录，引用路径为 `CDFEG/xxx.h`）。
 - 导出宏 `CDFEG_API` 由 `CDFEG.h` 定义，受 `CDFEG_EXPORTS` 宏控制；`CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE` 自动导出全部符号。
 
 ## 三、架构与对外接口
@@ -44,6 +46,7 @@
 | **虚函数** | `virtual int caculate() {return -1;}` | 派生类**必须**实现，控制计算流程 |
 | **虚函数** | `virtual int main() {return -1;}` | 派生类**必须**实现（部分示例用全局 main 替代） |
 | 前后处理 | `_processors: vector<Processor*>` | 持有前后处理器实例 |
+| 额外参数 | `_addParams` / `_paramValues` / `getParam(组名,参数名)` | **三层均有**：声明参数组、gidPrePost 回填后取值（见 §5.5） |
 
 #### 中层 `PhyFieldData`（PhyFieldData.h/.cpp）—— 物理场类
 包含一个或多个单元，负责该场的方程组装、求解与后处理。
@@ -125,7 +128,7 @@
 | 类 | 头文件 | 职责 |
 | --- | --- | --- |
 | `Processor`（抽象基） | Processor.h | `pre()` / `post(it)` 虚函数，持有 `_femData` 与 `_phyFieldData` |
-| `GidPrePost` | gidPrePost.h/.cpp | GiD 文件读写：`setFilePath` / `pre()` 读 `.dat`；`post()` / `post2(it)` 写 `.msh`/`.res`；持 `_resItems: vector<GidResItem>` |
+| `GidPrePost` | gidPrePost.h/.cpp | GiD 文件读写：`setFilePath` / `pre()` 读 `.dat`（含按三层 `_addParams` 声明收集并回填额外参数到各层 `_paramValues`，见 §5.5）；`post()` / `post2(it)` 写 `.msh`/`.res`；持 `_resItems: vector<GidResItem>` |
 | `GidPrePost2` | GidPrePost2.h/.cpp | GiD 后处理变体（多结果项） |
 | `GidResItem` | GidResItem.h/.cpp | 结果项描述：名称、类型（`GidResultType::Vector/Matrix/Scalar`）、`addVal(iField, valName)` 绑定物理场结果列 |
 | `vtkPost` | vtkPost.h/.cpp | VTK 后处理：`writeVTK(fn)` |
@@ -160,9 +163,20 @@
 
 `FEMData::_mateParams: vector<map<string,double>>` + `_mateNames`。`getElemMatParams(eleID, ele)` 按 `_eleMateIds` 索引返回。dat 中材料名必须为 `mat_<单元_name>`（见根文档 7.6）。
 
+### 5.5 额外参数前处理读取（`_addParams` 机制）
+
+三层（`FEMData` / `PhyFieldData` / `ElementBase`）均有 `_addParams: vector<vector<string>>`（每组首元素为组名、其余为参数名）与 `_paramValues: map<组名, vector<double>>`。
+
+- **声明与回填**：`gidPrePost::pre()` 开头 `collectPreParamDecls()` 收集三层声明表（跳过保留名 `time/basedata/coord/id/ubf/elem`、重名告警）；读 dat 时按组名命中、读一行 double 截断回填到声明层 `_paramValues`（用原始组名作 key）。
+- **取值**：各层 `getParam(组名, 参数名)` 按 `_addParams` 定位、从 `_paramValues` 取值；组/参数名不存在或值未读到时返回 `0.0`。
+- **dat 格式**：与 `time` 段同构（单星 `* name=<组名>` + 一行值），属项目级 GenData；`.bas` 模板用双星 `** name=`（GiD 渲染成单星）。
+- **pyTool 端**：由 `preParams`（`{name, params, defaults}`）→ `gidbas.j2`（`*GenData` 段）/ `gidprb.j2`（`QUESTION` 段）生成。
+- **首个应用**：DEl2D Newmark `gamma/beta`（`NewmarkDispFieldData._addParams = {{"newmark","gamma","beta"}}`，`NewmarkData::caculate` 用 `getParam` 取值并校验 `beta>0`）。设计稿见 `docs/superpowers/specs/2026-06-19-额外参数前处理机制-design.md`。
+
 ## 六、测试与质量
 
-- 无独立单元测试目录；回归依赖 `FEMproject/sample/` 各示例（truss1D 输出 `Truss1D.txt` 可人工核对）。
+- 机制级回归测试：`FEMproject/testPreParam/testPreParam.cpp`（验证三层 `_paramValues` 回填与 `getParam` 防御分支：组/参数名不存在、组行长度<2、向量越界均返回 0.0），已纳入根 CMake 的 `testPreParam` target。
+- 其它回归依赖 `FEMproject/sample/` 各示例（truss1D 输出 `Truss1D.txt` 可人工核对）。
 - 历史测试数据：`FEMproject/test/el2dData/`（注意：`.gitignore` 第 57 行忽略 `/FEMproject/test`，即此目录不入库）。
 - 质量工具：未见 eslint/ruff/golangci 等配置；Python 端靠 `pyTool/test/test*.py` 脚本（既是测试也是代码生成入口）。
 
@@ -177,8 +191,8 @@
 3. **Q: 如何选择继承 `ElementBase` 还是 `IsoEleBase`？**  
    A: 桁架等直接给单刚的单元继承 `ElementBase`；Q4/T3/六面体等需要形函数+高斯积分的等参元继承 `IsoEleBase`。pyTool 的 `DataEleSub.type ≥ 2` 时自动选 `IsoEleBase`。
 
-4. **Q: `FEMproject/include/CDFEG/` 与本目录的头文件关系？**  
-   A: `include/CDFEG/` 是历史公共头副本（含相同 15 个头），实际编译用本目录。两者内容需保持一致，属待清理项。
+4. **Q: 头文件包含路径？是否还有 `include/` 副本？**  
+   A: 统一用 `FEMproject/CDFEG/` 下的头文件（根 CMake 设 `${CMAKE_SOURCE_DIR}` 为包含目录，引用 `CDFEG/xxx.h`）。历史 `FEMproject/include/CDFEG/` 公共头副本已于 2026-06-19 删除（无构建/示例引用）。
 
 ## 八、相关文件清单
 
@@ -188,7 +202,7 @@
 构建：`CMakeLists.txt`  
 架构说明（人工）：`../程序说明.md`
 
-> 备注：`FEMproject/include/CDFEG/` 下有同名头文件副本（15 个），维护时注意同步。
+测试：`../testPreParam/testPreParam.cpp`（额外参数前处理机制回归，根 CMake 的 `testPreParam` target）
 
 ## 九、核心实现细节（总刚组装 / 边界施加 / 求解）
 
