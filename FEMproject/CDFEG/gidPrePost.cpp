@@ -167,6 +167,8 @@ namespace CDFEG {
 				}
 			}
 		}
+		// 额外参数声明表用完即清：裸指针仅在 pre() 内有效，避免常驻悬垂指针
+		_preParamDecls.clear();
 		return 0;
 	}
 

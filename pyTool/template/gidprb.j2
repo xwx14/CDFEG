@@ -8,7 +8,7 @@ VALUE: 1.0
 {% for pp in preParams %}
 {% for p in pp.params %}
 QUESTION: {{ p }}
-VALUE: {{ pp.defaults[loop.index0] }}
+VALUE: {{ pp.defaults[loop.index0] if (pp.defaults|length) > loop.index0 else 0.0 }}
 {% endfor %}
 {% endfor %}
 {%for mat in materials%}
