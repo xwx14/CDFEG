@@ -3,15 +3,6 @@
 > 创刀有限元程序生成系统（CDFEG = Chuang-Dao Finite Element Program Generator）。
 > 本文件由 init-architect 子智能体于 2026-06-18 15:43:22 生成/更新，供 AI 协作时快速建立全局认知。
 
-## 变更记录 (Changelog)
-
-| 时间 | 操作 | 说明 |
-| --- | --- | --- |
-| 2026-06-18 15:43:22 | 初始化 | init-architect 首次扫描，生成根级 + 3 个模块级 CLAUDE.md，建立三层架构与两大子系统的全局视图 |
-| 2026-06-18 | 清理 | 删除遗留示例 sample/el3d（依赖的旧基类 W4G/C8G/Q4g 在新核心库已不存在），示例数 7→6 |
-
----
-
 ## 一、项目愿景
 
 CDFEG 是一套**自研的有限元程序基础库 + 代码生成工具链**，目标是：
@@ -178,55 +169,45 @@ MakerGidFile(project, "sample/El2D").makeAll()  # 生成 GiD 文件
 - **makeData 形式**（mainMode=0，如 truss1D）：在 `main.cpp` 中手工 `addNode/addEle`，无文件依赖。
 - **GiD 数据文件形式**（mainMode=1，如 El2D）：命令行 `<project> <path>`，由 `GidPrePost.pre()` 读取 `<project>.dat`。
 
-## 六、全局规范（来自用户全局 CLAUDE.md）
+## 六、关键约定
 
-- **回复语言**：始终用简体中文回复。
-- **Git 提交**：提交注释采用中文；**未经用户主动要求，绝不执行 git 提交与分支操作**。
-- **命名**：变量及函数使用驼峰命名法。
-- **bat 脚本**：全英文，建立后要进行测试修正。
-- **文档**：以中文命名（CLAUDE.md 本身按约定保留英文名）。
-- **运行脚本前**：先从其代码确认其功能。
-- **工具选择**：结构性问题（调用关系、影响面、符号定义）用 codegraph；字面文本查询（字符串、注释、日志）用 grep/read。
-
-## 七、关键约定
-
-### 7.1 命名空间与导出
+### 6.1 命名空间与导出
 
 - 核心库统一命名空间 `CDFEG::`（曾用名 `SIFEG::`）。
 - DLL 导出宏 `CDFEG_API`：编译库时定义 `CDFEG_EXPORTS` 走 `dllexport`，使用方走 `dllimport`。
 
-### 7.2 单元子程序契约（ElementBase）
+### 6.2 单元子程序契约（ElementBase）
 
 派生单元必须：
 1. 构造函数设置 `_name`、`_nNode`、`_dispNames`、`_paramNames`、`_vtkCellType` 等基本信息；
 2. 重写 `run(r, coef, matParams)` 返回 `EleSubResult{estif, emass, edamp, eload, nodeIds}`；
 3. 可选重写 `uEle(...)` 返回后处理结果（应力、轴力等）。
 
-### 7.3 物理场契约（PhyFieldData）
+### 6.3 物理场契约（PhyFieldData）
 
 - 静力椭圆问题：默认 `eProgram()` 转发到已实现的 `eProgram_el()`，**无需重写**。
 - 动力学/非椭圆：**必须重写** `eProgram()`（如 Newmark 有效矩阵装配）与 `uPhy()`（状态更新 + 历史保存）。
 - 详见 `FEMproject/CDFEG/CLAUDE.md` 与 `FEMproject/sample/DEl2D/升级说明.md`（记录了 5 个易错点，尤其 `_bSavedData0` 缓存基线陷阱）。
 
-### 7.4 数据类契约（FEMData）
+### 6.4 数据类契约（FEMData）
 
 派生总体数据类必须：
 1. 构造函数设置网格（或通过 `GidPrePost.pre()` 从 `.dat` 读取）；
 2. 重写 `caculate()` 控制整个计算流程；
 3. 重写 `main()`（部分示例直接在 `main.cpp` 用全局函数替代）。
 
-### 7.5 前后处理器（Processor 派生）
+### 6.5 前后处理器（Processor 派生）
 
 - `Processor` 为抽象基类（`pre()` / `post()`）。
 - `GidPrePost`：读 `.dat`、写 `.msh`/`.res`，支持 `post2()` 多结果项输出。
 - `vtkPost`：写 VTK 文件。
 - `inpReader`：读 Abaqus `.inp`。
 
-### 7.6 dat 材料名约定
+### 6.6 dat 材料名约定
 
 `GidPrePost::readMate` 按 `mat_<单元_name>` 匹配材料。dat 文件 elem 段的 `name` 必须与单元 `_name` 完全一致，否则材料读取失败、单刚全为 0。
 
-## 八、AI 使用指引
+## 七、AI 使用指引
 
 1. **改核心库前**：先看 `FEMproject/CDFEG/CLAUDE.md` 的三层架构契约，避免破坏派生类假设。
 2. **改示例前**：先确认该示例是手写还是 pyTool 生成——**运行 pyTool 的 test 脚本会覆盖手写 C++ 源码**（见 `sample/DEl2D/升级说明.md` 5.11 节）。

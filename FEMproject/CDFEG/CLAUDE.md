@@ -6,19 +6,6 @@
 > 类型：C++ 动态链接库（DLL），命名空间 `CDFEG::`，C++14，依赖 Eigen 3.4  
 > 维护者：xwx14（谢文玺）
 
-## 变更记录 (Changelog)
-
-| 时间 | 说明 |
-| --- | --- |
-| 2026-06-18 15:43:22 | init-architect 首次生成模块文档 |
-| 2026-06-18 | 深挖补充 | 新增第九节「核心实现细节」：梳理 `PhyFieldData.cpp` / `EquationSystem.cpp` 的总刚组装、自由度编号、划行列法边界施加、`_bSavedData0` 基线机制与求解/后处理实现 |
-| 2026-06-18 | 深挖修正 | §9.3 修正单刚存储顺序描述：`adda` 列主序读取 vs 示例 `ElQ4g` 行主序填充，二者相反、靠单刚对称性掩盖（派生非对称单刚需注意） |
-| 2026-06-18 | 修复 | `adda` 单刚读取改为行主序（`estifn[j*nd+i]`→`estifn[i*nd+j]`），与所有单元的行主序填充统一；消除"靠对称性掩盖"的潜在非对称单刚错误（现有示例单刚均对称，结果不变） |
-| 2026-06-19 | 新增 | 三层 `_addParams`/`_paramValues`/`getParam` 额外参数前处理机制：各层声明参数组，`gidPrePost::pre()` 收集声明表、读 dat 按组名回填 `_paramValues`，`getParam(组名,参数名)` 取值。DEl2D Newmark gamma/beta 为首个应用。新增 `testPreParam` 回归测试（详见 §5.5、§6） |
-| 2026-06-19 | 清理 | 删除 `FEMproject/include/CDFEG/` 历史头文件副本（15 个，无构建/示例引用）；修复 `GidPrePost2.h`/`vtkPost.cpp` 头文件自包含缺陷，使 MinGW 完整 CMake 构建可用 |
-
----
-
 ## 一、模块职责
 
 提供有限元程序的**通用计算函数和通用父类**，使具体有限元程序只需派生并填充少量虚函数。本库本身不包含 main，编译为 `CDFEG.dll`（Windows）/ 共享库供示例链接。
