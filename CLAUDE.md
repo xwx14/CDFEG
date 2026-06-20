@@ -23,6 +23,7 @@
 
 - **pyTool test 脚本会覆盖 sample 手写 C++ 源码**：`test/test*.py` 是代码生成器，运行即覆盖对应示例。**DEl2D 是手写动力学示例，勿运行 `testDEL2D.py`**（会用空壳覆盖 `NewmarkQ4g`）。
 - **dat 材料名约定**：dat elem 段 `name` 与材料段 `mat_<name>` 必须与单元 `_name` 完全一致，否则材料读取失败、单刚全 0。
+- **dat 行尾与 TextReader**：`TextReader` 必须以 binary 模式打开（`std::ios::binary`）——`preLine` 依赖 `seekg` 字节精确回退，文本模式对 CRLF 文件 `tellg/seekg` 错位会使 `pre()` 跳过 coord/elem 段导致崩溃（曾致 DEl2D `writeNodes` 越界 SIGSEGV）。仓库以 `.gitattributes` 约定 `*.dat eol=lf`，库已兼容 CRLF/LF。
 
 ## AI 协作指引
 
