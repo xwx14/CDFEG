@@ -1,0 +1,3 @@
+# 统一数据文件行尾为 LF，避免 git autocrlf=true 在 Windows checkout 时将 dat 转为 CRLF
+# （核心库 TextReader 已以二进制模式读取并兼容 CRLF/LF，此处仅规范仓库行尾、减少跨平台 diff 噪音）
+*.dat text eol=lf

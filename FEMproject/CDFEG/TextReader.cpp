@@ -45,8 +45,9 @@ namespace CDFEG {
 			_fileStream.close();
 		}
 		
-		// 打开文件
-		_fileStream.open(_filePath.c_str());
+		// 以二进制模式打开：避免 Windows 文本模式下 tellg/seekg 在 CRLF 文件上位置错位
+		// （文本模式 CRLF→LF 转换会使 preLine 的 seekg 回退定位失败，导致 pre() 解析跳过数据段）
+		_fileStream.open(_filePath.c_str(), std::ios::in | std::ios::binary);
 		
 		// 清空当前行
 		_currentLine.clear();
@@ -75,8 +76,11 @@ namespace CDFEG {
 			return false;
 		}
 		_lastPos = _fileStream.tellg();
-		// 读取下一行
+		// 读取下一行（二进制模式不转换行尾，手动去除行尾 \r，使 _currentLine 内容与文本模式一致）
 		if (std::getline(_fileStream, _currentLine)) {
+			if (!_currentLine.empty() && _currentLine.back() == '\r') {
+				_currentLine.pop_back();
+			}
 			return true;
 		}
 		
