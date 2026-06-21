@@ -7,15 +7,15 @@ message(STATUS "del2d Eigen include directory: ${EIGEN_INCLUDE_DIR}")
 
 set(SOURCES
     main.cpp
-    NewmarkData.cpp
-    NewmarkDispFieldData.cpp
-    NewmarkQ4g.cpp
+    del2dData.cpp
+    DelDispFieldData.cpp
+    DelQ4g.cpp
 )
 
 set(HEADERS
-    NewmarkData.h
-    NewmarkDispFieldData.h
-    NewmarkQ4g.h
+    del2dData.h
+    DelDispFieldData.h
+    DelQ4g.h
 )
 
 # 创建可执行文件

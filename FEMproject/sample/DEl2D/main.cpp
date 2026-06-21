@@ -15,8 +15,8 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 
 #include <iostream>
-#include "NewmarkData.h"
-#include "NewmarkDispFieldData.h"
+#include "del2dData.h"
+#include "DelDispFieldData.h"
 #include "CDFEG/gidPrePost.h"
 
 int main(int argc, char* argv[]) {
@@ -27,13 +27,13 @@ int main(int argc, char* argv[]) {
     std::string project = argv[1];
     std::string path = argv[2];
 
-    NewmarkData data;
+    del2dData data;
     CDFEG::GidPrePost gidPrePost(&data);
     gidPrePost.setFilePath(path, project);
     gidPrePost.pre();
 
     // 前处理完成后设置初值（按程序内节点号，此处示例置零，可按需调用）
-    NewmarkDispFieldData* field = static_cast<NewmarkDispFieldData*>(data._phyDatas[0]);
+    DelDispFieldData* field = static_cast<DelDispFieldData*>(data._phyDatas[0]);
     // 例：初值全零；如有初速度/初加速度可在此循环调用 field->setInitialVel / setInitialAcc
 
     // 注册 GiD 结果项：位移、速度、加速度、应力（按节点输出）

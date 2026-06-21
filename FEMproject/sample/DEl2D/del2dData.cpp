@@ -14,29 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 
-#include "NewmarkData.h"
-#include "NewmarkDispFieldData.h"
+#include "del2dData.h"
+#include "DelDispFieldData.h"
 #include "CDFEG/gidPrePost.h"
 #include <iostream>
 
-NewmarkData::NewmarkData() {
+del2dData::del2dData() {
     _dim = 2;
     // 动力位移场（Newmark-β）
-    NewmarkDispFieldData* field = new NewmarkDispFieldData(this);
+    DelDispFieldData* field = new DelDispFieldData(this);
     _phyDatas.push_back(field);
 }
 
-NewmarkData::~NewmarkData() {
+del2dData::~del2dData() {
 
 }
 
-void NewmarkData::setPost(CDFEG::GidPrePost* prePost)
+void del2dData::setPost(CDFEG::GidPrePost* prePost)
 {
     _prePost = prePost;
 }
 
-int NewmarkData::caculate() {
-    NewmarkDispFieldData* aField = static_cast<NewmarkDispFieldData*>(_phyDatas[0]);
+int del2dData::caculate() {
+    DelDispFieldData* aField = static_cast<DelDispFieldData*>(_phyDatas[0]);
 
     // 一次方程编号 + 稀疏骨架初始化（稀疏结构全程不变）
     aField->initMatrix();
@@ -44,14 +44,14 @@ int NewmarkData::caculate() {
     // dt/tmax 来自 dat 的 time 段（FEMData 持有）；gamma/beta 来自 dat 的 newmark 段（物理场 _addParams 声明）
     if (_dt <= 0.0)
     {
-        std::cerr << "[NewmarkData] dt <= 0, 请检查 dat 文件 time 段" << std::endl;
+        std::cerr << "[del2dData] dt <= 0, 请检查 dat 文件 time 段" << std::endl;
         return -1;
     }
     double gamma = aField->getParam("newmark","gamma");
     double beta  = aField->getParam("newmark","beta");
     if (beta <= 0.0)
     {
-        std::cerr << "[NewmarkData] beta <= 0, 请检查 dat 文件 newmark 段" << std::endl;
+        std::cerr << "[del2dData] beta <= 0, 请检查 dat 文件 newmark 段" << std::endl;
         return -1;
     }
     aField->setNewmarkParams(gamma, beta, _dt);
@@ -78,7 +78,7 @@ int NewmarkData::caculate() {
     return 1;
 }
 
-int NewmarkData::main() {
+int del2dData::main() {
     caculate();
     return 1;
 }

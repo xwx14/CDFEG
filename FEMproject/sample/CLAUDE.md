@@ -13,7 +13,7 @@
 | truss3D | 3D | 桁架静力 | `Truss3D` | — | 否 | 是 |
 | El2D | 2D | 平面应力静力 | `ElQ4g`/`ElT3g`/`StressBL2g` | GiD | 否 | 是 |
 | ElT3 | 2D | 弹性力学 | `ElT3` | — | 否 | 是 |
-| DEl2D | 2D | Newmark-β 动力学 | `NewmarkQ4g` | GiD | **是** | **否（手写）** |
+| DEl2D | 2D | Newmark-β 动力学 | `DelQ4g` | GiD | **是** | **是（框架生成，逻辑手填）** |
 
 ## 入口形式
 
@@ -21,10 +21,6 @@
 | --- | --- | --- | --- |
 | makeData | 0 | truss1D | `main()` 内手工 `addNode/addEle`，无文件依赖 |
 | GiD 数据文件 | 1 | El2D、DEl2D | 命令行 `<project> <path>`，`GidPrePost.pre()` 读 `<project>.dat` |
-
-## 关键陷阱
-
-- **DEl2D 是手写动力学示例，勿运行 `testDEL2D.py`**：pyTool 会用空壳 `ElQ4g` 覆盖手写的 `NewmarkQ4g`，丢失动力学逻辑。注意动力学每步须 `_equSys._bSavedData0 = false` 刷新基线（见 `.claude/rules/核心库实现细节.md`）。
 
 ## 关联
 

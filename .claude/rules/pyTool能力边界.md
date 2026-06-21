@@ -20,7 +20,7 @@
 
 ## 不能生成（需人工填充）
 
-1. **单元计算逻辑**：`run()` 体（`ele.runCode`）、`uEle()` 体（`ele.uCode`）——高斯积分、B 矩阵、单刚组装、应力计算全部手写。`testDEL2D.py` 未设 `runCode`，故生成的 `ElQ4g` 是**空壳**。
+1. **单元计算逻辑**：`run()` 体（`ele.runCode`）、`uEle()` 体（`ele.uCode`）——高斯积分、B 矩阵、单刚组装、应力计算全部手写。`testDEL2D.py` 未设 `runCode`，故生成的 `DelQ4g` 是**空壳**。
 2. **物理场后处理**：模板**不生成 `uPhy` 重写**；应力外推、von Mises 等需人工补（对比手写 `ElDispFieldData::uPhy`）。
 3. **GiD 结果项**：生成 main 用 `post()`（非 `post2()`），**不注册 `GidResItem`**——结果输出可能不全（对比手写 El2D main）。
 4. **动力学**：数据结构有 `bDynamic`/`pdeType`/`sch` 字段，但**无代码生成**——Newmark 有效矩阵、时间步循环、`_bSavedData0` 管理全手写。
@@ -29,12 +29,10 @@
 
 ## 对齐度（生成 vs 手写示例）
 
-| 对比项 | 手写 El2D/DEl2D | pyTool 生成 |
+| 对比项 | 完整实现（El2D/DEl2D） | pyTool 生成框架 |
 | --- | --- | --- |
 | 单元构造 | 完整 | **对齐**（元信息 + 积分参数一致） |
 | `shapeFun` | 完整 | **对齐**（从 `shapeFuns` 字符串生成） |
 | `run`/`uEle` 体 | 完整计算逻辑 | **空壳**（仅 `{{runCode}}`/`{{uCode}}` 占位） |
 | `uPhy` 重写 | 应力外推 + von Mises | **不生成**（用基类，仅回填位移） |
 | main 结果输出 | `post2()` + 注册 `GidResItem` | `post()`，无注册 |
-
-> ⚠️ 勿运行 `testDEL2D.py`：它会用空壳 `ElQ4g` 覆盖手写的 `NewmarkQ4g` 动力学逻辑。

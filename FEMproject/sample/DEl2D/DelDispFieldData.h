@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 
-#ifndef NEWMARK_DISP_FIELD_DATA_H
-#define NEWMARK_DISP_FIELD_DATA_H
+#ifndef DEL_DISP_FIELD_DATA_H
+#define DEL_DISP_FIELD_DATA_H
 #include "CDFEG/PhyFieldData.h"
 #include <vector>
 #include <string>
@@ -26,10 +26,10 @@
 //   2) 新增当前步位移 _u / 速度 _v / 加速度 _w
 //   3) 重写 eProgram：装配 Newmark 有效矩阵 K+a0·M+a1·C 与有效载荷
 //   4) 重写 uPhy：由解向量更新加速度/速度/位移，并保存为下一步初值，再做应力恢复
-class NewmarkDispFieldData : public CDFEG::PhyFieldData {
+class DelDispFieldData : public CDFEG::PhyFieldData {
 public:
-    NewmarkDispFieldData(CDFEG::FEMData* femData);
-    ~NewmarkDispFieldData();
+    DelDispFieldData(CDFEG::FEMData* femData);
+    ~DelDispFieldData();
 
     // 设置 Newmark 积分参数（dt/tmax 由 FEMData 持有，gamma/beta 默认 0.5/0.25 平均加速度法）
     void setNewmarkParams(double gamma, double beta, double dt);

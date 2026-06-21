@@ -14,20 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 
-#include "NewmarkDispFieldData.h"
-#include "NewmarkData.h"
-#include "NewmarkQ4g.h"
+#include "DelDispFieldData.h"
+#include "del2dData.h"
+#include "DelQ4g.h"
 #include "CDFEG/ElementBase.h"
 #include "CDFEG/EquationSystem.h"
 #include <cmath>
 
-NewmarkDispFieldData::NewmarkDispFieldData(CDFEG::FEMData* femData)
+DelDispFieldData::DelDispFieldData(CDFEG::FEMData* femData)
     : CDFEG::PhyFieldData(2, femData) {
-    _name = "NewmarkDisp";
+    _name = "DelDisp";
     _dispNames = { "u", "v" };
     _dof2 = 2;
     // 注册动力单元（含集中质量/阻尼输出）
-    _eleSubs.push_back(new NewmarkQ4g(this));
+    _eleSubs.push_back(new DelQ4g(this));
     // 应力恢复结果名
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
     _resForm = "Vector OnNodes";
@@ -35,11 +35,11 @@ NewmarkDispFieldData::NewmarkDispFieldData(CDFEG::FEMData* femData)
     _addParams = { {"newmark","gamma","beta"} };
 }
 
-NewmarkDispFieldData::~NewmarkDispFieldData() {
+DelDispFieldData::~DelDispFieldData() {
 
 }
 
-void NewmarkDispFieldData::ensureHistorySize()
+void DelDispFieldData::ensureHistorySize()
 {
     if ((int)_u1.size() != _kVar)
     {
@@ -52,7 +52,7 @@ void NewmarkDispFieldData::ensureHistorySize()
     }
 }
 
-void NewmarkDispFieldData::setNewmarkParams(double gamma, double beta, double dt)
+void DelDispFieldData::setNewmarkParams(double gamma, double beta, double dt)
 {
     _gamma = gamma;
     _beta = beta;
@@ -60,7 +60,7 @@ void NewmarkDispFieldData::setNewmarkParams(double gamma, double beta, double dt
     calcNewmarkConstants();
 }
 
-void NewmarkDispFieldData::calcNewmarkConstants()
+void DelDispFieldData::calcNewmarkConstants()
 {
     // 标准 Newmark-β 积分常数（对应旧 newmarka.nfe 的 @begin 段）
     double o = _gamma;
@@ -75,28 +75,28 @@ void NewmarkDispFieldData::calcNewmarkConstants()
     _a7 = _dt * o;
 }
 
-void NewmarkDispFieldData::setInitialDisp(int nodeId, double u, double v)
+void DelDispFieldData::setInitialDisp(int nodeId, double u, double v)
 {
     ensureHistorySize();
     _u1[nodeId * _dof + 0] = u;
     _u1[nodeId * _dof + 1] = v;
 }
 
-void NewmarkDispFieldData::setInitialVel(int nodeId, double vu, double vv)
+void DelDispFieldData::setInitialVel(int nodeId, double vu, double vv)
 {
     ensureHistorySize();
     _v1[nodeId * _dof + 0] = vu;
     _v1[nodeId * _dof + 1] = vv;
 }
 
-void NewmarkDispFieldData::setInitialAcc(int nodeId, double au, double av)
+void DelDispFieldData::setInitialAcc(int nodeId, double au, double av)
 {
     ensureHistorySize();
     _w1[nodeId * _dof + 0] = au;
     _w1[nodeId * _dof + 1] = av;
 }
 
-int NewmarkDispFieldData::eProgram()
+int DelDispFieldData::eProgram()
 {
     ensureHistorySize();
     int dim = _femData->_dim;
@@ -184,7 +184,7 @@ int NewmarkDispFieldData::eProgram()
     return 1;
 }
 
-int NewmarkDispFieldData::uPhy()
+int DelDispFieldData::uPhy()
 {
     ensureHistorySize();
     // 1) 由解向量 _rhs 读取当前步位移

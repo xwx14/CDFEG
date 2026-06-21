@@ -65,7 +65,7 @@ MakerGidFile(project, "sample/El2D").makeAll()  # GiD .bas/.prb/.cnd/.bat
 
 | 现象 | 原因 | 修复 |
 | --- | --- | --- |
-| **手写示例被覆盖、动力学逻辑丢失** | 运行了对应 test 脚本 | **DEl2D 是手写的，勿运行 `testDEL2D.py`**（会用空壳 `ElQ4g` 覆盖 `NewmarkQ4g`） |
+| 手填逻辑被覆盖 | 重运行 test 脚本覆盖了手填的 `run`/`uEle`/`uPhy` 体 | 重生成前备份手填逻辑。DEl2D 已对齐命名（`DelQ4g`），`testDEL2D.py` 生成框架、Newmark 逻辑手填，可安全重生成（勿覆盖手填体） |
 | 等参元编译报错 | `baseClass` 未设 `IsoEleBase` | `type≥2` 自动设，或手动 `ele.baseClass = "IsoEleBase"` |
 | shapeFun 占位符未替换 | `shapeFuns` 未用 `x[i]` 占位符 | 用 `x[1]/x[2]`，由 `_replaceCoordVars` 替换为 `coordVars` |
 | VTK 单元类型错 | 未调 `inferVTKCellType()` | 构造后调用 |

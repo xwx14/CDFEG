@@ -33,4 +33,3 @@
 
 - 类结构与成员详解：[`代码解释.md`](./代码解释.md)（FEMData / PhyFieldData / ElementBase 层次与关键成员方法）
 - 总刚组装 / 边界划行列法 / 求解 / 后处理机制与陷阱：[`.claude/rules/核心库实现细节.md`](../../.claude/rules/核心库实现细节.md)
-- 相对旧 el 项目（FEPG/C）的升级说明：[`升级说明.md`](./升级说明.md)

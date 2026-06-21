@@ -14,18 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 
-#include "NewmarkQ4g.h"
-#include "NewmarkDispFieldData.h"
-#include "NewmarkData.h"
+#include "DelQ4g.h"
+#include "DelDispFieldData.h"
+#include "del2dData.h"
 #include "CDFEG/MatrixFun.h"
 
-NewmarkQ4g::NewmarkQ4g(CDFEG::PhyFieldData* pData)
+DelQ4g::DelQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
-    _name = "NewmarkQ4g";
+    _name = "DelQ4g";
     _dispNames = { "u", "v" };
     // 旧项目 a1eq4g2 材料：pe/pv/fu/fv/rou/alpha 六参数
     _paramNames = { "pe", "pv", "fu", "fv", "rou", "alpha" };
-    _types.insert("NewmarkQ4g");
+    _types.insert("DelQ4g");
 
     _dim = 2;
     _nGaus = 4;
@@ -56,11 +56,11 @@ NewmarkQ4g::NewmarkQ4g(CDFEG::PhyFieldData* pData)
     _vtkCellType = VTKCellType::VTK_QUAD;
 }
 
-NewmarkQ4g::~NewmarkQ4g() {
+DelQ4g::~DelQ4g() {
 
 }
 
-std::vector<double> NewmarkQ4g::shapeFun(const std::vector<double>& refc) {
+std::vector<double> DelQ4g::shapeFun(const std::vector<double>& refc) {
     std::vector<double> rt;
     double rx = refc[0];
     double ry = refc[1];
@@ -75,7 +75,7 @@ std::vector<double> NewmarkQ4g::shapeFun(const std::vector<double>& refc) {
     return rt;
 }
 
-CDFEG::EleSubResult& NewmarkQ4g::run(
+CDFEG::EleSubResult& DelQ4g::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
@@ -173,7 +173,7 @@ CDFEG::EleSubResult& NewmarkQ4g::run(
     return _result;
 }
 
-CDFEG::uResult NewmarkQ4g::uEle(
+CDFEG::uResult DelQ4g::uEle(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
