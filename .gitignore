@@ -53,6 +53,11 @@ Thumbs.db
 /pyTool/test/truss1D
 /FEMproject/builid22
 /FEMproject/buildvs
+
+# macs 迁移项目（new 模式）：生成的 CDFEG/third 库副本不入库（已在 FEMproject/CDFEG 跟踪），
+# 项目源码（macs/<Proj>/el/ 等）入库供填充
+/macs/*/CDFEG/
+/macs/*/third/
 /slides
 /DevTool
 /plans
