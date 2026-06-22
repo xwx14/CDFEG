@@ -1,0 +1,266 @@
+{
+    "name": "el",
+    "dim": 2,
+    "coordVars": [
+        "x",
+        "y"
+    ],
+    "eleType": [],
+    "fields": [
+        {
+            "name": "ela",
+            "eleSubs": [
+                {
+                    "name": "a1eq4g2",
+                    "dim": 2,
+                    "coordVars": [
+                        "x",
+                        "y"
+                    ],
+                    "nNodes": 4,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [
+                        "exx",
+                        "eyy",
+                        "exy"
+                    ],
+                    "paramNames": [
+                        "pe",
+                        "pv",
+                        "fu",
+                        "fv",
+                        "rou",
+                        "alpha"
+                    ],
+                    "paramValues": [
+                        10000000000.0,
+                        0.3,
+                        0.0,
+                        0.0,
+                        3000.0,
+                        0.6
+                    ],
+                    "bBC": false,
+                    "index": 1,
+                    "type": 2,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "preParams": [],
+                    "vtkCellType": "QUAD",
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            0.5773502692,
+                            0.5773502692
+                        ],
+                        [
+                            0.5773502692,
+                            -0.5773502692
+                        ],
+                        [
+                            -0.5773502692,
+                            0.5773502692
+                        ],
+                        [
+                            -0.5773502692,
+                            -0.5773502692
+                        ]
+                    ],
+                    "gaussWeights": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "shapeFuns": [
+                        "(1.-x[1])/2*(1.-x[2])/2",
+                        "(1.+x[1])/2*(1.-x[2])/2",
+                        "(1.+x[1])/2*(1.+x[2])/2",
+                        "(1.-x[1])/2*(1.+x[2])/2"
+                    ]
+                },
+                {
+                    "name": "a2ll2",
+                    "dim": 2,
+                    "coordVars": [
+                        "x"
+                    ],
+                    "nNodes": 2,
+                    "dispNames": [
+                        "u",
+                        "v"
+                    ],
+                    "eleResNames": [],
+                    "paramNames": [
+                        "fu",
+                        "fv"
+                    ],
+                    "paramValues": [
+                        0.0,
+                        100.0
+                    ],
+                    "bBC": true,
+                    "index": 1,
+                    "type": 1,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "preParams": [],
+                    "vtkCellType": "LINE",
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            -1.0
+                        ],
+                        [
+                            1.0
+                        ]
+                    ],
+                    "gaussWeights": [
+                        1.0,
+                        1.0
+                    ],
+                    "shapeFuns": [
+                        "(1.-x[1])/2",
+                        "(1.+x[1])/2"
+                    ]
+                }
+            ],
+            "eleTypes": [],
+            "pdeType": 1,
+            "dispNames": [
+                "u",
+                "v"
+            ],
+            "index": 0,
+            "bDynamic": false,
+            "sch": {},
+            "fieldDataClassName": "elaFieldData",
+            "dof": 2,
+            "dof2": 2,
+            "headerGuard": "ELA_FIELD_DATA_H",
+            "eleResNames": [
+                "exx",
+                "eyy",
+                "exy"
+            ],
+            "preParams": []
+        },
+        {
+            "name": "elb",
+            "eleSubs": [
+                {
+                    "name": "beq4g2",
+                    "dim": 2,
+                    "coordVars": [
+                        "x",
+                        "y"
+                    ],
+                    "nNodes": 4,
+                    "dispNames": [
+                        "dxx",
+                        "dyy",
+                        "dxy"
+                    ],
+                    "eleResNames": [],
+                    "paramNames": [
+                        "pe",
+                        "pv"
+                    ],
+                    "paramValues": [
+                        10000000000.0,
+                        0.3
+                    ],
+                    "bBC": false,
+                    "index": 1,
+                    "type": 2,
+                    "runCode": "",
+                    "uCode": "",
+                    "initCode": "",
+                    "shapeFunCode": "",
+                    "coordTransFunCode": "",
+                    "baseClass": "IsoEleBase",
+                    "calMatrix": [
+                        "eload",
+                        "estif",
+                        "emass",
+                        "edamp"
+                    ],
+                    "preParams": [],
+                    "vtkCellType": "QUAD",
+                    "gaussOrder": 2,
+                    "gaussPoints": [
+                        [
+                            0.5773502692,
+                            0.5773502692
+                        ],
+                        [
+                            0.5773502692,
+                            -0.5773502692
+                        ],
+                        [
+                            -0.5773502692,
+                            0.5773502692
+                        ],
+                        [
+                            -0.5773502692,
+                            -0.5773502692
+                        ]
+                    ],
+                    "gaussWeights": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "shapeFuns": [
+                        "(1.-x[1])/2*(1.-x[2])/2",
+                        "(1.+x[1])/2*(1.-x[2])/2",
+                        "(1.+x[1])/2*(1.+x[2])/2",
+                        "(1.-x[1])/2*(1.+x[2])/2"
+                    ]
+                }
+            ],
+            "eleTypes": [],
+            "pdeType": 1,
+            "dispNames": [
+                "dxx",
+                "dyy",
+                "dxy"
+            ],
+            "index": 1,
+            "bDynamic": false,
+            "sch": {},
+            "fieldDataClassName": "elbFieldData",
+            "dof": 3,
+            "dof2": 3,
+            "headerGuard": "ELB_FIELD_DATA_H",
+            "eleResNames": [],
+            "preParams": []
+        }
+    ],
+    "caculateCode": "",
+    "preParams": []
+}

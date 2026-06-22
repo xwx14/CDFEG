@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(el LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(EIGEN_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third CACHE PATH "Eigen include directory")
+
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/output)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+add_subdirectory(CDFEG)
+    add_subdirectory(el)
