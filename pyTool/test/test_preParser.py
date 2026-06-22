@@ -17,7 +17,7 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/..")
-from preParser import parsePre
+from preParser import parsePre, parseGcn
 
 MACS = r"E:/mfelProject/RegTest/testData/macs"
 proj = parsePre(MACS, "el")
@@ -58,5 +58,17 @@ ok &= (beq.type == 2)
 ok &= (len(beq.gaussPoints) == 4)
 ok &= (len(beq.shapeFuns) == 4)
 ok &= (hasattr(beq, "_gesCoefVars") and beq._gesCoefVars == ["u", "v"])
+# --- gcn 解析断言 ---
+parseGcn(MACS, "el", proj)
+ok &= (proj.caculateCode != "")
+ok &= ("ela" in proj.caculateCode and "elb" in proj.caculateCode)
+ok &= (proj.caculateCode.index("ela") < proj.caculateCode.index("elb"))
+ok &= ("elaFieldData->initMatrix()" in proj.caculateCode)
+ok &= ("elaFieldData->eProgram()" in proj.caculateCode)
+ok &= ("elaFieldData->solve()" in proj.caculateCode)
+ok &= ("elaFieldData->uPhy()" in proj.caculateCode)
+ok &= ("elbFieldData->initMatrix()" in proj.caculateCode)
+ok &= ("elbFieldData->solve()" in proj.caculateCode)
+
 print("parsePre:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
