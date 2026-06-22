@@ -7,6 +7,7 @@ public:
     elaFieldData(CDFEG::FEMData* femData);
     ~elaFieldData();
 
+    int eProgram() override;
 
 };
 
