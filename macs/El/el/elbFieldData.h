@@ -7,6 +7,7 @@ public:
     elbFieldData(CDFEG::FEMData* femData);
     ~elbFieldData();
 
+    int eProgram() override;
 
 };
 
