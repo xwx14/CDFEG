@@ -43,8 +43,8 @@ namespace CDFEG {
 		 */
 		int eProgram_el();
 
-		std::map<std::string, std::vector<double>>  getCoef1(std::vector<int> nodeIds);
-		std::map<std::string, std::vector<double>>  getCoef(std::vector<int> nodeIds);
+		virtual std::map<std::string, std::vector<double>>  getCoef1(std::vector<int> nodeIds);
+		virtual std::map<std::string, std::vector<double>>  getCoef(const std::vector<int>& nodeIds);
 		/**
 		 * @brief 设置节点个数，并初始化相关数值
 		 * @param n 节点个数

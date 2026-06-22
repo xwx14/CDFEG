@@ -99,9 +99,20 @@ namespace CDFEG {
 		return coef;
 	}
 
-	std::map<std::string, std::vector<double>> PhyFieldData::getCoef(std::vector<int> nodeIds)
+	std::map<std::string, std::vector<double>> PhyFieldData::getCoef(const std::vector<int>& nodeIds)
 	{
 		std::map<std::string, std::vector<double>> coef;
+		for (PhyFieldData* fd : _femData->_phyDatas)
+		{
+			for (auto& kv : fd->_nodeRes)
+			{
+				std::vector<double> v;
+				v.reserve(nodeIds.size());
+				for (int nid : nodeIds)
+					v.push_back(nid < (int)kv.second.size() ? kv.second[nid] : 0.0);
+				coef[fd->_name + "::" + kv.first] = std::move(v);
+			}
+		}
 		return coef;
 	}
 
