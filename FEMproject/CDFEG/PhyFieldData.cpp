@@ -210,13 +210,17 @@ namespace CDFEG {
 				for (const auto& it : res.eleResult)
 				{
 					const std::string& resName = it.first;
-					_elemRes[resName][eleID] = it.second;
+					auto eit = _elemRes.find(resName);
+					if (eit != _elemRes.end() && eleID < (int)eit->second.size())
+						eit->second[eleID] = it.second;
 				}
 				for (const auto& it : res.nodeResult)
 				{
 					const std::string& resName = it.first;
+					auto eit = _elemRes.find(resName);
 					const std::vector<double>& resVals = it.second;
-					if (resVals.size() == 1)_elemRes[resName][eleID] = resVals[0];
+					if (eit != _elemRes.end() && resVals.size() == 1 && eleID < (int)eit->second.size())
+						eit->second[eleID] = resVals[0];
 				}
 			}
 		}
