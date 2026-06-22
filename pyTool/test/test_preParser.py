@@ -35,5 +35,28 @@ ok &= (a1.paramNames == ["pe", "pv", "fu", "fv", "rou", "alpha"])
 ok &= (a1.paramValues == [1.0e10, 0.3, 0.0, 0.0, 3000.0, 0.6])
 elb = next(f for f in proj.fields if f.name == "elb")
 ok &= (elb.dispNames == ["dxx", "dyy", "dxy"])
+# --- ges 解析断言 ---
+# a1eq4g2: 2D 4节点面单元，4个积分点，双线性形函数，func=exx,eyy,exy
+a1 = next(e for e in ela.eleSubs if e.name == "a1eq4g2")
+ok &= (len(a1.gaussPoints) == 4)
+ok &= (abs(a1.gaussPoints[0][0] - 0.5773502692) < 1e-9)
+ok &= (a1.gaussWeights == [1.0, 1.0, 1.0, 1.0])
+ok &= (len(a1.shapeFuns) == 4)
+ok &= ("exx" in a1.eleResNames and "eyy" in a1.eleResNames and "exy" in a1.eleResNames)
+ok &= (a1.type == 2)  # 4节点2D → 面单元
+ok &= (a1.bBC == False)
+ok &= (a1.coordVars == ["x", "y"])
+# 线单元 a2ll2: 2节点，type=1, bBC=True
+a2 = next(e for e in ela.eleSubs if e.name == "a2ll2")
+ok &= (a2.type == 1 and a2.bBC == True)
+ok &= (len(a2.gaussPoints) == 2)
+ok &= (len(a2.shapeFuns) == 2)
+ok &= (a2.coordVars == ["x"])
+# beq4g2: 4节点面单元(含coef)，type=2，nNodes>=3修正
+beq = next(e for e in elb.eleSubs if e.name == "beq4g2")
+ok &= (beq.type == 2)
+ok &= (len(beq.gaussPoints) == 4)
+ok &= (len(beq.shapeFuns) == 4)
+ok &= (hasattr(beq, "_gesCoefVars") and beq._gesCoefVars == ["u", "v"])
 print("parsePre:", "PASS" if ok else "FAIL")
 sys.exit(0 if ok else 1)
