@@ -109,7 +109,7 @@ namespace CDFEG {
 				std::vector<double> v;
 				v.reserve(nodeIds.size());
 				for (int nid : nodeIds)
-					v.push_back(nid < (int)kv.second.size() ? kv.second[nid] : 0.0);
+					v.push_back((nid >= 0 && nid < (int)kv.second.size()) ? kv.second[nid] : 0.0);
 				coef[fd->_name + "::" + kv.first] = std::move(v);
 			}
 		}
