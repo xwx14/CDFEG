@@ -89,11 +89,15 @@ CDFEG::EleSubResult& beq4g2::run(
         double fyy = fact * (pv * exx + (1.0 - pv) * eyy);
         double fxy = fact * shear * exy;
 
-        // estif = lumped mass 对角矩阵（beq4g2.c:141-181 / beq4g2.ges mass lump）
-        // 每个自由度的"刚度"= vol*weight（对角，行主序）
-        for (int i = 0; i < 12; ++i)
+        // emass = lumped mass（beq4g2.c:146-181 / beq4g2.ges mass lump）
+        // 旧程序 estif 全 0（stiff*0.0），mass 单独存 emass；最小二乘法的"质量"分母
+        // emass[iv] += vol*weigh * N_i（带形函数值，与 eload 口径一致）
+        for (int i = 0; i < 4; ++i)
         {
-            _result.estif[i * 12 + i] += vol * weight;
+            double cd = cu[i][0];  // 形函数值 N_i
+            _result.emass[i * 3 + 0] += cd * vol * weight;  // dxx
+            _result.emass[i * 3 + 1] += cd * vol * weight;  // dyy
+            _result.emass[i * 3 + 2] += cd * vol * weight;  // dxy
         }
 
         // eload = 应力载荷（beq4g2.c:183-197 / beq4g2.ges load）

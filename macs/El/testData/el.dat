@@ -1,0 +1,29 @@
+* name=baseData,structure="I32"
+4 3
+* name=mat_a1eq4g2,structure="F64*6",type="mat",index=1
+1.0e10 0.3 0.0 0.0 3000.0 0.6
+* name=mat_a2ll2,structure="F64*2",type="mat",index=1
+0.0 100.0
+* name=mat_beq4g2,structure="F64*2",type="mat",index=1
+1.0e10 0.3
+* name=coord,structure="I32*1 F64*2",type="coord",index=1
+1 0.0 0.0
+2 1.0 0.0
+3 1.0 1.0
+4 0.0 1.0
+* name=idela,structure="I32*3",type="id",index=0
+* name=ubfela,structure="I32*1 F64*2",type="ubf",index=0
+1 0.0 0.0
+2 0.0 0.0
+* name=idelb,structure="I32*4",type="id",index=1
+* name=ubfelb,structure="I32*1 F64*3",type="ubf",index=1
+1 0.0 0.0 0.0
+2 0.0 0.0 0.0
+3 0.0 0.0 0.0
+4 0.0 0.0 0.0
+* name=a1eq4g2,structure="I32*6",type="elem",index=1
+1 1 2 3 4 1
+* name=a2ll2,structure="I32*4",type="elem",index=1
+2 3 4 1
+* name=beq4g2,structure="I32*6",type="elem",index=1
+3 1 2 3 4 1

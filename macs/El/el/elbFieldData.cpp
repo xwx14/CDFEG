@@ -17,9 +17,16 @@ elbFieldData::~elbFieldData() {
 
 int elbFieldData::eProgram()
 {
+    // elb 为应力场，采用显式最小二乘法（参照旧项目 eelb.c）：
+    // 不组装总刚、不施加边界、不求解方程组；beq4g2 返回 lumped mass(emass) 与应力
+    // 载荷(eload)，节点级累加后直接 stress = load / mass。
+    int nPts = _femData->_nPts;
     int dim = _femData->_dim;
+    // 节点级累加器，索引 = nodeId*_dof + iDof
+    std::vector<double> nodeMass(nPts * _dof, 0.0);
+    std::vector<double> nodeLoad(nPts * _dof, 0.0);
+
     int nEleSub = _eleSubs.size();
-    // 组装 lumped mass（estif）+ 应力载荷（eload）到总刚/右端项
     for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
     {
         CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
@@ -39,38 +46,49 @@ int elbFieldData::eProgram()
                 }
             }
             const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
-            // 跨场取 ela 位移（ela::u / ela::v），供 beq4g2 计算应力载荷
+            // 跨场取 ela 位移（ela::u / ela::v），供 beq4g2 计算应变/应力
             std::map<std::string, std::vector<double>> coef = getCoef(nodeIds);
             CDFEG::EleSubResult& outData = eleSub->run(r, coef, matParams);
-            // 构建定位向量 lm
-            std::vector<int> lm;
-            for (int nodi : nodeIds)
+            // 单元 emass/eload 累加到节点级（按 节点×自由度）
+            const std::vector<double>& emass = outData.emass;
+            const std::vector<double>& eload = outData.eload;
+            for (int i = 0; i < nNode; ++i)
             {
-                int iStart = nodi * _dof;
+                int ivNode = nodeIds[i] * _dof;
+                int ivEle = i * _dof;
                 for (int iDof = 0; iDof < _dof; ++iDof)
                 {
-                    lm.push_back(_ida[iDof + iStart]);
-                }
-            }
-            // estif（lumped mass 对角）组装到总刚
-            _equSys.adda(outData.estif, lm);
-            // eload（应力载荷）累加到右端项
-            const std::vector<double>& eload = outData.eload;
-            if (!eload.empty())
-            {
-                for (int i = 0; i < (int)lm.size(); ++i)
-                {
-                    if (lm[i] >= 0)
-                    {
-                        _equSys._f[lm[i]] += eload[i];
-                    }
+                    nodeMass[ivNode + iDof] += emass[ivEle + iDof];
+                    nodeLoad[ivNode + iDof] += eload[ivEle + iDof];
                 }
             }
         }
     }
 
-    // 边界条件
-    _equSys.applyFirstBCs(_nodeBC1s, _ida);
-    _equSys.applySecondBCs(_nodeBC2s, _ida);
+    // lumping 防除零（eelb.c:164-170）：过小的质量充零保护
+    double emmax = 0.0;
+    for (double v : nodeMass)
+    {
+        if (v > emmax) emmax = v;
+    }
+    double emmin = emmax / 1e8;
+    for (double& v : nodeMass)
+    {
+        if (v < emmin) v = emmin;
+    }
+
+    // 显式最小二乘：stress = load / mass，直接写入节点结果
+    for (const std::string& disp : _dispNames)
+    {
+        _nodeRes[disp].resize(nPts);
+    }
+    for (int iNode = 0; iNode < nPts; ++iNode)
+    {
+        int iv = iNode * _dof;
+        for (int iDof = 0; iDof < _dof; ++iDof)
+        {
+            _nodeRes[_dispNames[iDof]][iNode] = nodeLoad[iv + iDof] / nodeMass[iv + iDof];
+        }
+    }
     return 1;
 }

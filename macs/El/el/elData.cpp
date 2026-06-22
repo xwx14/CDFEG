@@ -20,12 +20,10 @@ int elData::caculate() {
     ela->solve();
     ela->uPhy();
 
-    // elb 后求解（应力场），依赖 ela 位移结果
+    // elb 后处理（应力场）：显式最小二乘法，不组装方程组、不 solve
+    // eProgram 内部完成 mass/load 累加 → stress=load/mass，结果写入 _nodeRes
     elbFieldData* elb = static_cast<elbFieldData*>(_phyDatas[1]);
-    elb->initMatrix();
     elb->eProgram();
-    elb->solve();
-    elb->uPhy();
 
     return 1;
 }

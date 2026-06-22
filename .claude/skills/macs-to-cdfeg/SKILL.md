@@ -31,6 +31,18 @@ cd pyTool && python test/testMacs.py <项目名>
 
 **多场 coef**：依赖场（如 elb）的 `eProgram` 调 `getCoef(nodeIds)` 取位移，单元 `run` 用 `coef["<场名>::<变量>"]`（如 `coef["ela::u"]`）。时序由 caculate 命令流保证（先 ela 后 elb）。
 
+**判断每场是否 solve：看旧 main 中该场 `ee<field>` 前有无 `starta`、后有无 `solv<field>`**——这是 caculate 调用序列的权威依据。
+- 前有 `starta` + 后有 `solv<field>`（如 ela：`starta→eela→solva→uela`）→ 方程组场，caculate 调 `initMatrix→eProgram→solve→uPhy`；
+- 前/后缺其一（如 elb：只有 `eelb`，无 `startb`/`solvb`）→ 非方程组场，`eProgram` 内自完成求解，caculate 只调 `eProgram`。
+
+> 四步映射：`starta→initMatrix`、`ee<field>→eProgram`、`solv<field>→solve`、`uel<field>→uPhy`；缺哪步就不调对应方法。
+
+**非方程组场**：旧 main 中只有 `ee<field>`、无 `solv<field>` 的场统称此类——不进框架方程组 solve，而在 `eProgram` 内自完成求解并填 `_nodeRes`。不止显式最小二乘一种，具体求解算法以旧 `ee<field>.c` 为准。常见子类：
+- **显式最小二乘**（应力恢复场 elb）：`ee<field>b.c` 内 lumped mass + 载荷累加 → `stress=load/mass`。单元 mass 填 `EleSubResult.emass`（**带形函数值 N_i**，与 eload 同口径），**不要**填 estif 对角（旧 `.ges` stiff 本就 `*0.0`）；`eProgram` 节点级累加 emass/eload → lumping 防除零（`emmin=emmax/1e8`）→ `_nodeRes=load/mass`。
+- **显式动力学**（中心差分等）：不组装等效动力方程组，用 lumped mass + 内力显式积分更新位移；同样在 `eProgram`（或其时间步循环）内自完成，不调 `solve`。
+
+无论哪个子类，**caculate 中只调 `eProgram()`**，不调 `initMatrix/solve/uPhy`（不依赖 `_ida`/`_equSys`）。
+
 ### 3. 比较 cnd
 核对生成 cnd 与原 `<proj>.cnd`：边界条件项（各场 -I/-D × volume/surface/line/point）+ 材料赋值项（mate_Num）。数量与 QUESTION/VALUE 结构一致即合格。
 
@@ -41,11 +53,12 @@ cd pyTool && python test/testMacs.py <项目名>
 | elb 位移全 0 | getCoef 时 ela 未求解 | caculate 顺序按 gcn 依赖 |
 | 载荷未生效 | eProgram_el 不处理 eload | 重写 eProgram，手动 `_equSys._f += eload` |
 | 重生成覆盖手填 | 重跑 testMacs | 先备份 run/uEle/eProgram 体 |
+| 应力场结果错/全 0 | 最小二乘场被当方程组 solve，或 mass 漏形函数值 N_i（estif 对角 ≠ emass） | mass 填 `emass`（带 N_i），eProgram 显式 `load/mass`，caculate 不 solve |
 
 ## 已知遗留（el 项目首次迁移）
-el 项目核心计算链路已验证（位移/应力与独立有限元交叉验证达机器精度，cnd 结构一致），但以下功能尚未实现，迁移其他项目时注意：
+el 项目核心计算链路已验证（位移与独立有限元交叉验证达机器精度；elb 最小二乘应力平滑已对齐旧 `eelb.c` 的显式 `load/mass`、不 solve；cnd 结构一致），但以下功能尚未实现，迁移其他项目时注意：
 - **a2ll2 面力载荷**：`a2ll2::run` 空壳，面力未施加（约 30 行可补，参考 a2ll2.c 的 load 段 + 沿线积分分配到节点）。带面力工况需先补。
-- **单元结果输出**：`post()` 只输出节点位移，`_elemRes`（应变等）未写 res 文件。需 `post2()` + 注册 `GidResItem`（参考 El2D main.cpp）。
+- **单元结果输出**：`post()` 输出各场节点结果（含 elb 节点应力 dxx/dyy/dxy），但 `_elemRes`（高斯点/单元心应变等）未写 res 文件。需 `post2()` + 注册 `GidResItem`（参考 El2D main.cpp）。
 - **readID 空实现**：一类边界靠 readUBF 工作；`id` 段精确自由度控制未实现（影响复杂边界）。
 - **pyTool 线单元 `_refc` 越界**：模板 `elesub.cpp.j2` 用 `range(ele.dim)` 渲染 `_refc`，但 `parseGes` 按 `nrefc` 截 `gaussPoints`，线单元（nrefc<dim）重新生成会产空值。macs/El/el/a2ll2.cpp 已手补；治本需修模板（range 改 nrefc）或 parseGes 补零。
 
