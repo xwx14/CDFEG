@@ -118,21 +118,14 @@ CDFEG::uResult a1eq4g2::uEle(
 ) {
     CDFEG::uResult res;
 
-    double pe = matParams.at("pe");
-    double pv = matParams.at("pv");
-    double vol = 1.0;
-    double fact = pe / (1.0 + pv) / (1.0 - pv * 2.0) * vol;
-    double shear = 0.5 - pv;
-
     const std::vector<double>& u = coef.at("u");
     const std::vector<double>& vDisp = coef.at("v");
 
-    // 节点应力累加器 + 权重
-    std::vector<double> nodeSigmaXX(4, 0.0), nodeSigmaYY(4, 0.0);
-    std::vector<double> nodeSigmaXY(4, 0.0);
+    // 节点应变累加器 + 权重（形函数加权外推到节点）
+    std::vector<double> nodeExx(4, 0.0), nodeEyy(4, 0.0), nodeExy(4, 0.0);
     std::vector<double> nodeWeight(4, 0.0);
 
-    double sigmaXX = 0.0, sigmaYY = 0.0, sigmaXY = 0.0;
+    double exxSum = 0.0, eyySum = 0.0, exySum = 0.0;
     double totalWeight = 0.0;
 
     for (int iGaus = 0; iGaus < _nGaus; ++iGaus)
@@ -148,52 +141,46 @@ CDFEG::uResult a1eq4g2::uEle(
         double weight = _gaus[iGaus] * det;
         totalWeight += weight;
 
-        // 应变 exx/eyy/exy（参考 ElQ4g::uEle）
-        double exx = 0.0, eyy = 0.0, exy = 0.0;
+        // 高斯点应变 exx=du/dx, eyy=dv/dy, exy=du/dy+dv/dx（与 ges func 段一致）
+        double gExx = 0.0, gEyy = 0.0, gExy = 0.0;
         for (int i = 0; i < 4; ++i)
         {
-            exx += cu[i][1] * u[i];
-            eyy += cu[i][2] * vDisp[i];
-            exy += cu[i][2] * u[i] + cu[i][1] * vDisp[i];
+            gExx += cu[i][1] * u[i];
+            gEyy += cv[i][2] * vDisp[i];
+            gExy += cu[i][2] * u[i] + cv[i][1] * vDisp[i];
         }
 
-        // 应力 sigma = D * epsilon
-        double gSigmaXX = fact * ((1.0 - pv) * exx + pv * eyy);
-        double gSigmaYY = fact * (pv * exx + (1.0 - pv) * eyy);
-        double gSigmaXY = fact * shear * exy;
-
-        sigmaXX += gSigmaXX * weight;
-        sigmaYY += gSigmaYY * weight;
-        sigmaXY += gSigmaXY * weight;
+        exxSum += gExx * weight;
+        eyySum += gEyy * weight;
+        exySum += gExy * weight;
 
         // 形函数加权外推到节点
         for (int i = 0; i < 4; ++i)
         {
             double nodeW = cu[i][0] * weight;
-            nodeSigmaXX[i] += gSigmaXX * nodeW;
-            nodeSigmaYY[i] += gSigmaYY * nodeW;
-            nodeSigmaXY[i] += gSigmaXY * nodeW;
+            nodeExx[i] += gExx * nodeW;
+            nodeEyy[i] += gEyy * nodeW;
+            nodeExy[i] += gExy * nodeW;
             nodeWeight[i] += nodeW;
         }
     }
 
-    // 单元平均应力（除以总权重）
+    // 单元平均应变（除以总权重）
     if (totalWeight > 0.0)
     {
-        sigmaXX /= totalWeight;
-        sigmaYY /= totalWeight;
-        sigmaXY /= totalWeight;
+        exxSum /= totalWeight;
+        eyySum /= totalWeight;
+        exySum /= totalWeight;
     }
 
-    res.eleResult["sigmaXX"] = sigmaXX;
-    res.eleResult["sigmaYY"] = sigmaYY;
-    res.eleResult["sigmaXY"] = sigmaXY;
-    res.eleResult["volume"] = totalWeight;
+    // 键名 exx/eyy/exy 对齐 elaFieldData::_eleResNames（来自 ges func 段）
+    res.eleResult["exx"] = exxSum;
+    res.eleResult["eyy"] = eyySum;
+    res.eleResult["exy"] = exySum;
 
-    res.nodeResult["sigmaXX"] = nodeSigmaXX;
-    res.nodeResult["sigmaYY"] = nodeSigmaYY;
-    res.nodeResult["sigmaXY"] = nodeSigmaXY;
-    res.nodeResult["weight"] = nodeWeight;
+    res.nodeResult["exx"] = nodeExx;
+    res.nodeResult["eyy"] = nodeEyy;
+    res.nodeResult["exy"] = nodeExy;
 
     return res;
 }
