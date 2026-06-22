@@ -52,11 +52,30 @@ ele1.shapeFuns = [
     "(1. - x[1]) / 2. * (1. + x[2]) / 2."
 ]
 field.addEleSub(ele1)
+# 2节点线单元（边界荷载）
+ele3 = DataEleSubG("StressBL2g", 2)
+ele3.type = 1
+ele3.bBC = True
+ele3.dim = 1
+ele3.coordVars = ['x']
+ele3.dispNames = ["u", "v"]
+ele3.paramNames = ["fu", "fv"]
+ele3.gaussPoints = [
+    [-s],
+    [s]
+]
+ele3.gaussWeights = [1.0, 1.0]
+ele3.shapeFuns = [
+    "0.5 * (1.0 - x[1])",
+    "0.5 * (1.0 + x[1])"
+]
+ele3.paramValues = [0.0, 0.0]
+field.addEleSub(ele3)
 
 project.addField(field)
 
 outPath = "sample/DEl2D"
-maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
+maker = MakerCpp(project, outPath, mode='new', sln_cmake_path="CMakeLists.txt")
 maker.mainMode=1
 maker.makeAll()
 gidMaker = MakerGidFile(project, outPath)

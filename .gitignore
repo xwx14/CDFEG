@@ -52,6 +52,7 @@ Thumbs.db
 /pyTool/test/truss2D
 /pyTool/test/truss1D
 /FEMproject/builid22
+/FEMproject/buildvs
 /slides
 /DevTool
 /plans
@@ -62,3 +63,4 @@ Thumbs.db
 /FEMproject/el2d.gid/el2d.exe
 /FEMproject/t.dat
 /FEMproject/*.o
+/待议Claude.md
