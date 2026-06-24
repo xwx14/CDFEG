@@ -17,10 +17,10 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/..")
-from preParser import parsePre, parseGcn
+from fepgParser import parseProject
 
 MACS = r"E:/mfelProject/RegTest/testData/macs"
-proj = parsePre(MACS, "el")
+proj = parseProject(MACS, "el")
 ok = True
 ok &= (proj.dim == 2)
 names = [f.name for f in proj.fields]
@@ -59,7 +59,6 @@ ok &= (len(beq.gaussPoints) == 4)
 ok &= (len(beq.shapeFuns) == 4)
 ok &= (hasattr(beq, "_gesCoefVars") and beq._gesCoefVars == ["u", "v"])
 # --- gcn 解析断言 ---
-parseGcn(MACS, "el", proj)
 ok &= (proj.caculateCode != "")
 ok &= ("ela" in proj.caculateCode and "elb" in proj.caculateCode)
 ok &= (proj.caculateCode.index("ela") < proj.caculateCode.index("elb"))

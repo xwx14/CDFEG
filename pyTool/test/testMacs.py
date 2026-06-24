@@ -24,7 +24,7 @@ PYTOOL = os.path.dirname(HERE)                 # pyTool/
 PROJ_ROOT = os.path.dirname(PYTOOL)            # 项目根 CDFEG/
 sys.path.append(PYTOOL)
 
-from preParser import parsePre, parseGcn
+from fepgParser import parseProject
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 
@@ -35,9 +35,8 @@ def main():
         sys.exit(1)
     projName = sys.argv[1]
     macsRoot = sys.argv[2] if len(sys.argv) > 2 else r"E:/mfelProject/RegTest/testData/macs"
-    # 解析 pre/ges/gcn → DataProject
-    project = parsePre(macsRoot, projName)
-    parseGcn(macsRoot, projName, project)
+    # 解析 pre/gcn/ges → DataProject
+    project = parseProject(macsRoot, projName)
     # 落地项目根 macs/<Proj>，new 模式（自带库副本）
     outPath = os.path.join(PROJ_ROOT, "macs", projName.capitalize())
     os.makedirs(outPath, exist_ok=True)
