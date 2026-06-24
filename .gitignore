@@ -58,6 +58,9 @@ Thumbs.db
 # 项目源码（macs/<Proj>/el/ 等）入库供填充
 /macs/*/CDFEG/
 /macs/*/third/
+# new 模式生成的示例产物（含 CDFEG/third 库副本，与 FEMproject/sample 重复），整体不入库
+/sample/
+/pyTool/sample/
 /slides
 /DevTool
 /plans
