@@ -31,9 +31,10 @@ cd pyTool && python test/testMacs.py <项目名>
 
 **多场 coef**：依赖场（如 elb）的 `eProgram` 调 `getCoef(nodeIds)` 取位移，单元 `run` 用 `coef["<场名>::<变量>"]`（如 `coef["ela::u"]`）。时序由 caculate 命令流保证（先 ela 后 elb）。
 
-**判断每场是否 solve：看旧 main 中该场 `ee<field>` 前有无 `starta`、后有无 `solv<field>`**——这是 caculate 调用序列的权威依据。
-- 前有 `starta` + 后有 `solv<field>`（如 ela：`starta→eela→solva→uela`）→ 方程组场，caculate 调 `initMatrix→eProgram→solve→uPhy`；
-- 前/后缺其一（如 elb：只有 `eelb`，无 `startb`/`solvb`）→ 非方程组场，`eProgram` 内自完成求解，caculate 只调 `eProgram`。
+**判断每场是否 solve：看旧 main 中该场 `ee<field>` 后有无 `solv<field>`**——这是 caculate 调用序列的权威依据。
+
+-  后有 `solv<field>`（如 ela：`starta→eela→solva→uela`）→ 方程组场，caculate 调 `initMatrix→eProgram→solve→uPhy`；
+- 后无 `solv<field>`（如 elb：只有 `eelb`，无 `solvb`）→ 非方程组场，`eProgram` 内自完成求解，caculate 只调 `eProgram`。
 
 > 四步映射：`starta→initMatrix`、`ee<field>→eProgram`、`solv<field>→solve`、`uel<field>→uPhy`；缺哪步就不调对应方法。
 
