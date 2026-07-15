@@ -18,7 +18,7 @@
 #define STRESS_BL2G_H
 #include "CDFEG/ElementBase.h"
 
-// 二维 2 节点边界面力载荷单元（对应旧 newmark 项目的 a2ll2 + a2gl2）
+// 二维 2 节点边界面力载荷单元
 // 纯载荷单元：刚度/质量/阻尼恒为 0，仅 eload 沿线积分把面力分配到 2 节点。
 // 依附于同 id 的 DelQ4g 体单元的一条边（边 id = 所属体单元 id，由 FEMData::addEle
 // 的「节点更少即边」机制识别）。材料参数：fu（沿线切向面力）、fv（沿线法向面力）。

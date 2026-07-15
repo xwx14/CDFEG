@@ -73,6 +73,9 @@ Thumbs.db
 /FEMproject/build_cyg
 /FEMproject/ddd.gid
 /FEMproject/t.dat
+
+# 本地自留参考文档（不入库）
+/.claude/rules/macs到CDFEG升级方法.md
 /FEMproject/*.o
 /待议Claude.md
 /testData
