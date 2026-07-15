@@ -10,12 +10,14 @@ set(SOURCES
     del2dData.cpp
     DelDispFieldData.cpp
     DelQ4g.cpp
+    StressBL2g.cpp
 )
 
 set(HEADERS
     del2dData.h
     DelDispFieldData.h
     DelQ4g.h
+    StressBL2g.h
 )
 
 # 创建可执行文件

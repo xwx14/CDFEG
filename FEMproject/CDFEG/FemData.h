@@ -55,13 +55,17 @@ namespace CDFEG {
 		void addNodeEnd();
 		/**
 		 * @brief 添加单元
-		 * @param id 单元id
+		 * @param id 单元id（文件中编号）
 		 * @param nodeIds 单元节点id列表
-		 * @return
+		 * @param eleType 单元类型名（与 ElementBase::_types 匹配）
+		 * @return 该单元在程序中的内部索引（供绑定材料等使用）
+		 * @note 当 id 已存在但 nodeIds 节点数更少时，按「边单元」处理：
+		 *       记录到 _edgeIdMap（边所属体单元），追加节点但不增加 _nElem，
+		 *       避免与同 id 的体单元冲突（边 id 即所属体单元 id）。
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		void addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType);
+		int addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType);
 		/**
 		* @brief 添加edge
 		* @param id 单元id
@@ -87,6 +91,15 @@ namespace CDFEG {
 		 * @date 2025-3-17
 		 */
 		void setEleMateByName(int eleId, const std::string& name);
+		/**
+		 * @brief 通过材料名称设置单元材料号（按程序内部单元索引）
+		 * @param internalId 程序内部单元索引（addEle 的返回值）
+		 * @param name 材料名称（不含 "mat_" 前缀，如 "DelQ4g_1"）
+		 * @note 用于边单元等与体单元共享文件 id 的场景：setEleMateByName 按
+		 *       文件 id 经 _eleIdMap 查内部索引，同 id 的边会被误绑到体单元；
+		 *       本方法直接用内部索引绑定，体单元/边单元均正确。
+		 */
+		void setEleMateByInternal(int internalId, const std::string& name);
 		/**
 		 * @brief 添加材料参数
 		 * @param matParam 材料参数

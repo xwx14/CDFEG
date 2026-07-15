@@ -69,6 +69,10 @@ Thumbs.db
 /.cursor/rules
 /.vscode
 /FEMproject/el2d.gid/el2d.exe
+# cygwin 编译产物与 ddd 测试运行目录（基准程序/输入/输出/结果不入库）
+/FEMproject/build_cyg
+/FEMproject/ddd.gid
 /FEMproject/t.dat
 /FEMproject/*.o
 /待议Claude.md
+/testData

@@ -315,8 +315,8 @@ namespace CDFEG {
 			vals.erase(vals.begin());
 			mateId = vals[vals.size() - 1];
 			vals.pop_back();
-			_femData->addEle(id, vals, name);
-			_femData->setEleMateByName(id,name+"_" + std::to_string(mateId));
+			int internalId = _femData->addEle(id, vals, name);
+			_femData->setEleMateByInternal(internalId, name+"_" + std::to_string(mateId));
 		}
 		return 0;
 	}

@@ -50,6 +50,8 @@ class MakerGidFile(MakerBase):
 
         self.data={"name":pro.name,
         "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"bDynamic":False,"preParams":[]}
+        # 收集所有单元，按 gidName 分组
+        eleGroups = {}  # key: gidName, value: {ele, fieldIndex}
         for field in pro.fields:
             # 添加场
             dof=len(field.dispNames)
@@ -63,11 +65,23 @@ class MakerGidFile(MakerBase):
             if field.bDynamic:
                 self.data["bDynamic"] = True
             self.data["fields"].append(field1)
+            
             for ele in field.eleSubs:
-                # 添加单元（index 用 ele.index）
-                self.addElem(ele.name, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
-                # 添加材料（index 用 field.index）
-                self.addMaterial(ele.name, ele.paramNames, ele.paramValues, index)
+                gidName = ele.gidName
+                if gidName not in eleGroups:
+                    eleGroups[gidName] = {'ele': ele, 'fieldIndex': index, 'paramNames': set(), 'paramValues': []}
+                # 合并 paramNames（去重）
+                eleGroups[gidName]['paramNames'].update(ele.paramNames)
+        
+        # 添加单元和材料
+        for gidName, group in eleGroups.items():
+            ele = group['ele']
+            fieldIndex = group['fieldIndex']
+            # 添加单元（使用 gidName）
+            self.addElem(gidName, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
+            # 添加材料（使用 gidName 和合并后的 paramNames）
+            mergedParamNames = list(group['paramNames'])
+            self.addMaterial(gidName, mergedParamNames, ele.paramValues, fieldIndex)
 
         self.basFn=path+"\\"+pro.name+".bas"
         self.prbFn=path+"\\"+pro.name+".prb"

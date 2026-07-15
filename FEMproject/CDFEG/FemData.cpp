@@ -50,26 +50,39 @@ void CDFEG::FEMData::addNodeEnd()
 	setNPts(n);
 }
 
-void CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType)
+int CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType)
 {
 	int i = _elePt.size() - 1;
-	if (_eleIdMap.find(id) == _eleIdMap.end()) {
+	auto it = _eleIdMap.find(id);
+	if (it == _eleIdMap.end()) {
+		// 新 id：作为体单元添加
 		_eleIdMap[id] = i;
 		_nElem = _eleIdMap.size();
-		for (int id : nodeIds)
+		for (int nid : nodeIds)
 		{
-			_eleNodes.push_back(_nodeIdMap[id]);
+			_eleNodes.push_back(_nodeIdMap[nid]);
 		}
 		_elePt.push_back(_eleNodes.size());
 	}
-	//条件判断 _elePt[_eleIdMap[id] + 1] - _elePt[_eleIdMap[id]] 计算的是原单元的节点个数，
-	//当 nodeIds.size() 与之不一致时才重新添加（递归调用）。如果节点数一致则作为edge边添加。
-	else if (nodeIds.size() != _elePt[_eleIdMap[id] + 1] - _elePt[_eleIdMap[id]])
+	else
 	{
-		return addEle(id, nodeIds, eleType);
+		// id 已存在（同 id 的体单元已登记）：判断本单元是否为该体单元的「边」
+		int ownerIdx = it->second;
+		int ownerNodeCnt = _elePt[ownerIdx + 1] - _elePt[ownerIdx];
+		if ((int)nodeIds.size() < ownerNodeCnt)
+		{
+			// 节点更少 → 作为边单元（边 id 即所属体单元 id），追加节点但不计入 _nElem
+			_edgeIdMap[i] = ownerIdx;
+			for (int nid : nodeIds)
+			{
+				_eleNodes.push_back(_nodeIdMap[nid]);
+			}
+			_elePt.push_back(_eleNodes.size());
+		}
+		// else 节点数 >= 已有体单元：忽略，保持原体单元不变
 	}
 
-	VTKCellType iEleType;
+	VTKCellType iEleType = VTKCellType::VTK_EMPTY_CELL;
 	if (eleType != "")
 	{
 		for (PhyFieldData* p : _phyDatas)
@@ -86,6 +99,7 @@ void CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::
 		}
 	}
 	_eleTypes.push_back(iEleType);
+	return i;
 }
 
 void CDFEG::FEMData::addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType)
@@ -142,6 +156,25 @@ void CDFEG::FEMData::setEleMateByName(int eleId, const std::string& name)
 	{
 		setEleMateId(eleId, mateId);
 	}
+}
+
+void CDFEG::FEMData::setEleMateByInternal(int internalId, const std::string& name)
+{
+	// 在 _mateNames 中查找材料名称对应的序号
+	int mateId = -1;
+	for (size_t i = 0; i < _mateNames.size(); i++)
+	{
+		if (_mateNames[i] == "mat_" + name)
+		{
+			mateId = static_cast<int>(i);
+			break;
+		}
+	}
+	if (mateId < 0) return;
+	// 直接按程序内部单元索引设置材料号（不经 _eleIdMap，避免边/体单元 id 冲突）
+	int nPt = _elePt.size() - 1;
+	if ((int)_eleMateIds.size() < nPt) _eleMateIds.resize(nPt, 0);
+	_eleMateIds[internalId] = mateId;
 }
 
 int CDFEG::FEMData::addMate(const std::map<std::string, double>& matParam, const std::string& name)

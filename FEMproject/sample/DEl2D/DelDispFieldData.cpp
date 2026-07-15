@@ -17,6 +17,7 @@
 #include "DelDispFieldData.h"
 #include "del2dData.h"
 #include "DelQ4g.h"
+#include "StressBL2g.h"
 #include "CDFEG/ElementBase.h"
 #include "CDFEG/EquationSystem.h"
 #include <cmath>
@@ -28,6 +29,8 @@ DelDispFieldData::DelDispFieldData(CDFEG::FEMData* femData)
     _dof2 = 2;
     // 注册动力单元（含集中质量/阻尼输出）
     _eleSubs.push_back(new DelQ4g(this));
+    // 注册边界面力载荷单元（StressBL2g=旧 a2ll2，纯载荷：沿线积分把面力分配到节点）
+    _eleSubs.push_back(new StressBL2g(this));
     // 应力恢复结果名
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
     _resForm = "Vector OnNodes";

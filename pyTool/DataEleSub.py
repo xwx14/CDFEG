@@ -41,6 +41,8 @@ class DataEleSub:
         self.vtkCellType=None
         # VTK 单元类型名称（用于代码生成）
         self.vtkCellTypeName=None
+        # GiD 单元名称（用于 GiD 前后处理，默认与 name 相同）
+        self.gidName=name
         self.runCode=""           # 单元计算代码
         self.uCode=""             # 单元后处理代码
         self.initCode=""          # 构造函数初始化代码
@@ -100,6 +102,8 @@ class DataEleSub:
         # 如果设置了 vtkCellType，添加到字典中
         if self.vtkCellTypeName is not None:
             dict_data['vtkCellType'] = self.vtkCellTypeName
+        # GiD 单元名称
+        dict_data['gidName'] = self.gidName
         return dict_data
 
     @classmethod
@@ -152,6 +156,9 @@ class DataEleSub:
                         break
             except (ImportError, ValueError):
                 pass  # 如果转换失败，保持为 None
+        
+        # 恢复 GiD 单元名称（如果有）
+        ele.gidName = data.get('gidName', None)
 
         return ele
     
