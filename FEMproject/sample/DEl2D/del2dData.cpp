@@ -56,7 +56,7 @@ int del2dData::caculate() {
     }
     aField->setNewmarkParams(gamma, beta, _dt);
 
-    int nStep = static_cast<int>(_tMax / _dt + 0.5);
+    int nStep = static_cast<int>(_tMax / _dt + 1.5);
     double time = 0.0;
 
     // 时间步主循环（对应旧 newmark.c 的 l1 循环）

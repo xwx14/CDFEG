@@ -22,7 +22,7 @@ StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(2, pData) {
     _name = "StressBL2g";
     _dispNames = { "u", "v" };
-    // 旧 a2ll2 材料：fu/fv 两参数（x/y 向面力）
+    // 旧 a2ll2 材料：fu/fv 两参数（fu=沿线切向面力, fv=沿线法向面力）
     _paramNames = { "fu", "fv" };
     _types.insert("StressBL2g");
 
@@ -42,53 +42,89 @@ StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
 StressBL2g::~StressBL2g() {
 }
 
+void StressBL2g::computeLocalMatrix(
+    const std::vector<double>& r,
+    const std::map<std::string, double>& matParams,
+    std::vector<double>& estif,
+    std::vector<double>& emass,
+    std::vector<double>& edamp,
+    std::vector<double>& eload
+) {
+    // 对应基准 a2ll2：在局部坐标（切向/法向）下计算单元矩阵。
+    // stif/mass/damp 恒 0（a2ll2.ges 中 *0.0），仅 load=+[u]*fu+[v]*fv。
+    const int nvar = 4;
+    estif.assign(nvar * nvar, 0.0);
+    emass.assign(nvar, 0.0);
+    edamp.assign(nvar, 0.0);
+    eload.assign(nvar, 0.0);
+
+    double fu = matParams.at("fu");   // 切向面力密度
+    double fv = matParams.at("fv");   // 法向面力密度
+
+    // 线长 → 参考坐标到弧长的雅可比 det = L/2
+    double len = std::hypot(r[2] - r[0], r[3] - r[1]);
+    double det = len / 2.0;
+
+    // 2 高斯点 rx=±1，权重=1；形函数 N1=(1-rx)/2，N2=(1+rx)/2。
+    // 局部 eload 顺序：[节点1切向, 节点1法向, 节点2切向, 节点2法向]
+    const double gausRx[2] = { -1.0, 1.0 };
+    for (int g = 0; g < 2; ++g)
+    {
+        double N1 = (1.0 - gausRx[g]) / 2.0;
+        double N2 = (1.0 + gausRx[g]) / 2.0;
+        double w = det;   // gaus 权重 = 1
+        eload[0] += N1 * fu * w;
+        eload[1] += N1 * fv * w;
+        eload[2] += N2 * fu * w;
+        eload[3] += N2 * fv * w;
+    }
+}
+
+void StressBL2g::coordTransform(
+    const std::vector<double>& r,
+    const std::vector<double>& locEstif,
+    const std::vector<double>& locEmass,
+    const std::vector<double>& locEdamp,
+    const std::vector<double>& locEload
+) {
+    // 对应基准 a2gl2：smit 构造局部坐标轴 → t 矩阵 → tkt/tmt/tl 局部→全局。
+    // smit（施密特正交）：切向 t̂=(dx,dy)/L（节点1→2），法向 n̂=(-dy,dx)/L（逆时针90°）
+    double dx = r[2] - r[0], dy = r[3] - r[1];
+    double len = std::hypot(dx, dy);
+    double tx = dx / len, ty = dy / len;
+    double nx = -ty, ny = tx;
+
+    // t 矩阵 4×4（行=局部变量[节点1切向,节点1法向,节点2切向,节点2法向]，列=全局变量[u1,v1,u2,v2]）
+    double t[4][4] = { {0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0} };
+    t[0][0] = tx; t[0][1] = ty;
+    t[1][0] = nx; t[1][1] = ny;
+    t[2][2] = tx; t[2][3] = ty;
+    t[3][2] = nx; t[3][3] = ny;
+
+    const int nvar = 4;
+    // tl: egl = tᵀ·ell（载荷向量局部→全局）
+    for (int i = 0; i < nvar; ++i)
+    {
+        double s = 0.0;
+        for (int l = 0; l < nvar; ++l) s += t[l][i] * locEload[l];
+        _result.eload[i] = s;
+    }
+    // tkt/tmt：estif/emass/edamp 局部恒 0，变换后仍 0，直接置 0
+    std::fill(_result.estif.begin(), _result.estif.end(), 0.0);
+    std::fill(_result.emass.begin(), _result.emass.end(), 0.0);
+    std::fill(_result.edamp.begin(), _result.edamp.end(), 0.0);
+}
+
 CDFEG::EleSubResult& StressBL2g::run(
     const std::vector<double>& r,
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    // 清零本边单元结果（estif/emass/edamp 恒 0，仅算 eload）
-    std::fill(_result.estif.begin(), _result.estif.end(), 0.0);
-    std::fill(_result.emass.begin(), _result.emass.end(), 0.0);
-    std::fill(_result.edamp.begin(), _result.edamp.end(), 0.0);
-    std::fill(_result.eload.begin(), _result.eload.end(), 0.0);
-
-    // fu/fv 为局部坐标的面力密度：fu 沿线切向、fv 沿线法向（对应基准 a2ll2/a2gl2）
-    double fu = matParams.at("fu");
-    double fv = matParams.at("fv");
-
-    // 2 节点坐标 r = [x1, y1, x2, y2]（与 DelQ4g 一致：外层节点、内层维度）
-    double x1 = r[0], y1 = r[1];
-    double x2 = r[2], y2 = r[3];
-    double dx = x2 - x1, dy = y2 - y1;
-    double len = std::hypot(dx, dy);
-    double det = len / 2.0;   // 参考坐标 → 弧长的雅可比（线长一半）
-
-    // 局部坐标轴（与基准 smit 施密特正交一致）：
-    //   切向 t̂=(dx,dy)/L（节点1→节点2），法向 n̂=(-dy,dx)/L（逆时针90°）
-    double tx = dx / len, ty = dy / len;
-    double nx = -ty, ny = tx;
-
-    // 2 高斯点 rx = ±1，权重 = 1；形函数 N1=(1-rx)/2，N2=(1+rx)/2。
-    // 先按 a2ll2 算局部节点载荷（切向 N·fu、法向 N·fv），再按 a2gl2 的 tl(egl=tᵀ·ell)
-    // 变换到全局：全局u = tx·(切向)+nx·(法向)；全局v = ty·(切向)+ny·(法向)。
-    //   eload[0/1]=节点1 全局u/v，eload[2/3]=节点2 全局u/v
-    const double gausPts[2] = { -1.0, 1.0 };
-    const double gausW[2] = { 1.0, 1.0 };
-    for (int g = 0; g < 2; ++g)
-    {
-        double rx = gausPts[g];
-        double N1 = (1.0 - rx) / 2.0;
-        double N2 = (1.0 + rx) / 2.0;
-        double w = det * gausW[g];
-        // 节点1 / 节点2 的局部（切向 lu / 法向 lv）载荷
-        double lu1 = N1 * fu * w, lv1 = N1 * fv * w;
-        double lu2 = N2 * fu * w, lv2 = N2 * fv * w;
-        _result.eload[0] += tx * lu1 + nx * lv1;
-        _result.eload[1] += ty * lu1 + ny * lv1;
-        _result.eload[2] += tx * lu2 + nx * lv2;
-        _result.eload[3] += ty * lu2 + ny * lv2;
-    }
+    // Step 1: 局部坐标下的单元矩阵（a2ll2）
+    std::vector<double> locEstif, locEmass, locEdamp, locEload;
+    computeLocalMatrix(r, matParams, locEstif, locEmass, locEdamp, locEload);
+    // Step 2: 坐标转换局部→全局（a2gl2: smit + tkt/tmt/tl），写入 _result
+    coordTransform(r, locEstif, locEmass, locEdamp, locEload);
 
     if (_bSaveResult) _results.push_back(_result);
     return _result;
