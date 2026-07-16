@@ -273,11 +273,13 @@ namespace CDFEG {
 		int id = -1;
 		const std::string& line = _datReader.getCurrentLine();
 		while (_datReader.readNextLine()) {
+			if (line.empty()) continue;                 // 容错：跳过空行
 			if (line[0] == '*') {
 				_datReader.preLine();
 				break;
 			}
 			std::vector<double> vals = TextReader::splitDoubles(line, " ,");
+			if (vals.empty()) continue;                 // 容错：跳过空行/无效行
 			id = vals[0]+0.1;
 			switch (vals.size())
 			{
@@ -306,14 +308,16 @@ namespace CDFEG {
 		std::string name = params.at("name");
 		const std::string& line = _datReader.getCurrentLine();
 		while (_datReader.readNextLine()) {
+			if (line.empty()) continue;                 // 容错：跳过空行（避免 line[0] 越界）
 			if (line[0] == '*') {
 				_datReader.preLine();
 				break;
 			}
 			std::vector<int> vals = TextReader::splitInts(line, " ,");
+			if (vals.size() < 2) continue;              // 容错：跳过空行/无效行（至少需 id + mateId）
 			id = vals[0];
 			vals.erase(vals.begin());
-			mateId = vals[vals.size() - 1];
+			mateId = vals.back();
 			vals.pop_back();
 			int internalId = _femData->addEle(id, vals, name);
 			_femData->setEleMateByInternal(internalId, name+"_" + std::to_string(mateId));
@@ -357,11 +361,13 @@ namespace CDFEG {
 		int dof = curField->_dof;
 		const std::string& line = _datReader.getCurrentLine();
 		while (_datReader.readNextLine()) {
+			if (line.empty()) continue;                 // 容错：跳过空行
 			if (line[0] == '*') {
 				_datReader.preLine();
 				break;
 			}
 			std::vector<double> vals = TextReader::splitDoubles(line, " ,");
+			if ((int)vals.size() < dof + 1) continue;   // 容错：跳过空行/无效行（至少需节点 + dof 个边界值）
 			for (int i = 0; i < dof; ++i)
 			{
 				curField->setFirstBoundry(vals[0]+0.1, vals[i+1], i);

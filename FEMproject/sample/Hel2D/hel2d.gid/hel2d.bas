@@ -25,7 +25,8 @@
 *Add Cond point-hel2dHeat *nodes
 *loop nodes *OnlyInCond
 *NodesNum *cond(2)
-*end** name=idDelDisp,structure="I32**3",type="id",index=1
+*end
+** name=idDelDisp,structure="I32**3",type="id",index=1
 *Set Cond volume-hel2dDelDisp *nodes
 *Add Cond surface-hel2dDelDisp *nodes
 *Add Cond line-hel2dDelDisp *nodes
@@ -40,7 +41,8 @@
 *Add Cond point-hel2dDelDisp *nodes
 *loop nodes *OnlyInCond
 *NodesNum *cond(2) *cond(4)
-*end** name=HelQ4g,structure="I32**6",type="elem",index=1
+*end
+** name=HelQ4g,structure="I32**6",type="elem",index=1
 *set cond Surface-HelQ4g *elems
 *loop elems *OnlyIncond
 *ElemsNum *elemsConec *cond(1)
