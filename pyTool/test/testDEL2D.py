@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-# 2D弹性力学场（平面应力）
+# 2D瞬态弹性力学场（平面应力）
 import sys
 import json
 import os

@@ -69,19 +69,31 @@ class MakerGidFile(MakerBase):
             for ele in field.eleSubs:
                 gidName = ele.gidName
                 if gidName not in eleGroups:
-                    eleGroups[gidName] = {'ele': ele, 'fieldIndex': index, 'paramNames': set(), 'paramValues': []}
-                # 合并 paramNames（去重）
-                eleGroups[gidName]['paramNames'].update(ele.paramNames)
-        
+                    eleGroups[gidName] = {'ele': ele, 'fieldIndex': index,
+                                          'paramNames': [], 'paramValues': [], 'paramSeen': {}}
+                # 按场出现先后追加 paramNames（同名第 2 次起加序号 _1、_2...，不去重）
+                # 并同步合并与各 paramName 一一配对的 paramValues
+                paramSeen = eleGroups[gidName]['paramSeen']
+                groupNames = eleGroups[gidName]['paramNames']
+                groupValues = eleGroups[gidName]['paramValues']
+                for i, name in enumerate(ele.paramNames):
+                    if name in paramSeen:
+                        paramSeen[name] += 1
+                        groupNames.append(f"{name}_{paramSeen[name]}")
+                    else:
+                        paramSeen[name] = 0
+                        groupNames.append(name)
+                    # paramValues 与 paramNames 等长配对；缺失位置补 0.0
+                    groupValues.append(ele.paramValues[i] if i < len(ele.paramValues) else 0.0)
+
         # 添加单元和材料
         for gidName, group in eleGroups.items():
             ele = group['ele']
             fieldIndex = group['fieldIndex']
             # 添加单元（使用 gidName）
             self.addElem(gidName, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
-            # 添加材料（使用 gidName 和合并后的 paramNames）
-            mergedParamNames = list(group['paramNames'])
-            self.addMaterial(gidName, mergedParamNames, ele.paramValues, fieldIndex)
+            # 添加材料（使用 gidName 和按出现先后排列的 paramNames 及其配对的 paramValues）
+            self.addMaterial(gidName, group['paramNames'], group['paramValues'], fieldIndex)
 
         self.basFn=path+"\\"+pro.name+".bas"
         self.prbFn=path+"\\"+pro.name+".prb"
