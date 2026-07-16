@@ -2,7 +2,7 @@
 #include "elData.h"
 #include "beq4g2.h"
 
-elbFieldData::elbFieldData(CDFEG::FEMData* femData)
+elbFieldData::elbFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(3, femData) {
     _name="elb";
     _dispNames = { "dxx", "dyy", "dxy" };

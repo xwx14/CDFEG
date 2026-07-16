@@ -15,9 +15,9 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 #include "Processor.h"
 #include "PhyFieldData.h"
-#include "FemData.h"
+#include "DomainData.h"
 namespace CDFEG {
-	Processor::Processor(FEMData* data, PhyFieldData* fieldData)
+	Processor::Processor(DomainData* data, PhyFieldData* fieldData)
 	{
 		_femData = data;
 		_phyFieldData = fieldData;

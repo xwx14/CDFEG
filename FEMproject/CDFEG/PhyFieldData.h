@@ -25,10 +25,10 @@
 
 namespace CDFEG {
 	class ElementBase;
-	class FEMData;
+	class DomainData;
 	class CDFEG_API  PhyFieldData {
 	public:
-		PhyFieldData(int dof, FEMData* femData);
+		PhyFieldData(int dof, DomainData* femData);
 		virtual ~PhyFieldData();
 		/**
 		 * @brief E程序，计算总刚矩阵和右端项
@@ -43,7 +43,6 @@ namespace CDFEG {
 		 */
 		int eProgram_el();
 
-		virtual std::map<std::string, std::vector<double>>  getCoef1(std::vector<int> nodeIds);
 		virtual std::map<std::string, std::vector<double>>  getCoef(const std::vector<int>& nodeIds);
 		/**
 		 * @brief 设置节点个数，并初始化相关数值
@@ -58,7 +57,7 @@ namespace CDFEG {
 		 * @author Xie Wenxi
 		 * @date 2025-3-17
 		 */
-		void setFEMData(FEMData* femData) { _femData = femData; };
+		void setDomainData(DomainData* femData) { _femData = femData; };
 		/**
 		 * @brief 添加单元类型
 		 * @param eleSub 单元类型
@@ -124,7 +123,7 @@ namespace CDFEG {
 		// 关联的场
 		std::vector<PhyFieldData*> _assPhys;
 		// 有限元空间数据
-		FEMData* _femData = nullptr;
+		DomainData* _femData = nullptr;
 		// 单元子程序
 		std::vector<CDFEG::ElementBase*> _eleSubs;
 		// 节点规格数，start程序后会记录等式号

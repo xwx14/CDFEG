@@ -27,12 +27,12 @@
  * @date 2025-3-27
  */
 namespace CDFEG {
-	class FEMData;
+	class DomainData;
 	class PhyFieldData;
 	class CDFEG_API Processor
 	{
 	public:
-		Processor(FEMData* data, PhyFieldData* fieldData);
+		Processor(DomainData* data, PhyFieldData* fieldData);
 		virtual~Processor();
 		/**
 		 * @brief 前处理
@@ -48,7 +48,7 @@ namespace CDFEG {
 		virtual int post(int it = 0);
 
 	public:
-		FEMData* _femData;
+		DomainData* _femData;
 		PhyFieldData* _phyFieldData;
 		bool _bNeedTime = false;
 		int _nPts = 0;

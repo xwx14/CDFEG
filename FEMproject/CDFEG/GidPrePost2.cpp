@@ -22,7 +22,7 @@
 #include <vector>
 #include <stdexcept>
 #include <sstream>
-CDFEG::GidPrePost2::GidPrePost2(FEMData* data) :Processor(data, nullptr)
+CDFEG::GidPrePost2::GidPrePost2(DomainData* data) :Processor(data, nullptr)
 {
 
 }

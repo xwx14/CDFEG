@@ -39,7 +39,7 @@ namespace CDFEG {
 	class CDFEG_API GidPrePost :public Processor
 	{
 	public:
-		GidPrePost(FEMData* data);
+		GidPrePost(DomainData* data);
 		~GidPrePost();
 		void setFilePath(const std::string& parentPath, const std::string& name);
 		virtual int pre();

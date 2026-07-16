@@ -17,9 +17,9 @@
 #include "vtkPost.h"
 #include <fstream>
 #include "PhyFieldData.h"
-#include "FemData.h"
+#include "DomainData.h"
 namespace CDFEG {
-	vtkPost::vtkPost(FEMData* data, PhyFieldData* fieldData):Processor(data, fieldData)
+	vtkPost::vtkPost(DomainData* data, PhyFieldData* fieldData):Processor(data, fieldData)
 	{
 
 	}

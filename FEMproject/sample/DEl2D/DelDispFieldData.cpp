@@ -22,16 +22,16 @@
 #include "CDFEG/EquationSystem.h"
 #include <cmath>
 
-DelDispFieldData::DelDispFieldData(CDFEG::FEMData* femData)
+DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name = "DelDisp";
     _dispNames = { "u", "v" };
     _dof2 = 2;
     // 注册动力单元（含集中质量/阻尼输出）
     _eleSubs.push_back(new DelQ4g(this));
-    // 注册边界面力载荷单元（StressBL2g=旧 a2ll2，纯载荷：沿线积分把面力分配到节点）
+    // 注册边界面力载荷单元（StressBL2g，纯载荷：沿线积分把面力分配到节点）
     _eleSubs.push_back(new StressBL2g(this));
-    // 应力恢复结果名
+    // 应力结果名
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
     _resForm = "Vector OnNodes";
     // 声明从前处理读取的 Newmark 积分参数组（gamma/beta）
@@ -65,7 +65,7 @@ void DelDispFieldData::setNewmarkParams(double gamma, double beta, double dt)
 
 void DelDispFieldData::calcNewmarkConstants()
 {
-    // 标准 Newmark-β 积分常数（对应旧 newmarka.nfe 的 @begin 段）
+    // 标准 Newmark-β 积分常数
     double o = _gamma;
     double aa = _beta;
     _a0 = 1.0 / (_dt * _dt * aa);

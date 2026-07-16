@@ -20,7 +20,7 @@
 
 class Truss3DDispFieldData : public CDFEG::PhyFieldData {
 public:
-    Truss3DDispFieldData(CDFEG::FEMData* femData);
+    Truss3DDispFieldData(CDFEG::DomainData* femData);
     ~Truss3DDispFieldData();
 };
 

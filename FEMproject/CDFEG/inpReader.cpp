@@ -15,7 +15,7 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "inpReader.h"
-#include "FemData.h"
+#include "DomainData.h"
 #include "PhyFieldData.h"
 #include <iostream>
 #include <algorithm>
@@ -23,7 +23,7 @@
 
 namespace CDFEG {
 
-inpReader::inpReader(FEMData* data, PhyFieldData* fieldData)
+inpReader::inpReader(DomainData* data, PhyFieldData* fieldData)
     : Processor(data, fieldData)
     , _hasPartAssembly(false)
     , _logLevel(1)
@@ -147,8 +147,8 @@ int inpReader::pre()
         assembleInstances();
     }
 
-    // 转换为FEMData/PhyFieldData
-    //convertToFEMData();
+    // 转换为DomainData/PhyFieldData
+    //convertToDomainData();
 
     return static_cast<int>(InpReaderError::SUCCESS);
 }
@@ -733,7 +733,7 @@ void inpReader::assembleInstances()
     }
 }
 
-void inpReader::convertToFEMData()
+void inpReader::convertToDomainData()
 {
     if (!_femData)  return;
     

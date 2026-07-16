@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
 // 
-#ifndef CDFEG_FEM_DATA_H
-#define CDFEG_FEM_DATA_H
+#ifndef CDFEG_DOMAIN_DATA_H
+#define CDFEG_DOMAIN_DATA_H
 #include <vector>
 #include <string>
 #include "CDFEG.h"
@@ -26,10 +26,10 @@ namespace CDFEG {
 	class ElementBase;
 	class Processor;
 	// 有限元空间数据
-	class CDFEG_API FEMData {
+	class CDFEG_API DomainData {
 	public:
-		FEMData();
-		virtual ~FEMData();
+		DomainData();
+		virtual ~DomainData();
 		/**
 		 * @brief 设置网格点的个数
 		 * @param n 网格点个数
@@ -121,6 +121,17 @@ namespace CDFEG {
 		virtual int caculate() { return -1; };
 		// main程序
 		virtual int main() { return -1; };
+		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
+		double getParam(const std::string& group, const std::string& param) const;
+		/*!
+		 * @brief 获取coef(其他场的数据)
+		 * @param nodeIds 节点id
+		 * @param dataNames 数据名称,key为场号，value为场内数据名序列
+		 * @return coef
+		 * author xwx14
+		 * date 2026/07/16
+		 */
+		std::map<std::string, std::vector<double>>  getCoef(const std::vector<int>& nodeIds,const std::map<int,std::vector<std::string>>& dataNames);
 	public:
 		int _nPts;
 		double _dt = 0.0;
@@ -158,8 +169,7 @@ namespace CDFEG {
 		std::vector<std::vector<std::string>> _addParams;
 		// 从前处理读回的参数值，key=组名，value 按该组 _addParams 参数名顺序对齐
 		std::map<std::string, std::vector<double>> _paramValues;
-		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
-		double getParam(const std::string& group, const std::string& param) const;
+		
 	};
 };
 #endif

@@ -10,7 +10,7 @@
 
 | 产物 | 来源模板 | 内容 |
 | --- | --- | --- |
-| FEMData 派生类 | `femdata.*.j2` | `_dim` + 注册物理场 + `caculate`（命令流渲染） |
+| DomainData 派生类 | `domaindata.*.j2` | `_dim` + 注册物理场 + `caculate`（命令流渲染） |
 | PhyFieldData 派生类 | `phyfielddata.*.j2` | `_name/_dispNames/_dof2` + 注册单元 + `_eleResNames` |
 | 单元派生类 | `elesub.*.j2` | 构造（元信息 + 积分参数 + `caculateShapeCoef` + resize 结果）+ `shapeFun`（从字符串表达式）+ **空的 `run`/`uEle` 体** |
 | main 入口 | `main.cpp.j2` / `mainGid.cpp.j2` | GiD 文件入口：`setFilePath→pre→caculate→post` |

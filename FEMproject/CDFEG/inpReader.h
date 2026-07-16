@@ -37,7 +37,7 @@ enum class InpReaderError {
 class CDFEG_API inpReader : public Processor
 {
 public:
-    inpReader(FEMData* data, PhyFieldData* fieldData);
+    inpReader(DomainData* data, PhyFieldData* fieldData);
     virtual ~inpReader();
 
     // 设置方法
@@ -78,7 +78,7 @@ private:
 
     // 辅助方法
     void assembleInstances();
-    void convertToFEMData();
+    void convertToDomainData();
     void logWarning(const std::string& message);
     std::string readContinuationLines();
 

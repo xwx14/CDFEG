@@ -41,7 +41,7 @@ int del2dData::caculate() {
     // 一次方程编号 + 稀疏骨架初始化（稀疏结构全程不变）
     aField->initMatrix();
 
-    // dt/tmax 来自 dat 的 time 段（FEMData 持有）；gamma/beta 来自 dat 的 newmark 段（物理场 _addParams 声明）
+    // dt/tmax 来自 dat 的 time 段（DomainData 持有）；gamma/beta 来自 dat 的 newmark 段（物理场 _addParams 声明）
     if (_dt <= 0.0)
     {
         std::cerr << "[del2dData] dt <= 0, 请检查 dat 文件 time 段" << std::endl;

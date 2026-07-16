@@ -12,7 +12,7 @@
 │   │   ├── EquationSystem.h   # 方程组求解
 │   │   ├── MatrixFun.h       # 常用的计算函数
 │   │   ├── PhyFieldData.h   # 物理场数据基类
-│   │   ├── FemData.h        # 有限元空间数据基类
+│   │   ├── DomainData.h        # 有限元空间数据基类
 │   │   └── gidProPost.h    # GID前后处理接口
 │   └── sample/        # 示例程序
 ├── pyTool/            # Python 代码生成工具
@@ -40,7 +40,7 @@ CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单�
 EleSubBase (单元子程序基类)
     └── IsoEleBase (等参元基类)
 PhyFieldData (物理场数据)
-FEMData (有限元空间数据)
+DomainData (有限元空间数据)
 EquationSystem (方程组求解)
 ```
 
@@ -53,7 +53,7 @@ EquationSystem (方程组求解)
 | `EquationSystem.h` | 基于 Eigen 库的稀疏矩阵求解器，支持总刚组装、`addFirstBC()`/`addSecondBC()` 施加边界条件 |
 | `MatrixFun.h` | 矩阵运算工具库：行列式、逆矩阵、矩阵乘法、转置、向量运算、方向余弦计算等 |
 | `PhyFieldData.h` | 物理场数据管理，每个物理场包含若干单元类型；管理自由度编号与边界条件 |
-| `FemData.h` | 有限元空间数据：节点坐标(`addNode`)、单元连接(`addEle`)、材料属性管理 |
+| `DomainData.h` | 有限元空间数据：节点坐标(`addNode`)、单元连接(`addEle`)、材料属性管理 |
 | `gidProPost.h` | GID 前后处理接口，支持网格导入与结果可视化 |
 | `InpDataStructures.h` | Abaqus INP 文件读取器 |
 
@@ -108,13 +108,13 @@ CDFEG::EleSubResult& Truss1D::run(...) {
 // Truss1DDispFieldData.h
 class Truss1DDispFieldData : public CDFEG::PhyFieldData {
 public:
-    Truss1DDispFieldData(CDFEG::FEMData* femData);
+    Truss1DDispFieldData(CDFEG::DomainData* femData);
 };
 ```
 
 ```cpp
 // Truss1DDispFieldData.cpp
-Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::FEMData* femData)
+Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(1, femData) {  // 1 = 每节点1个自由度
     _name = "Truss1DDisp";
     _dispNames = {"u"};
@@ -127,7 +127,7 @@ Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::FEMData* femData)
 
 ```cpp
 // 定义数据类
-class Truss1DData : public CDFEG::FEMData {
+class Truss1DData : public CDFEG::DomainData {
 public:
     Truss1DData() {
         _dim = 1;
@@ -177,8 +177,8 @@ int main() {
 | `EleSubBase::uEle()` | 后处理计算，如应力、应变 |
 | `PhyFieldData::eProgram_el()` | 组装总刚矩阵与右端项 |
 | `PhyFieldData::solve()` | 求解方程组 |
-| `FEMData::addNode()` | 添加节点 |
-| `FEMData::addEle()` | 添加单元 |
+| `DomainData::addNode()` | 添加节点 |
+| `DomainData::addEle()` | 添加单元 |
 
 
 ## 编译

@@ -25,4 +25,4 @@
 ## 关联
 
 - 派生新单元的操作流程：skill `derive-element`。
-- 头文件引用：`#include "CDFEG/FemData.h"`、`#include "CDFEG/gidPrePost.h"`。
+- 头文件引用：`#include "CDFEG/DomainData.h"`、`#include "CDFEG/gidPrePost.h"`。

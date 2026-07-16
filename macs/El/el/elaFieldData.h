@@ -4,7 +4,7 @@
 
 class elaFieldData : public CDFEG::PhyFieldData {
 public:
-    elaFieldData(CDFEG::FEMData* femData);
+    elaFieldData(CDFEG::DomainData* femData);
     ~elaFieldData();
 
     int eProgram() override;

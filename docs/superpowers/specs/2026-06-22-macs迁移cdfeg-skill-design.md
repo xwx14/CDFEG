@@ -26,7 +26,7 @@
 ## 3. 整体流程（SKILL 三步）
 
 ### 步骤 1：解析生成框架
-`preParser` 读 macs 项目的 pre/ges/gcn → 构造 `DataProject` → `testMacs.py` 以 `mode='new'` 生成 C++ 类骨架（FEMData/PhyFieldData/EleSub 派生类）+ CMake + GiD 文件。
+`preParser` 读 macs 项目的 pre/ges/gcn → 构造 `DataProject` → `testMacs.py` 以 `mode='new'` 生成 C++ 类骨架（DomainData/PhyFieldData/EleSub 派生类）+ CMake + GiD 文件。
 
 ### 步骤 2：填充计算逻辑
 参考旧 C 源码改造填充（**每个场的 `eProgram` 必须重写**，单元 `run`/`uEle` 手写）。映射见第 6 节。

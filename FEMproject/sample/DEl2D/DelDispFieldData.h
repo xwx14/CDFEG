@@ -28,10 +28,10 @@
 //   4) 重写 uPhy：由解向量更新加速度/速度/位移，并保存为下一步初值，再做应力恢复
 class DelDispFieldData : public CDFEG::PhyFieldData {
 public:
-    DelDispFieldData(CDFEG::FEMData* femData);
+    DelDispFieldData(CDFEG::DomainData* femData);
     ~DelDispFieldData();
 
-    // 设置 Newmark 积分参数（dt/tmax 由 FEMData 持有，gamma/beta 默认 0.5/0.25 平均加速度法）
+    // 设置 Newmark 积分参数（dt/tmax 由 DomainData 持有，gamma/beta 默认 0.5/0.25 平均加速度法）
     void setNewmarkParams(double gamma, double beta, double dt);
     // 设置初值（按节点号设置该节点 u/v/w 初值，未设置的节点默认 0）
     void setInitialDisp(int nodeId, double u, double v);

@@ -123,7 +123,7 @@ class MakerCpp(MakerBase):
             self.write2File("mainGid.cpp.j2", "main.cpp", context, output_path=output_path)
         file_lists["cpp"].append("main.cpp")
 
-    def _makeFEMData(self, project, output_path: str, file_lists: dict):
+    def _makeDomainData(self, project, output_path: str, file_lists: dict):
         femDataClassName = f"{project.name}Data"
         project.caculateCode=self.parseCmds(project)
         context = {
@@ -133,10 +133,10 @@ class MakerCpp(MakerBase):
 
         }
         h_filename = f"{project.name}Data.h"
-        self.write2File("femdata.h.j2", h_filename, context, output_path=output_path)
+        self.write2File("domaindata.h.j2", h_filename, context, output_path=output_path)
         file_lists["h"].append(h_filename)
         cpp_filename = f"{project.name}Data.cpp"
-        self.write2File("femdata.cpp.j2", cpp_filename, context, output_path=output_path)
+        self.write2File("domaindata.cpp.j2", cpp_filename, context, output_path=output_path)
         file_lists["cpp"].append(cpp_filename)
 
     def _makePhyFieldData(self, project, field, output_path: str, file_lists: dict):
@@ -219,8 +219,8 @@ class MakerCpp(MakerBase):
 
         if iProgramType == 0:
             self._makeMain(project, output_path, iProgramType, file_lists)
-        safePrint(f"\n📝 生成全局 FEMData 类...")
-        self._makeFEMData(project, output_path, file_lists)
+        safePrint(f"\n📝 生成全局 DomainData 类...")
+        self._makeDomainData(project, output_path, file_lists)
         for field in project.fields:
             safePrint(f"\n📝 生成场 '{field.name}' 的文件...")
             self._makePhyFieldData(project, field, output_path, file_lists)

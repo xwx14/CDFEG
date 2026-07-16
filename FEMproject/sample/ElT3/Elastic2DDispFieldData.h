@@ -4,7 +4,7 @@
 
 class Elastic2DDispFieldData : public CDFEG::PhyFieldData {
 public:
-    Elastic2DDispFieldData(CDFEG::FEMData* femData);
+    Elastic2DDispFieldData(CDFEG::DomainData* femData);
     ~Elastic2DDispFieldData();
 
 

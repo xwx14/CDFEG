@@ -94,7 +94,7 @@ CDFEG::EleSubResult& DelQ4g::run(
     double rou = matParams.at("rou");
     double alpha = matParams.at("alpha");
     double vol = 1.0;
-    // 平面应变本构因子（与 ElQ4g / 旧 a1eq4g2 一致）
+    // 平面应变本构因子（与 ElQ4g 一致）
     double fact = pe / (1.0 + pv) / (1.0 - pv * 2.0) * vol;
     double shear = 0.5 - pv;
 

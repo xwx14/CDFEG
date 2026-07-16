@@ -4,7 +4,7 @@
 #include "CDFEG/ElementBase.h"
 #include "CDFEG/EquationSystem.h"
 
-HeatFieldData::HeatFieldData(CDFEG::FEMData* femData)
+HeatFieldData::HeatFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(1, femData) {
     _name="Heat";
     _dispNames = { "T" };
@@ -17,8 +17,7 @@ HeatFieldData::~HeatFieldData() {
 
 }
 
-// E 程序：组装热传导总刚 + 热源载荷 → 右端项（对应旧 ehela.c）
-// 基类 eProgram_el 只组装刚度、忽略 eload，故此处重写以叠加热源。
+// E 程序：组装热传导总刚 + 热源载荷 → 右端项
 int HeatFieldData::eProgram()
 {
     std::fill(_equSys._data.begin(), _equSys._data.end(), 0.0);

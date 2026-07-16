@@ -1,5 +1,5 @@
 // 验证 _paramValues / getParam 取值 + gidPrePost 按 _addParams 声明从 dat 回填
-#include "CDFEG/FemData.h"
+#include "CDFEG/DomainData.h"
 #include "CDFEG/PhyFieldData.h"
 #include "CDFEG/ElementBase.h"
 #include "CDFEG/gidPrePost.h"
@@ -8,7 +8,7 @@
 
 int main() {
     using namespace CDFEG;
-    FEMData* fd = new FEMData();
+    DomainData* fd = new DomainData();
     fd->_addParams = { {"proj","dim"} };
     PhyFieldData* f = new PhyFieldData(2, fd);
     f->_name = "F";

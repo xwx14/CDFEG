@@ -4,7 +4,7 @@
 #include "{{ele.name}}.h"
 {% endfor %}
 
-{{field.fieldDataClassName}}::{{field.fieldDataClassName}}(CDFEG::FEMData* femData)
+{{field.fieldDataClassName}}::{{field.fieldDataClassName}}(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData({{field.dof}}, femData) {
     _name="{{field.name}}";
     _dispNames = { {% for disp in field.dispNames %}"{{disp}}"{% if not loop.last %}, {% endif %}{% endfor %} };

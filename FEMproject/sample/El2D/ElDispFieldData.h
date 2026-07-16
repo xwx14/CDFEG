@@ -4,7 +4,7 @@
 
 class ElDispFieldData : public CDFEG::PhyFieldData {
 public:
-    ElDispFieldData(CDFEG::FEMData* femData);
+    ElDispFieldData(CDFEG::DomainData* femData);
     ~ElDispFieldData();
 
     virtual int uPhy() override;

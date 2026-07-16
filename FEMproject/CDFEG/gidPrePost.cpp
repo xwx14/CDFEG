@@ -19,7 +19,7 @@
 #include <map>
 #include <iomanip>
 #include "gidPrePost.h"
-#include "FemData.h"
+#include "DomainData.h"
 #include "PhyFieldData.h"
 #include "ElementBase.h"
 #include <set>
@@ -101,7 +101,7 @@ namespace CDFEG {
 			return "Triangle";
 		}
 	}
-	GidPrePost::GidPrePost(FEMData* data) :Processor(data,nullptr)
+	GidPrePost::GidPrePost(DomainData* data) :Processor(data,nullptr)
 	{
 		for (PhyFieldData* f : _femData->_phyDatas)
 		{

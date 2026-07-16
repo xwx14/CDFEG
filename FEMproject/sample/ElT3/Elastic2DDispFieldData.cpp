@@ -2,7 +2,7 @@
 #include "ElasticT3Data.h"
 #include "ElT3.h"
 
-Elastic2DDispFieldData::Elastic2DDispFieldData(CDFEG::FEMData* femData)
+Elastic2DDispFieldData::Elastic2DDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name="Elastic2DDisp";
     _dispNames = { "u", "v" };

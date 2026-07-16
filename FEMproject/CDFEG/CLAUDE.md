@@ -8,7 +8,7 @@
 
 | 层 | 类 | 职责 | 派生要点 |
 | --- | --- | --- | --- |
-| 总体数据 | `FEMData` | 网格 / 材料 / 物理场 / 流程控制 | 重写 `caculate()`、`main()` |
+| 总体数据 | `DomainData` | 网格 / 材料 / 物理场 / 流程控制 | 重写 `caculate()`、`main()` |
 | 物理场 | `PhyFieldData` | 自由度 / 边界 / 方程组装求解 / 后处理 | 线性椭圆问题用默认 `eProgram_el()`；**非线性 / 非椭圆 PDE 必须重写 `eProgram`** |
 | 单元 | `ElementBase` / `IsoEleBase` | `run()` 算单刚单质单阻载荷、`uEle()` 后处理 | 派生流程见 skill `derive-element` |
 
@@ -31,5 +31,5 @@
 
 ## 深度参考
 
-- 类结构与成员详解：[`代码解释.md`](./代码解释.md)（FEMData / PhyFieldData / ElementBase 层次与关键成员方法）
+- 类结构与成员详解：[`代码解释.md`](./代码解释.md)（DomainData / PhyFieldData / ElementBase 层次与关键成员方法）
 - 总刚组装 / 边界划行列法 / 求解 / 后处理机制与陷阱：[`.claude/rules/核心库实现细节.md`](../../.claude/rules/核心库实现细节.md)

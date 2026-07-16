@@ -3,7 +3,7 @@
 #include "a1eq4g2.h"
 #include "a2ll2.h"
 
-elaFieldData::elaFieldData(CDFEG::FEMData* femData)
+elaFieldData::elaFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name="ela";
     _dispNames = { "u", "v" };

@@ -18,7 +18,7 @@
 #include "Truss1DData.h"
 #include "Truss1D.h"
 
-Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::FEMData* femData)
+Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(1, femData) {
     _name="Truss1DDisp";
     _dispNames = { "u"};

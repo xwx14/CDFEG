@@ -4,7 +4,7 @@
 
 class elbFieldData : public CDFEG::PhyFieldData {
 public:
-    elbFieldData(CDFEG::FEMData* femData);
+    elbFieldData(CDFEG::DomainData* femData);
     ~elbFieldData();
 
     int eProgram() override;

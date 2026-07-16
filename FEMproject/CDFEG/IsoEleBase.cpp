@@ -17,7 +17,7 @@
 // 
 #include "IsoEleBase.h"
 #include "PhyFieldData.h"
-#include "FemData.h"
+#include "DomainData.h"
 
 CDFEG::IsoEleBase::IsoEleBase(int nNode, PhyFieldData* pData /*= nullptr*/) :ElementBase(nNode, pData)
 {

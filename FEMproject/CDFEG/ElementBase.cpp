@@ -16,7 +16,7 @@
 
 #include "ElementBase.h"
 #include "PhyFieldData.h"
-#include "FemData.h"
+#include "DomainData.h"
 
 CDFEG::ElementBase::ElementBase(int nNode, PhyFieldData* pData)
 {

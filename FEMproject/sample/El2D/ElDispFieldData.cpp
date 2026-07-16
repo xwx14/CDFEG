@@ -4,7 +4,7 @@
 #include "ElT3g.h"
 #include "StressBL2g.h"
 
-ElDispFieldData::ElDispFieldData(CDFEG::FEMData* femData)
+ElDispFieldData::ElDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name="ElDisp";
     _dispNames = { "u", "v" };

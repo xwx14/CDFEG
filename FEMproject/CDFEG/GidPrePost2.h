@@ -26,7 +26,7 @@ namespace CDFEG{
 		public Processor
 	{
 	public:
-		GidPrePost2(FEMData* data);
+		GidPrePost2(DomainData* data);
 		~GidPrePost2();
 		virtual int pre();
 		virtual int post(int it = 0);

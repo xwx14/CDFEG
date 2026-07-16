@@ -5,7 +5,7 @@
 #include "CDFEG/EquationSystem.h"
 #include <cmath>
 
-DelDispFieldData::DelDispFieldData(CDFEG::FEMData* femData)
+DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name="DelDisp";
     _dispNames = { "u", "v" };
@@ -20,7 +20,7 @@ DelDispFieldData::~DelDispFieldData() {
 }
 
 // 取 Heat 场（_phyDatas[0]）的节点温度，按 nodeIds 构造 coef["T"]
-static void fillTempCoef(CDFEG::FEMData* femData,
+static void fillTempCoef(CDFEG::DomainData* femData,
                          const std::vector<int>& nodeIds,
                          std::map<std::string, std::vector<double>>& coef)
 {
@@ -35,7 +35,7 @@ static void fillTempCoef(CDFEG::FEMData* femData,
     coef["T"] = std::move(T);
 }
 
-// E 程序：组装弹性总刚 + 体力/热载荷 → 右端项（对应旧 ehelb.c）
+// E 程序：组装弹性总刚 + 体力/热载荷 → 右端项
 int DelDispFieldData::eProgram()
 {
     std::fill(_equSys._data.begin(), _equSys._data.end(), 0.0);
@@ -85,14 +85,13 @@ int DelDispFieldData::eProgram()
             }
         }
     }
-
     _equSys._bSavedData0 = false;
     _equSys.applyFirstBCs(_nodeBC1s, _ida);
     _equSys.applySecondBCs(_nodeBC2s, _ida);
     return 1;
 }
 
-// u 程序：回填位移 + 应力恢复（合并旧 uhelb.c 与 ehelc.c，应力在位移场后处理计算）
+// u 程序：回填位移 + 应力恢复（应力在位移场后处理计算）
 int DelDispFieldData::uPhy()
 {
     // 1) 回填节点位移

@@ -18,7 +18,7 @@
 #include "Truss2DData.h"
 #include "Truss2D.h"
 
-Truss2DDispFieldData::Truss2DDispFieldData(CDFEG::FEMData* femData)
+Truss2DDispFieldData::Truss2DDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {
     _name="Truss2DDisp";
     _dispNames = { "u", "v" };

@@ -4,7 +4,7 @@
 
 class DelDispFieldData : public CDFEG::PhyFieldData {
 public:
-    DelDispFieldData(CDFEG::FEMData* femData);
+    DelDispFieldData(CDFEG::DomainData* femData);
     ~DelDispFieldData();
 
     // 重写 eProgram：组装弹性总刚 + 体力/热载荷（取 Heat 场温度）→ 右端项

@@ -13,18 +13,18 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-#include "FemData.h"
+#include "DomainData.h"
 #include "PhyFieldData.h"
-CDFEG::FEMData::FEMData() {
+CDFEG::DomainData::DomainData() {
 	_elePt.push_back(0);
 }
-CDFEG::FEMData::~FEMData() {
+CDFEG::DomainData::~DomainData() {
 	for (PhyFieldData* p : _phyDatas)
 	{
 		delete p;
 	}
 }
-void CDFEG::FEMData::setNPts(int n)
+void CDFEG::DomainData::setNPts(int n)
 {
 	_nPts = n;
 	for (PhyFieldData* p : _phyDatas)
@@ -33,7 +33,7 @@ void CDFEG::FEMData::setNPts(int n)
 	}
 }
 
-void CDFEG::FEMData::addNode(int id, double x, double y/*=0.0*/, double z/*=0.0*/)
+void CDFEG::DomainData::addNode(int id, double x, double y/*=0.0*/, double z/*=0.0*/)
 {
 	int n = _nodeIdMap.size();
 	_nodeIdMap[id] = n;
@@ -44,13 +44,13 @@ void CDFEG::FEMData::addNode(int id, double x, double y/*=0.0*/, double z/*=0.0*
 	_nodes.push_back(z);
 }
 
-void CDFEG::FEMData::addNodeEnd()
+void CDFEG::DomainData::addNodeEnd()
 {
 	int n = _nodeIdMap.size();
 	setNPts(n);
 }
 
-int CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType)
+int CDFEG::DomainData::addEle(int id, const std::vector<int>& nodeIds, const std::string& eleType)
 {
 	int i = _elePt.size() - 1;
 	auto it = _eleIdMap.find(id);
@@ -102,7 +102,7 @@ int CDFEG::FEMData::addEle(int id, const std::vector<int>& nodeIds, const std::s
 	return i;
 }
 
-void CDFEG::FEMData::addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType)
+void CDFEG::DomainData::addEdge(int id, const std::vector<int>& nodeIds, const std::string& eleType)
 {
 	int i = _elePt.size() - 1;
 	_edgeIdMap[i]=_eleIdMap[id];
@@ -131,7 +131,7 @@ void CDFEG::FEMData::addEdge(int id, const std::vector<int>& nodeIds, const std:
 	_eleTypes.push_back(iEleType);
 }
 
-void CDFEG::FEMData::setEleMateId(int eleId, int id)
+void CDFEG::DomainData::setEleMateId(int eleId, int id)
 {
 	int interId = _eleIdMap[eleId];
 	int nPt = _elePt.size() - 1;
@@ -139,7 +139,7 @@ void CDFEG::FEMData::setEleMateId(int eleId, int id)
 	_eleMateIds[interId] = id;
 }
 
-void CDFEG::FEMData::setEleMateByName(int eleId, const std::string& name)
+void CDFEG::DomainData::setEleMateByName(int eleId, const std::string& name)
 {
 	// 在_mateNames中查找材料名称对应的序号
 	int mateId = -1;
@@ -158,7 +158,7 @@ void CDFEG::FEMData::setEleMateByName(int eleId, const std::string& name)
 	}
 }
 
-void CDFEG::FEMData::setEleMateByInternal(int internalId, const std::string& name)
+void CDFEG::DomainData::setEleMateByInternal(int internalId, const std::string& name)
 {
 	// 在 _mateNames 中查找材料名称对应的序号
 	int mateId = -1;
@@ -177,7 +177,7 @@ void CDFEG::FEMData::setEleMateByInternal(int internalId, const std::string& nam
 	_eleMateIds[internalId] = mateId;
 }
 
-int CDFEG::FEMData::addMate(const std::map<std::string, double>& matParam, const std::string& name)
+int CDFEG::DomainData::addMate(const std::map<std::string, double>& matParam, const std::string& name)
 {
 	_mateParams.push_back(matParam);
 	_mateNames.push_back(name);
@@ -186,7 +186,7 @@ int CDFEG::FEMData::addMate(const std::map<std::string, double>& matParam, const
 
 
 
-const std::map<std::string, double>& CDFEG::FEMData::getElemMatParams(int eleID, ElementBase* ele) const
+const std::map<std::string, double>& CDFEG::DomainData::getElemMatParams(int eleID, ElementBase* ele) const
 {
 	// 为适应旧版本数据而设
 	if (ele->_eleMatIDMap.find(eleID) != ele->_eleMatIDMap.find(eleID)) {
@@ -197,7 +197,7 @@ const std::map<std::string, double>& CDFEG::FEMData::getElemMatParams(int eleID,
 }
 
 // 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
-double CDFEG::FEMData::getParam(const std::string& group, const std::string& param) const {
+double CDFEG::DomainData::getParam(const std::string& group, const std::string& param) const {
 	for (const auto& g : _addParams) {
 		if (g.size() < 2 || g[0] != group) continue;
 		for (size_t i = 1; i < g.size(); ++i) {
@@ -210,4 +210,24 @@ double CDFEG::FEMData::getParam(const std::string& group, const std::string& par
 		return 0.0;
 	}
 	return 0.0;
+}
+
+std::map<std::string, std::vector<double>> CDFEG::DomainData::getCoef(const std::vector<int>& nodeIds, const std::map<int, std::vector<std::string>>& datas)
+{
+	std::map<std::string, std::vector<double>> coef;
+	for (const auto& d : datas) 
+	{
+		PhyFieldData* fd= _phyDatas[d.first];
+		for (const std::string& name : d.second) 
+		{
+            if (fd->_nodeRes.find(name) == fd->_nodeRes.end())continue;
+			std::vector<double> v;
+			const std::vector<double>& kv = fd->_nodeRes[name];
+			v.reserve(nodeIds.size());
+			for (int nid : nodeIds)
+				v.push_back((nid >= 0 && nid < (int)kv.size()) ? kv[nid] : 0.0);
+			coef[fd->_name + "::" + name] = std::move(v);
+		}
+	}
+	return coef;
 }

@@ -1,9 +1,9 @@
 #ifndef ELASTICT3_DATA_H
 #define ELASTICT3_DATA_H
 #include <string>
-#include "CDFEG/FemData.h"
+#include "CDFEG/DomainData.h"
 
-class ElasticT3Data : public CDFEG::FEMData {
+class ElasticT3Data : public CDFEG::DomainData {
 public:
     ElasticT3Data();
     ~ElasticT3Data();

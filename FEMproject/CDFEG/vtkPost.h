@@ -23,7 +23,7 @@ namespace CDFEG {
         public Processor
     {
         public:
-        vtkPost(FEMData* data, PhyFieldData* fieldData);
+        vtkPost(DomainData* data, PhyFieldData* fieldData);
         ~vtkPost();
 
         virtual int post(int it = 0);

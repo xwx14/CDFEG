@@ -18,7 +18,7 @@ description: Use when 把 mfel 旧项目（macs 测试集：el/heat/newmark 等�
 ```bash
 cd pyTool && python test/testMacs.py <项目名>
 ```
-解析 `<proj>.pre`+`*.ges`+`<proj>.gcn` → 生成 `macs/<Proj>`（new 模式，自带库副本）。产物：FEMData/PhyFieldData/EleSub 派生类骨架 + CMake + GiD。
+解析 `<proj>.pre`+`*.ges`+`<proj>.gcn` → 生成 `macs/<Proj>`（new 模式，自带库副本）。产物：DomainData/PhyFieldData/EleSub 派生类骨架 + CMake + GiD。
 
 ### 2. 填充计算逻辑（参考旧 C 源码）
 **每个场的 `eProgram` 必须重写**（基类 `eProgram_el` 不处理 eload→右端，也不调 getCoef）。映射：

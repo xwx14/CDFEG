@@ -30,7 +30,7 @@
 #define H2 0.04
 
 namespace CDFEG {
-	class FEMData;
+	class DomainData;
 	class PhyFieldData;
 	// 单元子程序计算结果
 	struct EleSubResult
@@ -84,7 +84,7 @@ namespace CDFEG {
 		// 所属的物理场
 		PhyFieldData* _phyData;
 		// 所属的有限元空间
-		FEMData* _femData;
+		DomainData* _femData;
 		// 实时计算结果
 		EleSubResult _result;
 		// 每个单元的计算结果

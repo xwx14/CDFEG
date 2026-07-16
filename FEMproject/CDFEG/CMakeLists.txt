@@ -5,7 +5,7 @@ project(CDFEG LANGUAGES CXX)
 set(SOURCES
     ElementBase.cpp
     EquationSystem.cpp
-    FemData.cpp
+    DomainData.cpp
 
     GidPrePost2.cpp
     GidResItem.cpp
@@ -23,7 +23,7 @@ set(HEADERS
     CDFEG.h
     ElementBase.h
     EquationSystem.h
-    FemData.h
+    DomainData.h
 
     GidPrePost2.h
     GidResItem.h

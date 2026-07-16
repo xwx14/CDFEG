@@ -34,7 +34,7 @@
       "claudeMd": "FEMproject/CDFEG/CLAUDE.md",
       "entry": "无（DLL 库）",
       "keyInterfaces": [
-        "CDFEG::FEMData (FemData.h)",
+        "CDFEG::DomainData (DomainData.h)",
         "CDFEG::PhyFieldData (PhyFieldData.h)",
         "CDFEG::ElementBase / IsoEleBase (ElementBase.h / IsoEleBase.h)",
         "CDFEG::EquationSystem (EquationSystem.h)",
@@ -110,7 +110,7 @@
   ],
   "nextSteps": [
     "深度补扫 FEMproject/CDFEG/PhyFieldData.cpp 与 EquationSystem.cpp（理解总刚组装与边界施加的完整实现，尤其 _bSavedData0 缓存机制）",
-    "读取 pyTool/template/femdata.cpp.j2 与 elesub.cpp.j2（理解生成的 caculate/ run 代码骨架，对齐手写示例）",
+    "读取 pyTool/template/domaindata.cpp.j2 与 elesub.cpp.j2（理解生成的 caculate/ run 代码骨架，对齐手写示例）",
     "补扫 sample/El2D/ElQ4g.cpp（等参元 run 标准实现，作为派生 ElementBase 的参考样板）",
     "补扫 pyTool/test/testDEL2D.py 与 testHeat2D.py（确认生成器对动力学/热传导的支持范围）"
   ]

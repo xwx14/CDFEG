@@ -1,9 +1,9 @@
 #ifndef EL_DATA_H
 #define EL_DATA_H
 #include <string>
-#include "CDFEG/FemData.h"
+#include "CDFEG/DomainData.h"
 
-class elData : public CDFEG::FEMData {
+class elData : public CDFEG::DomainData {
 public:
     elData();
     ~elData();

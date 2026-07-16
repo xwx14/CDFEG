@@ -17,9 +17,9 @@
 #ifndef TRUSS3D_DATA_H
 #define TRUSS3D_DATA_H
 #include <string>
-#include "CDFEG/FemData.h"
+#include "CDFEG/DomainData.h"
 
-class Truss3DData : public CDFEG::FEMData {
+class Truss3DData : public CDFEG::DomainData {
 public:
     Truss3DData();
     ~Truss3DData();

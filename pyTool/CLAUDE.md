@@ -26,7 +26,7 @@ DataProject（项目）→ DataField（场）→ DataEleSub / DataEleSubG（单�
 
 ## 模板清单（`pyTool/template/`）
 
-`main.cpp.j2`/`mainGid.cpp.j2`、`femdata.*.j2`、`phyfielddata.*.j2`、`elesub.*.j2`、`cmake.j2`/`cmakeSln.j2`、`gidbas`/`gidprb`/`gidcnd`/`gidbat.j2`、`imp.cmd.j2`（唯一命令模板：渲染 `initMatrix→eProgram→solve→uPhy→calRightVals`）。
+`main.cpp.j2`/`mainGid.cpp.j2`、`domaindata.*.j2`、`phyfielddata.*.j2`、`elesub.*.j2`、`cmake.j2`/`cmakeSln.j2`、`gidbas`/`gidprb`/`gidcnd`/`gidbat.j2`、`imp.cmd.j2`（唯一命令模板：渲染 `initMatrix→eProgram→solve→uPhy→calRightVals`）。
 
 ## 关键陷阱
 

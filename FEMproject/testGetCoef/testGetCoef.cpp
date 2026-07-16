@@ -16,13 +16,13 @@
 //
 // getCoef 跨场取数测试：验证 key 格式"场名::变量名"、越界兜底 0、跨场收集
 #include "CDFEG/PhyFieldData.h"
-#include "CDFEG/FemData.h"
+#include "CDFEG/DomainData.h"
 #include <iostream>
 #include <vector>
 #include <string>
 int main() {
     using namespace CDFEG;
-    FEMData* fd = new FEMData();
+    DomainData* fd = new DomainData();
     fd->setNPts(4);                 // 4 节点
     fd->addNodeEnd();
     PhyFieldData* ela = new PhyFieldData(2, fd);   // dof=2
@@ -44,7 +44,7 @@ int main() {
     auto coef2 = elb->getCoef({0, 9});
     ok &= (coef2["ela::u"] == std::vector<double>{1.0, 0.0});
     std::cout << (ok ? "TEST PASS" : "TEST FAIL") << std::endl;
-    fd->_phyDatas.clear();   // 清除悬空指针，防止 FEMData 析构时访问已释放内存
+    fd->_phyDatas.clear();   // 清除悬空指针，防止 DomainData 析构时访问已释放内存
     delete elb;
     delete ela;
     delete fd;

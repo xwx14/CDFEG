@@ -16,13 +16,13 @@
 // 
 #include "PhyFieldData.h"
 #include "ElementBase.h"
-#include "FemData.h"
+#include "DomainData.h"
 #include <set>
 #include <iostream>
 #include <map>
 namespace CDFEG {
 
-	PhyFieldData::PhyFieldData(int dof, FEMData* femData)
+	PhyFieldData::PhyFieldData(int dof, DomainData* femData)
 	{
 		_dof = dof;
 		_femData = femData;
@@ -91,12 +91,6 @@ namespace CDFEG {
 		_equSys.applyFirstBCs(_nodeBC1s, _ida);
 		_equSys.applySecondBCs(_nodeBC2s, _ida);
 		return 1;
-	}
-
-	std::map<std::string, std::vector<double>> PhyFieldData::getCoef1(std::vector<int> nodeIds)
-	{
-		std::map<std::string, std::vector<double>> coef;
-		return coef;
 	}
 
 	std::map<std::string, std::vector<double>> PhyFieldData::getCoef(const std::vector<int>& nodeIds)
