@@ -139,3 +139,14 @@ class AnalyticalCase:
 
     def run(self, ctx) -> CaseResult:
         return CaseResult(self.name, self.suite, "skip", detail="解析解算例待实现")
+
+
+class SkipCase:
+    """config 标 skip=true 的用例：不执行，报告中显示 skip 与原因。"""
+    def __init__(self, name, suite="e2e", reason=""):
+        self.name = name
+        self.suite = suite
+        self.reason = reason
+
+    def run(self, ctx) -> CaseResult:
+        return CaseResult(self.name, self.suite, "skip", detail=self.reason or "配置跳过")

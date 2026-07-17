@@ -18,7 +18,7 @@ PROJ_ROOT = TEST_DIR.parent
 from framework.config import load_config
 from framework.tolerance import Tolerance
 from framework.builder import Builder
-from framework.case import E2ECase, UnitCase, GeneratorCase, AnalyticalCase
+from framework.case import E2ECase, UnitCase, GeneratorCase, AnalyticalCase, SkipCase
 from framework.report import aggregate
 
 
@@ -41,6 +41,10 @@ def build_cases(cfg, args):
     if "e2e" in suites:
         for c in cfg.suite_e2e():
             if args.case and c["name"] != args.case:
+                continue
+            if c.get("skip"):
+                cases.append(SkipCase(name=f"e2e.{c['name']}", suite="e2e",
+                                      reason=c.get("skip_reason", "配置跳过")))
                 continue
             cases.append(E2ECase(
                 name=f"e2e.{c['name']}", target=c["target"], project=c["project"],
