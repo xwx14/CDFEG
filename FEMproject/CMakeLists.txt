@@ -25,3 +25,10 @@ add_subdirectory(sample/El2D)
 add_subdirectory(sample/ElT3)
 add_subdirectory(sample/DEl2D)
 add_subdirectory(sample/Hel2D)
+
+# 测试系统（CDFEG_BUILD_TESTS=ON 时启用，默认 OFF 不干扰日常构建）
+option(CDFEG_BUILD_TESTS "构建 CDFEG 测试系统（unit 单测 target）" OFF)
+if(CDFEG_BUILD_TESTS)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../test/suites/unit
+                     ${CMAKE_BINARY_DIR}/cdfeg_unit_test_build)
+endif()
