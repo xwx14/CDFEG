@@ -37,3 +37,13 @@ def test_run_nonzero_returncode(tmp_path):
         r = run("del2d.exe", ["del2d", "."], tmp_path, [])
         assert r.returncode == 139
         assert "Segmentation" in r.stderr
+
+
+def test_run_timeout(tmp_path):
+    import subprocess
+    with patch("framework.runner.subprocess.run") as mock_run:
+        mock_run.side_effect = subprocess.TimeoutExpired(cmd="del2d.exe", timeout=1)
+        r = run("del2d.exe", ["del2d", "."], tmp_path, ["del2d.post.res"])
+        assert r.timed_out is True
+        assert r.returncode == -1
+        assert r.outputs == {}
