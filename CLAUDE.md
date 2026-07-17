@@ -15,6 +15,7 @@
 ## 构建与编码约定
 
 - **C++14**，CMake；生成器 MinGW Makefiles 或 MSVC。
+- **编译调试环境**：`C:\dev\mingw64`（含 `g++`/`gcc`/`mingw32-make.exe`）。`make` **不在 PATH**，Unix Makefiles 构建需显式 `-DCMAKE_MAKE_PROGRAM=C:/dev/mingw64/bin/mingw32-make.exe`；cmake 位于 `D:\greensoft\cmake-4.1.1`。**本机无 cygwin**（`.claude/rules/` 中关于 cygwin 的假设已过时，实际统一使用 mingw64）。
 - **编码**：源文件 UTF-8（含中文注释），MSVC 下必须 `/utf-8`（根 CMake 已配），否则中文注释被按 GBK 解码报错。
 - **命名空间** `CDFEG::`；DLL 导出宏 `CDFEG_API`（编译库时定义 `CDFEG_EXPORTS` 走 `dllexport`）。
 - `FEMproject/build.bat` 当前仅 `cmake -B`，**未指定 `-G`、也未 `cmake --build`**，完整构建需补全。
