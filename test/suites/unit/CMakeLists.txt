@@ -7,9 +7,9 @@ if(MSVC)
     add_compile_options(/utf-8)
 endif()
 
-# Task 15 将替换 SOURCES 为 catch_main.cpp + test_*.cpp
 set(SOURCES
-    unit_main_placeholder.cpp
+    catch_main.cpp
+    test_equation_system.cpp
 )
 
 add_executable(cdfeg_unit_test ${SOURCES})

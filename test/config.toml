@@ -40,7 +40,7 @@ skip = true
 skip_reason = "CDFEG El2D 示例运行时 Eigen operator[] 越界崩溃 + DomainData getElemMatParams:192 bug（待修，follow-up）"
 
 [suite.unit]
-cases = []
+cases = [ { name = "core", binary = "cdfeg_unit_test" } ]
 
 [suite.generator]
 pytest_dir = "suites/generator"

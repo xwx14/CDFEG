@@ -56,7 +56,8 @@ def build_cases(cfg, args):
         for c in cfg.suite_unit():
             if args.case and c["name"] != args.case:
                 continue
-            cases.append(UnitCase(name=f"unit.{c['name']}", binary=c["binary"], builder=builder))
+            cases.append(UnitCase(name=f"unit.{c['name']}", binary=c["binary"], builder=builder,
+                                  dll_dirs=cfg.toolchain.dll_dirs))
     if "generator" in suites:
         g = cfg.suite_generator()
         cases.append(GeneratorCase(name="generator.pytool",

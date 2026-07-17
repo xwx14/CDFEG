@@ -29,6 +29,7 @@ def run(exe, args, cwd, expect_outputs, timeout=600, extra_dll_dirs=None) -> Run
         proc = subprocess.run(
             [exe, *args], cwd=str(cwd), capture_output=True,
             text=True, timeout=timeout, env=env,
+            encoding="utf-8", errors="replace",
         )
     except subprocess.TimeoutExpired as e:
         return RunResult(returncode=-1, stdout=e.stdout or "", stderr=e.stderr or "",

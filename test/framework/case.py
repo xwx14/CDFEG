@@ -94,23 +94,25 @@ class UnitCase:
     """C++ Catch2 单测：跑 cdfeg_unit_test.exe，退出码 0=全过。"""
     suite = "unit"
 
-    def __init__(self, name, binary, builder, timeout=300):
+    def __init__(self, name, binary, builder, timeout=300, dll_dirs=None):
         self.name = name
         self.binary = binary
         self.builder = builder
         self.timeout = timeout
+        self.dll_dirs = dll_dirs or []
 
     def run(self, ctx) -> CaseResult:
         try:
             exes = self.builder.build([self.binary])
         except Exception as e:
             return CaseResult(self.name, self.suite, "error", detail=f"构建失败: {e}")
-        rr = _runner_run_default(exes[self.binary], [], Path("."), [], timeout=self.timeout)
+        rr = _runner_run_default(exes[self.binary], [], Path("."), [], timeout=self.timeout,
+                                 extra_dll_dirs=self.dll_dirs)
         if rr.returncode == 0:
             return CaseResult(self.name, self.suite, "pass",
                               detail=rr.stdout[-200:] if rr.stdout else "")
         return CaseResult(self.name, self.suite, "fail",
-                          detail=f"Catch2 断言失败:\n{rr.stdout[:500]}")
+                          detail=f"Catch2 断言失败:\n{(rr.stdout or '')[:500]}")
 
 
 class GeneratorCase:
