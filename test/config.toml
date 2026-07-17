@@ -17,6 +17,26 @@ output = "del2d.post.res"
 tol_atol = 1e-12
 tol_rtol = 0.0
 
+[[suite.e2e.cases]]
+name = "hel2d1"
+target = "hel2d"
+project = "hel"
+case_dir = "models/hel2d1.gid"
+baseline = "hel.post.res"
+output = "hel.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
+[[suite.e2e.cases]]
+name = "el2d1"
+target = "el2d"
+project = "el"
+case_dir = "models/el2d1.gid"
+baseline = "el.post.res"
+output = "el.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
 [suite.unit]
 cases = []
 
