@@ -1,0 +1,22 @@
+[toolchain]
+cmake_generator = "Unix Makefiles"
+source_dir = "FEMproject"
+build_dir = "test/build"
+output_subdir = "output"
+
+[suite.e2e]
+cases = [
+  { name = "del2d1", target = "del2d", project = "del2d",
+    case_dir = "models/del2d1.gid", baseline = "del2d.post.res",
+    output = "del2d.post.res", tol_atol = 1e-12, tol_rtol = 0.0 },
+]
+
+[suite.unit]
+cases = []
+
+[suite.generator]
+pytest_dir = "suites/generator"
+default_in_all = false
+
+[suite.analytical]
+cases = []
