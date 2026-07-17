@@ -57,8 +57,8 @@ def test_e2e_work_dir_isolated_from_baseline(tmp_path):
     case.run(None)
     after = (case_dir / "del2d.post.res").read_bytes()
     assert before == after  # 基准未被改动
-    assert not (Path(builder.build_dir) / "run" / "e2e.del2d1" / "del2d.post.res").parent.exists() or \
-           (Path(builder.build_dir) / "run" / "e2e.del2d1" / "del2d.post.res").exists()
+    work_output = Path(builder.build_dir) / "run" / "e2e.del2d1" / "del2d.post.res"
+    assert work_output.exists(), "产出应在隔离 work_dir 中，而非 case_dir"
 
 
 def test_e2e_error_when_exe_crash(tmp_path):
