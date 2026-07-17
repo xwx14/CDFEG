@@ -10,6 +10,7 @@ endif()
 set(SOURCES
     catch_main.cpp
     test_equation_system.cpp
+    test_domain_data.cpp
 )
 
 add_executable(cdfeg_unit_test ${SOURCES})

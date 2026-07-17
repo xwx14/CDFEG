@@ -411,7 +411,8 @@ namespace CDFEG {
 				for (int iNode1 = elePt[id]; iNode1 < elePt[id + 1]; ++iNode1) {
 					outFile << std::setw(6) << _femData->_eleNodes[iNode1] + 1;
 				}
-				iMat = eleSub->_eleMatIDMap[id] - iMatStart + 1;
+				auto matIt = eleSub->_eleMatIDMap.find(id);
+				iMat = ((matIt != eleSub->_eleMatIDMap.end()) ? matIt->second : 0) - iMatStart + 1;
 				outFile << "  " << iMat << std::endl;
 			}
 			outFile << "End elements" << std::endl;

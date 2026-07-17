@@ -189,7 +189,7 @@ int CDFEG::DomainData::addMate(const std::map<std::string, double>& matParam, co
 const std::map<std::string, double>& CDFEG::DomainData::getElemMatParams(int eleID, ElementBase* ele) const
 {
 	// 为适应旧版本数据而设
-	if (ele->_eleMatIDMap.find(eleID) != ele->_eleMatIDMap.find(eleID)) {
+	if (ele->_eleMatIDMap.find(eleID) != ele->_eleMatIDMap.end()) {
 		int iMat = ele->_eleMatIDMap[eleID];
 		return _mateParams[iMat];
 	}
