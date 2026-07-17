@@ -1,0 +1,2 @@
+# 框架自测用 pytest；tomllib 为 Python 3.11+ 标准库，无需列出
+pytest>=7.0
