@@ -31,7 +31,7 @@ class E2ECase:
     suite = "e2e"
 
     def __init__(self, name, target, project, case_dir, baseline, output,
-                 tol: Tolerance, builder, timeout=600):
+                 tol: Tolerance, builder, timeout=600, dll_dirs=None):
         self.name = name
         self.target = target
         self.project = project
@@ -41,6 +41,7 @@ class E2ECase:
         self.tol = tol
         self.builder = builder
         self.timeout = timeout
+        self.dll_dirs = dll_dirs or []
         self._runner_run = _runner_run_default  # 可被测试替换
 
     def _prepare_work_dir(self) -> Path:
@@ -61,7 +62,8 @@ class E2ECase:
             return CaseResult(self.name, self.suite, "error", detail=f"构建失败: {e}")
         work_dir = self._prepare_work_dir()
         rr: RunResult = self._runner_run(exes[self.target], [self.project, "."], work_dir,
-                                         [self.output], timeout=self.timeout)
+                                         [self.output], timeout=self.timeout,
+                                         extra_dll_dirs=self.dll_dirs)
         if rr.timed_out:
             return CaseResult(self.name, self.suite, "error", detail=f"运行超时({self.timeout}s)")
         if rr.returncode != 0:

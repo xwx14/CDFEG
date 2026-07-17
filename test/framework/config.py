@@ -1,6 +1,6 @@
 """读取 config.toml，提供结构化访问。Python 3.11+ 用标准库 tomllib。"""
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 if sys.version_info >= (3, 11):
@@ -15,6 +15,8 @@ class Toolchain:
     source_dir: str
     build_dir: str
     output_subdir: str
+    make_program: str = ""
+    dll_dirs: list[str] = field(default_factory=list)
 
 
 class Config:
@@ -27,6 +29,8 @@ class Config:
             source_dir=tc.get("source_dir", "FEMproject"),
             build_dir=tc.get("build_dir", "test/build"),
             output_subdir=tc.get("output_subdir", "output"),
+            make_program=tc.get("make_program", ""),
+            dll_dirs=tc.get("dll_dirs", []),
         )
 
     def suite_e2e(self) -> list[dict]:

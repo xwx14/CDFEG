@@ -23,11 +23,14 @@ from framework.report import aggregate
 
 
 def build_cases(cfg, args):
+    extra_cmake_args = ["-DCDFEG_BUILD_TESTS=ON"]
+    if cfg.toolchain.make_program:
+        extra_cmake_args.append(f"-DCMAKE_MAKE_PROGRAM={cfg.toolchain.make_program}")
     builder = Builder(
         source_dir=str(PROJ_ROOT / cfg.toolchain.source_dir),
         build_dir=str(PROJ_ROOT / cfg.toolchain.build_dir),
         generator=cfg.toolchain.cmake_generator,
-        extra_cmake_args=["-DCDFEG_BUILD_TESTS=ON"],
+        extra_cmake_args=extra_cmake_args,
         output_subdir=cfg.toolchain.output_subdir,
     )
     if args.rebuild:
@@ -43,7 +46,7 @@ def build_cases(cfg, args):
                 name=f"e2e.{c['name']}", target=c["target"], project=c["project"],
                 case_dir=TEST_DIR / c["case_dir"], baseline=c["baseline"],
                 output=c["output"], tol=Tolerance(c["tol_atol"], c.get("tol_rtol", 0.0)),
-                builder=builder,
+                builder=builder, dll_dirs=cfg.toolchain.dll_dirs,
             ))
     if "unit" in suites:
         for c in cfg.suite_unit():

@@ -3,13 +3,19 @@ cmake_generator = "Unix Makefiles"
 source_dir = "FEMproject"
 build_dir = "test/build"
 output_subdir = "output"
+make_program = "C:/dev/mingw64/bin/mingw32-make.exe"
+dll_dirs = ["C:/dev/mingw64/bin"]
 
 [suite.e2e]
-cases = [
-  { name = "del2d1", target = "del2d", project = "del2d",
-    case_dir = "models/del2d1.gid", baseline = "del2d.post.res",
-    output = "del2d.post.res", tol_atol = 1e-12, tol_rtol = 0.0 },
-]
+[[suite.e2e.cases]]
+name = "del2d1"
+target = "del2d"
+project = "del2d"
+case_dir = "models/del2d1.gid"
+baseline = "del2d.post.res"
+output = "del2d.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
 
 [suite.unit]
 cases = []

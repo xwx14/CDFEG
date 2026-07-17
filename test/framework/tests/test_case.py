@@ -32,7 +32,7 @@ def test_e2e_pass_when_identical(tmp_path):
     case_dir = _setup_case_dir(tmp_path)
     builder, case = _make_case(case_dir, tmp_path)
 
-    def fake_run(exe, args, cwd, expect, timeout=600):
+    def fake_run(exe, args, cwd, expect, timeout=600, **kwargs):
         out = Path(cwd) / "del2d.post.res"
         shutil.copy(FIXTURE, out)  # 模拟 exe 产出 == 基准
         return RunResult(0, "", "", {"del2d.post.res": out})
@@ -48,7 +48,7 @@ def test_e2e_work_dir_isolated_from_baseline(tmp_path):
     before = (case_dir / "del2d.post.res").read_bytes()
     builder, case = _make_case(case_dir, tmp_path)
 
-    def fake_run(exe, args, cwd, expect, timeout=600):
+    def fake_run(exe, args, cwd, expect, timeout=600, **kwargs):
         out = Path(cwd) / "del2d.post.res"
         shutil.copy(FIXTURE, out)
         return RunResult(0, "", "", {"del2d.post.res": out})
