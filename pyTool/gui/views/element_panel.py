@@ -48,6 +48,8 @@ class ElementPanel(QWidget):
         self._bBC = QCheckBox("边界单元")
         self._baseClass = QComboBox()
         self._baseClass.addItems(["EleSubBase", "IsoEleBase"])
+        # 类型由实例决定（DataEleSub vs DataEleSubG），只读反映当前类型
+        self._baseClass.setEnabled(False)
         self._gidName = QLineEdit()
         form.addRow("单元名称", self._name)
         form.addRow("节点数", self._nNodes)
@@ -167,8 +169,8 @@ class ElementPanel(QWidget):
         ele.paramValues = [r[1] if len(r) > 1 else "" for r in rows]
         if isinstance(ele, DataEleSubG):
             ele.gaussOrder = self._gaussOrder.value()
-            ele.gaussPoints = [[float(x) for x in r] for r in self._gaussPoints.rows()]
-            ele.gaussWeights = [float(w) for w in self._gaussWeights.items()]
+            ele.gaussPoints = [[float(x) for x in r if x.strip()] for r in self._gaussPoints.rows()]
+            ele.gaussWeights = [float(w) for w in self._gaussWeights.items() if w.strip()]
             ele.shapeFuns = self._shapeFuns.items()
         if self._field is not None:
             self._field.makeData()

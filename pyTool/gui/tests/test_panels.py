@@ -93,3 +93,20 @@ def test_element_panel_param_table_roundtrip(qapp):
     ep = ElementPanel(m)
     ep.loadEleSub(f, ele)
     assert ep._params.rows() == [["E", ""], ["A", ""]]
+
+
+def test_element_panel_gauss_commit_filters_empty(qapp):
+    """2D G 单元回填后第 3 列为空串，_commit 必须不崩且剔除空列。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "ElQ4g", gauss=True)
+    g.dim = 2
+    g.gaussPoints = [[0.5, 0.5]]
+    g.gaussWeights = [1.0]
+    g.shapeFuns = ["N1"]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, g)
+    # 回填后 3 列表格第 3 列为空；_commit 必须不崩且剔除空列
+    ep._commit()
+    assert g.gaussPoints == [[0.5, 0.5]]
+    assert g.gaussWeights == [1.0]
