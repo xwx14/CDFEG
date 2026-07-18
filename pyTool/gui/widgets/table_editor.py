@@ -50,9 +50,11 @@ class TableEditor(QWidget):
         self._table.itemChanged.connect(lambda *_: self.rowsChanged.emit())
 
     def setRows(self, rows):
+        self._table.blockSignals(True)
         self._table.setRowCount(0)
         for r in rows:
             self._addRowWithData([str(x) for x in r])
+        self._table.blockSignals(False)
 
     def rows(self):
         out = []
