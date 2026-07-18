@@ -46,3 +46,50 @@ def test_field_panel_edits_pdtype(qapp):
     fp._commit()
     assert f.pdeType == 2
     assert m.isDirty is True
+
+
+# ---- ElementPanel (Task 8) ----
+from DataEleSubG import DataEleSubG
+from views.element_panel import ElementPanel
+
+
+def test_element_panel_plain_writes_back(qapp):
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Truss", gauss=False)
+    m.markClean()
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    assert ep._gaussGroup.isHidden()  # 普通单元不显示高斯区
+    ep._name.setText("Truss2")
+    ep._nNodes.setValue(3)
+    ep._commit()
+    assert ele.name == "Truss2"
+    assert ele.nNodes == 3
+    assert m.isDirty is True
+
+
+def test_element_panel_gauss_shows_gauss_group(qapp):
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "ElQ4g", gauss=True)
+    g.gaussPoints = [[0.5, 0.5]]
+    g.gaussWeights = [1.0]
+    g.shapeFuns = ["N1"]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, g)
+    assert not ep._gaussGroup.isHidden()  # G 单元显示高斯区
+    assert ep._gaussPoints.rows() == [["0.5", "0.5", ""]]
+    assert ep._gaussWeights.items() == ["1.0"]
+    assert ep._shapeFuns.items() == ["N1"]
+
+
+def test_element_panel_param_table_roundtrip(qapp):
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Truss", gauss=False)
+    ele.paramNames = ["E", "A"]
+    ele.paramValues = ["", ""]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    assert ep._params.rows() == [["E", ""], ["A", ""]]
