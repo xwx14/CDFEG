@@ -45,3 +45,25 @@ def test_list_editor_emits_changed(qapp):
     assert hits == []
     le._add()
     assert len(hits) >= 1
+
+
+from widgets.table_editor import TableEditor
+
+
+def test_table_editor_set_get(qapp):
+    te = TableEditor(["名称", "默认值"])
+    te.setRows([["E", ""], ["A", ""]])
+    assert te.rows() == [["E", ""], ["A", ""]]
+
+
+def test_table_editor_gauss_points(qapp):
+    te = TableEditor(["xi", "eta"])
+    te.setRows([["0.5", "0.5"], ["-0.5", "0.5"]])
+    rows = te.rows()
+    assert rows == [["0.5", "0.5"], ["-0.5", "0.5"]]
+
+
+def test_table_editor_empty_rows_dropped(qapp):
+    te = TableEditor(["a"])
+    te.setRows([["x"], [""], ["y"]])
+    assert te.rows() == [["x"], ["y"]]
