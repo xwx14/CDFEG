@@ -40,11 +40,14 @@ def test_list_editor_emits_changed(qapp):
     le = ListEditor()
     hits = []
     le.itemsChanged.connect(lambda: hits.append(1))
-    le.setItems(["x"])
-    # setItems 不触发；新增才触发
+    le.setItems(["a", "b"])
+    # setItems 不触发
     assert hits == []
-    le._add()
+    # 删除触发 itemsChanged
+    le._list.setCurrentRow(0)
+    le._remove()
     assert len(hits) >= 1
+    assert le.items() == ["b"]
 
 
 from widgets.table_editor import TableEditor

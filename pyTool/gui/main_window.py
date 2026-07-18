@@ -18,7 +18,6 @@
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QSplitter, QTreeWidget, QTreeWidgetItem,
     QStackedWidget, QVBoxLayout, QFileDialog, QMessageBox, QInputDialog,
-    QMenu, QLabel,
 )
 from PySide6.QtCore import Qt
 
@@ -52,8 +51,6 @@ class MainWindow(QMainWindow):
         self._projPanel = ProjectPanel(self._model)
         self._fieldPanel = FieldPanel(self._model)
         self._elePanel = ElementPanel(self._model)
-        placeholder = QLabel("（请在左侧选择节点）")
-        placeholder.setAlignment(Qt.AlignCenter)
         self._stack = QStackedWidget()
         self._stack.addWidget(self._projPanel)    # 0
         self._stack.addWidget(self._fieldPanel)   # 1

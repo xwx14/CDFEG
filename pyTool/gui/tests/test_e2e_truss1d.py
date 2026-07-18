@@ -21,6 +21,7 @@ from DataProject import DataProject
 from DataField import DataField
 from DataEleSub import DataEleSub
 from MakerCpp import MakerCpp
+from services import json_io, generate
 
 
 def _buildTruss1DProject() -> DataProject:
@@ -51,18 +52,20 @@ def _projectFiles(root):
 
 
 def test_gui_path_matches_script_path(tmp_path):
-    proj_for_gui = _buildTruss1DProject()      # GUI 路径用相同数据
-    proj_for_script = _buildTruss1DProject()   # 脚本路径用相同数据
+    """GUI 全链路（json_io round-trip → generate.run）与脚本路径产物逐字节一致。"""
+    proj_for_gui = _buildTruss1DProject()
+    proj_for_script = _buildTruss1DProject()
 
     gui_dir = str(tmp_path / "gui_out")
     script_dir = str(tmp_path / "script_out")
 
-    # GUI 路径：直接经 MakerCpp（generate.run 内部即此调用）
-    mk = MakerCpp(proj_for_gui, gui_dir, mode="new")
-    mk.mainMode = 0
-    mk.makeAll()
+    # GUI 路径：模拟 GUI 配置结果 → 存档 → 加载 → 生成（GUI 真实链路）
+    tmp_json = str(tmp_path / "truss.cdfeg.json")
+    json_io.save(proj_for_gui, tmp_json)
+    proj_reloaded = json_io.load(tmp_json)
+    generate.run(proj_reloaded, mode="new", mainMode=0, outPath=gui_dir, log=lambda *_: None)
 
-    # 脚本路径：完全照搬 test1DTruss.py 的调用
+    # 脚本路径：照搬 test1DTruss.py 的调用
     mk2 = MakerCpp(proj_for_script, script_dir, mode="new")
     mk2.mainMode = 0
     mk2.makeAll()

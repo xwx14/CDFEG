@@ -60,13 +60,7 @@ class ListEditor(QWidget):
         return [self._list.item(i).text() for i in range(self._list.count())]
 
     def _add(self):
-        import os
-        if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
-            # headless 测试环境：直接添加默认项，不弹对话框
-            text = "new_item"
-            ok = True
-        else:
-            text, ok = QInputDialog.getText(self, "新增", "请输入：")
+        text, ok = QInputDialog.getText(self, "新增", "请输入：")
         if ok and text:
             self._list.addItem(text)
             self.itemsChanged.emit()

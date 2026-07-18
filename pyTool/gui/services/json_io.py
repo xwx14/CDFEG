@@ -28,9 +28,11 @@ EXT = ".cdfeg.json"
 
 
 def save(project: DataProject, path: str) -> None:
-    """保存为 .cdfeg.json（内容即 DataProject.toDict()）。"""
+    """保存为 .cdfeg.json（toDict 基础 + cmds 补充）。"""
+    data = project.toDict()
+    data["cmds"] = project.cmds  # toDict 不含 cmds，手动补上
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(project.toDict(), f, indent=4, ensure_ascii=False)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 def _buildEle(ele_data: dict):
@@ -64,5 +66,7 @@ def load(path: str) -> DataProject:
             field.sch = DataSch.fromDict(field_data["sch"])
         field.makeData()  # 重新聚合 dispNames / eleResNames
         project.addField(field)
+
+    project.cmds = data.get("cmds", [])
 
     return project
