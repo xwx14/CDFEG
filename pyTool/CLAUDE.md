@@ -7,6 +7,7 @@
 ## 入口
 
 - 无统一 CLI；每个 `test/test*.py` 既是测试也是生成入口。
+- GUI：`python pyTool/gui/main.py`（PySide6 配置式生成器，可视化编辑三层结构 → 存档 .cdfeg.json → 一键生成；详见 `docs/superpowers/specs/2026-07-18-pytool-gui-design.md`）。
 - 运行：在 `pyTool/` 下 `python test/testXxx.py`（脚本 `sys.path.append` 上级目录以导入 Maker）。
 
 ## 数据结构（三层）
