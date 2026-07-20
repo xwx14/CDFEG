@@ -31,6 +31,8 @@ class DataEleSub:
         self.paramNames=[]
         # 参数默认值
         self.paramValues=[]
+        # 材料本构类型名（DataProject.mateTypes 的 key）；为空则由 MakerCpp 自动兼容
+        self.mateTypeName = ""
         # 是否为边界条件
         self.bBC=False
         # index
@@ -86,6 +88,7 @@ class DataEleSub:
             'eleResNames': self.eleResNames,
             'paramNames': self.paramNames,
             'paramValues': self.paramValues,
+            'mateTypeName': self.mateTypeName,
             'bBC': self.bBC,
             'index': self.index,
             'type': self.type,
@@ -127,6 +130,7 @@ class DataEleSub:
         ele.eleResNames = data.get('eleResNames', [])
         ele.paramNames = data.get('paramNames', [])
         ele.paramValues = data.get('paramValues', [])
+        ele.mateTypeName = data.get('mateTypeName', '')
         ele.bBC = data.get('bBC', False)
         ele.index = data.get('index', 1)
         ele.type = data.get('type', 1)
