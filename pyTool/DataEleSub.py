@@ -31,7 +31,7 @@ class DataEleSub:
         self.paramNames=[]
         # 参数默认值
         self.paramValues=[]
-        # 材料本构类型名（DataProject.mateTypes 的 key）；为空则由 MakerCpp 自动兼容
+        # 材料本构类型名（DataProject.mateTypes 的 key）；由 DataProject.makeData() 自动设置
         self.mateTypeName = ""
         # 是否为边界条件
         self.bBC=False
