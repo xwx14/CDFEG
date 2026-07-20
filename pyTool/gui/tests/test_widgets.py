@@ -15,6 +15,8 @@
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 # 可复用 widget 测试
 from widgets.list_editor import ListEditor
+from widgets.table_editor import TableEditor
+from widgets.csv_line_edit import CsvLineEdit
 
 
 def test_list_editor_set_get(qapp):
@@ -50,9 +52,6 @@ def test_list_editor_emits_changed(qapp):
     assert le.items() == ["b"]
 
 
-from widgets.table_editor import TableEditor
-
-
 def test_table_editor_set_get(qapp):
     te = TableEditor(["名称", "默认值"])
     te.setRows([["E", ""], ["A", ""]])
@@ -70,9 +69,6 @@ def test_table_editor_empty_rows_dropped(qapp):
     te = TableEditor(["a"])
     te.setRows([["x"], [""], ["y"]])
     assert te.rows() == [["x"], ["y"]]
-
-
-from widgets.csv_line_edit import CsvLineEdit
 
 
 def test_csv_line_edit_roundtrip(qapp):

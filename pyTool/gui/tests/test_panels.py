@@ -51,6 +51,7 @@ def test_field_panel_edits_pdtype(qapp):
 # ---- ElementPanel (Task 8) ----
 from DataEleSubG import DataEleSubG
 from views.element_panel import ElementPanel
+from widgets.csv_line_edit import CsvLineEdit
 
 
 def test_element_panel_plain_writes_back(qapp):
@@ -113,9 +114,6 @@ def test_element_panel_gauss_commit_filters_empty(qapp):
 
 
 # ---- ElementPanel CSV 输入 (Task 2) ----
-from widgets.csv_line_edit import CsvLineEdit
-
-
 def test_element_panel_csv_input_writes_back(qapp):
     """广义位移/单元变量为 CsvLineEdit，中文逗号输入写回为 list。"""
     m = ProjectModel()

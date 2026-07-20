@@ -43,10 +43,10 @@ class CsvLineEdit(QWidget):
         # programmatic setText 不触发 editingFinished，故 setItems 不会误触发。
         self._edit.editingFinished.connect(self.itemsChanged.emit)
 
-    def setItems(self, items) -> None:
+    def setItems(self, items: list[str]) -> None:
         # 统一以「英文逗号 + 空格」展示；不主动 emit，与 ListEditor 行为一致。
         self._edit.setText(", ".join(str(x) for x in items))
 
-    def items(self) -> list:
+    def items(self) -> list[str]:
         parts = self._SPLIT_RE.split(self._edit.text())
         return [p.strip() for p in parts if p.strip()]

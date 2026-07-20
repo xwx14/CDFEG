@@ -111,6 +111,7 @@ def test_main_window_buttons_enable_on_ele_select(qapp):
     field_node = root.child(0)
     ele_node = field_node.child(0)
     win._tree.setCurrentItem(ele_node)
+    assert win._btnAddField.isEnabled() is True
     assert win._btnAddEle.isEnabled() is True
     assert win._btnDelete.isEnabled() is True
     win.deleteLater()
