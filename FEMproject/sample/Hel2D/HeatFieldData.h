@@ -6,7 +6,9 @@ class HeatFieldData : public CDFEG::PhyFieldData {
 public:
     HeatFieldData(CDFEG::DomainData* femData);
     ~HeatFieldData();
-    int eProgram();
+
+    // 重写 eProgram：基类 eProgram_el 不处理 eload→右端，热源载荷需手动累加到 _f
+    virtual int eProgram() override;
 
 };
 
