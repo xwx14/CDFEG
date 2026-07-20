@@ -184,6 +184,11 @@ int CDFEG::DomainData::addMate(const std::map<std::string, double>& matParam, co
 	return _mateParams.size() - 1;
 }
 
+void CDFEG::DomainData::addMateType(const std::string& name, const std::vector<std::string>& params)
+{
+	_mateConstitutive[name] = params;
+}
+
 
 
 const std::map<std::string, double>& CDFEG::DomainData::getElemMatParams(int eleID, ElementBase* ele) const

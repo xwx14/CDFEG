@@ -18,6 +18,7 @@
 #define CDFEG_DOMAIN_DATA_H
 #include <vector>
 #include <string>
+#include <map>
 #include "CDFEG.h"
 #include "ElementBase.h"
 #include "EquationSystem.h"
@@ -109,6 +110,14 @@ namespace CDFEG {
 		 */
 		int addMate(const std::map<std::string, double>& matParam,const std::string& name="");
 		/**
+		 * @brief 注册材料本构类型（参数 schema）
+		 * @param name 本构类型名（与材料段头 name 一致，如 "HelQ4g"）
+		 * @param params 参数名列表（供 readMate 为材料值命名）
+		 * @author xwx14
+		 * @date 2026-07-20
+		 */
+		void addMateType(const std::string& name, const std::vector<std::string>& params);
+		/**
 		 * @brief 获取单元的材料参数
 		 * @param eleID 单元id
 		 * @param
@@ -141,6 +150,8 @@ namespace CDFEG {
 		// 材料参数
 		std::vector<std::map<std::string, double>> _mateParams;
 		std::vector<std::string> _mateNames;
+		// 材料本构类型表：key=本构类型名，value=参数名列表（readMate 按此为材料值命名）
+		std::map<std::string, std::vector<std::string>> _mateConstitutive;
 		// 记录每个单元的材料号
 		std::vector<int> _eleMateIds;
 		// 维度
