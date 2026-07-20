@@ -192,19 +192,6 @@ class MakerCpp(MakerBase):
 
     # ========== 多项目 / 解决方案级方法 ==========
 
-    @staticmethod
-    def _applyMateTypeCompat(project):
-        """未声明 mateTypeName 的单元：默认取单元名，并用其 paramNames 注册同名本构类型。
-        使旧 test 脚本（仅设 paramNames）零改动即可走新本构表机制。"""
-        existing = {mt['name'] for mt in project.mateTypes}
-        for field in project.fields:
-            for ele in field.eleSubs:
-                if not ele.mateTypeName:
-                    ele.mateTypeName = ele.name
-                    if ele.paramNames and ele.name not in existing:
-                        project.addMateType(ele.name, ele.paramNames, ele.paramValues)
-                        existing.add(ele.name)
-
     def _build_render_data(self, project):
         for idx, field in enumerate(project.fields):
             field.makeData()
@@ -215,7 +202,6 @@ class MakerCpp(MakerBase):
                 field.headerGuard = f"{field.name.upper()}_FIELD_DATA_H"
             if not hasattr(field, 'eleResNames') or not field.eleResNames:
                 field.eleResNames = ["stress", "strain"]
-        self._applyMateTypeCompat(project)
 
     def makeProject(self, project, output_path: str, iProgramType: int):
         """
@@ -228,6 +214,7 @@ class MakerCpp(MakerBase):
         """
         os.makedirs(output_path, exist_ok=True)
         self._build_render_data(project)
+        project.makeData()
 
         file_lists = {"h": [], "cpp": []}
 

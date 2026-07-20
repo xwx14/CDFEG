@@ -1,4 +1,5 @@
 from DataProject import DataProject
+from DataField import DataField
 from DataEleSub import DataEleSub
 
 
@@ -72,39 +73,35 @@ def test_domaindata_template_renders_mateConstitutive():
     out = _render("domaindata.cpp.j2", ctx)
     assert '_mateConstitutive["HelQ4g"] = { "ek", "pe" };' in out
 
-from MakerCpp import MakerCpp
-
-
-def test_applyMateTypeCompat_defaults_to_ele_name_and_registers():
-    p = DataProject("p", 2)
+def test_makeData_singleField_uses_ele_name():
+    p = DataProject("p", 1)
     f = p.addField("F")
-    e = DataEleSub("Truss", 2)
-    e.paramNames = ["E", "A"]
-    e.paramValues = [1.0, 2.0]
+    e = DataEleSub("Truss1D", 2); e.paramNames = ["E", "A"]; e.paramValues = [1.0, 2.0]
     f.addEleSub(e)
-    MakerCpp._applyMateTypeCompat(p)
-    assert e.mateTypeName == "Truss"
-    assert p.mateTypes == [{"name": "Truss", "params": ["E", "A"], "defaults": [1.0, 2.0]}]
+    p.makeData()
+    assert e.mateTypeName == "Truss1D"
+    assert p.mateTypes == [{"name": "Truss1D", "params": ["E", "A"], "defaults": [1.0, 2.0]}]
 
 
-def test_applyMateTypeCompat_skips_existing_mateTypeName():
+def test_makeData_multiField_uses_gidName_and_merges_dedup():
     p = DataProject("p", 2)
-    p.addMateType("HelQ4g", ["ek"], [])
-    f = p.addField("F")
-    e = DataEleSub("HeatQ4g", 4)
-    e.mateTypeName = "HelQ4g"
-    e.paramNames = ["ek"]
-    f.addEleSub(e)
-    MakerCpp._applyMateTypeCompat(p)
-    assert e.mateTypeName == "HelQ4g"
-    assert len(p.mateTypes) == 1  # 不重复注册
-
-
-def test_applyMateTypeCompat_no_duplicate_for_shared_ele_name():
-    p = DataProject("p", 2)
-    f = p.addField("F")
-    e1 = DataEleSub("El", 4); e1.paramNames = ["pe"]
-    e2 = DataEleSub("El", 4); e2.paramNames = ["pe"]
-    f.addEleSub(e1); f.addEleSub(e2)
-    MakerCpp._applyMateTypeCompat(p)
+    f1 = p.addField("Heat"); f2 = p.addField("Del")
+    e1 = DataEleSub("HeatQ4g", 4); e1.gidName = "HelQ4g"; e1.paramNames = ["ek", "ec", "q"]
+    e2 = DataEleSub("DelQ4g", 4); e2.gidName = "HelQ4g"; e2.paramNames = ["pe", "pv", "ek"]
+    f1.addEleSub(e1); f2.addEleSub(e2)
+    p.makeData()
+    assert e1.mateTypeName == "HelQ4g" and e2.mateTypeName == "HelQ4g"
     assert len(p.mateTypes) == 1
+    assert p.mateTypes[0]["name"] == "HelQ4g"
+    assert p.mateTypes[0]["params"] == ["ek", "ec", "q", "pe", "pv"]  # ek 保序去重
+
+
+def test_makeData_singleField_multi_ele_separate_constitutives():
+    p = DataProject("p", 2)
+    f = p.addField("F")
+    e1 = DataEleSub("ElQ4g", 4); e1.paramNames = ["pe"]
+    e2 = DataEleSub("StressBL2g", 2); e2.paramNames = ["fu", "fv"]
+    f.addEleSub(e1); f.addEleSub(e2)
+    p.makeData()
+    assert {mt["name"] for mt in p.mateTypes} == {"ElQ4g", "StressBL2g"}
+    assert e1.mateTypeName == "ElQ4g" and e2.mateTypeName == "StressBL2g"

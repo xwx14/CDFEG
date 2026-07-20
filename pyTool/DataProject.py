@@ -55,7 +55,28 @@ class DataProject:
     def makeData(self):
         for field in self.fields:
             field.makeData()
-    
+        # 建立本构表：单物理场用单元 name，多物理场用 gidName（同 key 保序合并去重）
+        self.mateTypes = []
+        multiField = len(self.fields) > 1
+        for field in self.fields:
+            for ele in field.eleSubs:
+                constitutiveName = ele.gidName if multiField else ele.name
+                ele.mateTypeName = constitutiveName
+                self._mergeOrAddMateType(constitutiveName, ele.paramNames, ele.paramValues)
+
+    def _mergeOrAddMateType(self, name, params, values):
+        """注册或合并本构类型：同名保序合并去重，否则新增。"""
+        for mt in self.mateTypes:
+            if mt['name'] == name:
+                seen = set(mt['params'])
+                for i, p in enumerate(params):
+                    if p not in seen:
+                        seen.add(p)
+                        mt['params'].append(p)
+                        mt['defaults'].append(values[i] if i < len(values) else 0.0)
+                return
+        self.addMateType(name, params, values)
+
     def toDict(self):
         """
         将项目数据转换为字典
