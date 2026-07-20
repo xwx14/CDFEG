@@ -22,7 +22,7 @@ ElT3g::ElT3g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(3, pData) {
     _name="ElT3g";
     _dispNames = { "u", "v" };
-    _paramNames ={ "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateTypeName = "ElT3g";
     _types.insert("ElT3g");
 	_dim = 2;
 	_nGaus = 3;

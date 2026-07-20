@@ -23,7 +23,7 @@ ElQ4g::ElQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
     _name = "ElQ4g";
     _dispNames = { "u", "v" };
-    _paramNames = { "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateTypeName = "ElQ4g";
     _types.insert("ElQ4g");
 
     _dim = 2;

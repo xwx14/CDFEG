@@ -4,6 +4,9 @@
 elData::elData() {
     _dim = 2;
     _phyDatas.push_back(new ElDispFieldData(this));
+    _mateConstitutive["ElQ4g"] = { "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateConstitutive["ElT3g"] = { "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateConstitutive["StressBL2g"] = { "fu", "fv" };
 }
 
 elData::~elData() {
