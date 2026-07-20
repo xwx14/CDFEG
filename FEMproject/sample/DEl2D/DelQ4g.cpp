@@ -24,7 +24,7 @@ DelQ4g::DelQ4g(CDFEG::PhyFieldData* pData)
     _name = "DelQ4g";
     _dispNames = { "u", "v" };
     // 旧项目 a1eq4g2 材料：pe/pv/fu/fv/rou/alpha 六参数
-    _paramNames = { "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateTypeName = "DelQ4g";
     _types.insert("DelQ4g");
 
     _dim = 2;

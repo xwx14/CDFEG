@@ -24,6 +24,8 @@ del2dData::del2dData() {
     // 动力位移场（Newmark-β）
     DelDispFieldData* field = new DelDispFieldData(this);
     _phyDatas.push_back(field);
+    _mateConstitutive["DelQ4g"] = { "pe", "pv", "fu", "fv", "rou", "alpha" };
+    _mateConstitutive["StressBL2g"] = { "fu", "fv" };
 }
 
 del2dData::~del2dData() {

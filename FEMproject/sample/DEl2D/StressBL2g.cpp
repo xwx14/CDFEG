@@ -23,7 +23,7 @@ StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
     _name = "StressBL2g";
     _dispNames = { "u", "v" };
     // 旧 a2ll2 材料：fu/fv 两参数（fu=沿线切向面力, fv=沿线法向面力）
-    _paramNames = { "fu", "fv" };
+    _mateTypeName = "StressBL2g";
     _types.insert("StressBL2g");
 
     _dim = 2;
