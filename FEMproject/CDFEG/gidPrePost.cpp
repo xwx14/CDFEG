@@ -176,29 +176,9 @@ namespace CDFEG {
 	int GidPrePost::readMate(const std::map<std::string, std::string>& params)
 	{
 		std::string name = params.at("name");
-		// 优先走本构类型表（新机制）：材料段头 name 即本构类型名
 		auto itType = _femData->_mateConstitutive.find(name);
-		const std::vector<std::string>* pmateparams = nullptr;
-		if (itType != _femData->_mateConstitutive.end())
-		{
-			pmateparams = &itType->second;
-		}
-		else
-		{
-			// 回退（旧机制）：按 <单元 _name> 找单元，用其 _paramNames
-			ElementBase* curEle = nullptr;
-			for (PhyFieldData* f : _femData->_phyDatas)
-			{
-				for (ElementBase* e : f->_eleSubs)
-				{
-					if (e->_name == name) { curEle = e; break; }
-				}
-				if (curEle) break;
-			}
-			if (!curEle) return -1;
-			pmateparams = &curEle->_paramNames;
-		}
-		const std::vector<std::string>& mateparams = *pmateparams;
+		if (itType == _femData->_mateConstitutive.end()) return -1;
+		const std::vector<std::string>& mateparams = itType->second;
 		const std::string& line = _datReader.getCurrentLine();
 		int i = 0;
 		while (_datReader.readNextLine()) {
