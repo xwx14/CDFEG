@@ -110,3 +110,41 @@ def test_element_panel_gauss_commit_filters_empty(qapp):
     ep._commit()
     assert g.gaussPoints == [[0.5, 0.5]]
     assert g.gaussWeights == [1.0]
+
+
+# ---- ElementPanel CSV 输入 (Task 2) ----
+from widgets.csv_line_edit import CsvLineEdit
+
+
+def test_element_panel_csv_input_writes_back(qapp):
+    """广义位移/单元变量为 CsvLineEdit，中文逗号输入写回为 list。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Truss", gauss=False)
+    m.markClean()
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    # 已换成 CsvLineEdit
+    assert isinstance(ep._dispNames, CsvLineEdit)
+    assert isinstance(ep._eleResNames, CsvLineEdit)
+    # 中文逗号输入广义位移 → 写回 ele.dispNames
+    ep._dispNames._edit.setText("u，v")
+    ep._dispNames._edit.editingFinished.emit()  # 触发 _commit
+    assert ele.dispNames == ["u", "v"]
+    # 英文逗号输入单元变量
+    ep._eleResNames._edit.setText("sx, sy, sxy")
+    ep._eleResNames._edit.editingFinished.emit()
+    assert ele.eleResNames == ["sx", "sy", "sxy"]
+    assert m.isDirty is True
+
+
+def test_element_panel_csv_roundtrip_on_reload(qapp):
+    """已存的 dispNames 在 loadEleSub 时正确回填到单行框。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "T", gauss=False)
+    ele.dispNames = ["u", "v", "w"]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    assert ep._dispNames._edit.text() == "u, v, w"
+    assert ep._dispNames.items() == ["u", "v", "w"]

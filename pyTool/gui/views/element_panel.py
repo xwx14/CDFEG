@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
 
 from DataEleSubG import DataEleSubG
 from widgets.list_editor import ListEditor
+from widgets.csv_line_edit import CsvLineEdit
 from widgets.table_editor import TableEditor
 
 
@@ -64,8 +65,8 @@ class ElementPanel(QWidget):
         # ---- 列表：dispNames / eleResNames ----
         lists = QGroupBox("位移与变量名")
         lh = QHBoxLayout()
-        self._dispNames = ListEditor("广义位移")
-        self._eleResNames = ListEditor("单元变量")
+        self._dispNames = CsvLineEdit("广义位移", placeholder="逗号分隔，如：u, v, w")
+        self._eleResNames = CsvLineEdit("单元变量", placeholder="逗号分隔，如：sx, sy, sxy")
         lh.addWidget(self._dispNames)
         lh.addWidget(self._eleResNames)
         lists.setLayout(lh)
