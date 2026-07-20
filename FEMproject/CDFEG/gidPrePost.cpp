@@ -176,16 +176,29 @@ namespace CDFEG {
 	int GidPrePost::readMate(const std::map<std::string, std::string>& params)
 	{
 		std::string name = params.at("name");
-		ElementBase* curEle = nullptr;
-		for (PhyFieldData* f : _femData->_phyDatas)
+		// 优先走本构类型表（新机制）：材料段头 name 即本构类型名
+		auto itType = _femData->_mateConstitutive.find(name);
+		const std::vector<std::string>* pmateparams = nullptr;
+		if (itType != _femData->_mateConstitutive.end())
 		{
-			for (ElementBase* e : f->_eleSubs)
-			{
-				if ("mat_" + e->_name == name)curEle = e;
-			}
+			pmateparams = &itType->second;
 		}
-		if (!curEle)return -1;
-		std::vector<std::string>& mateparams = curEle->_paramNames;
+		else
+		{
+			// 回退（旧机制）：按 mat_<单元 _name> 找单元，用其 _paramNames
+			ElementBase* curEle = nullptr;
+			for (PhyFieldData* f : _femData->_phyDatas)
+			{
+				for (ElementBase* e : f->_eleSubs)
+				{
+					if ("mat_" + e->_name == name) { curEle = e; break; }
+				}
+				if (curEle) break;
+			}
+			if (!curEle) return -1;
+			pmateparams = &curEle->_paramNames;
+		}
+		const std::vector<std::string>& mateparams = *pmateparams;
 		const std::string& line = _datReader.getCurrentLine();
 		int i = 0;
 		while (_datReader.readNextLine()) {
@@ -195,7 +208,7 @@ namespace CDFEG {
 			}
 			std::vector<double> vals = TextReader::splitDoubles(line, " ,");
 			int len1 = vals.size();
-			if (len1 > mateparams.size())len1 = mateparams.size();
+			if (len1 > (int)mateparams.size())len1 = mateparams.size();
 			std::map<std::string, double> paramMap;
 			for (int j = 0; j < len1; ++j) {
 				paramMap[mateparams[j]] = vals[j];
