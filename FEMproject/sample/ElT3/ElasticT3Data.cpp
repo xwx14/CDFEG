@@ -4,6 +4,7 @@
 ElasticT3Data::ElasticT3Data() {
     _dim = 2;
     _phyDatas.push_back(new Elastic2DDispFieldData(this));
+    _mateConstitutive["ElT3"] = { "E", "nu", "t", "fx", "fy" };
 }
 
 ElasticT3Data::~ElasticT3Data() {

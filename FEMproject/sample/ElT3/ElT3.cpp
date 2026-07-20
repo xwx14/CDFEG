@@ -18,7 +18,7 @@ ElT3::ElT3(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(3, pData) {
     _name = "ElT3";
     _dispNames = { "u", "v" };
-    _paramNames = { "E", "nu","t", "fx", "fy"};
+    _mateTypeName = "ElT3";
     _types.insert("ElT3");
 }
 
