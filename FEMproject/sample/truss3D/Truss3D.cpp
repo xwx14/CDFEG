@@ -24,7 +24,7 @@ Truss3D::Truss3D(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(2, pData) {
     _name = "Truss3D";
     _dispNames = { "u", "v", "w" };
-    _paramNames = { "E", "A" };
+    _mateTypeName = "Truss3D";
     _types.insert("Truss3D");
 }
 

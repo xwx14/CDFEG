@@ -21,7 +21,7 @@ Truss1D::Truss1D(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(2, pData) {
     _name="Truss1D";
     _dispNames = { "u"};
-    _paramNames ={ "E","A"};
+    _mateTypeName = "Truss1D";
     _types.insert("Truss1D");
     // TODO: 设置 VTK 单元类型
     // _vtkCellType = VTKCellType::VTK_<TYPE>;

@@ -22,7 +22,7 @@ Truss2D::Truss2D(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(2, pData) {
     _name="Truss2D";
     _dispNames = { "u", "v" };
-    _paramNames ={ "E", "A" };
+    _mateTypeName = "Truss2D";
     _types.insert("Truss2D");
     // TODO: 设置 VTK 单元类型
     // _vtkCellType = VTKCellType::VTK_<TYPE>;

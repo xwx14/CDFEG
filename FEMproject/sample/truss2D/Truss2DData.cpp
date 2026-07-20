@@ -20,6 +20,7 @@
 Truss2DData::Truss2DData() {
     _dim = 2;
     _phyDatas.push_back(new Truss2DDispFieldData(this));
+    _mateConstitutive["Truss2D"] = { "E", "A" };
 }
 
 Truss2DData::~Truss2DData() {

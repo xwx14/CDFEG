@@ -21,6 +21,7 @@
 Truss3DData::Truss3DData() {
     _dim = 3;
     _phyDatas.push_back(new Truss3DDispFieldData(this));
+    _mateConstitutive["Truss3D"] = { "E", "A" };
 }
 
 Truss3DData::~Truss3DData() {

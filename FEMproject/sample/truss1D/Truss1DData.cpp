@@ -20,6 +20,7 @@
 Truss1DData::Truss1DData() {
     _dim = 1;
     _phyDatas.push_back(new Truss1DDispFieldData(this));
+    _mateConstitutive["Truss1D"] = { "E", "A" };
 }
 
 Truss1DData::~Truss1DData() {
