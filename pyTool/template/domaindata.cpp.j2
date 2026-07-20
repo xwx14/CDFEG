@@ -8,6 +8,9 @@
 {% for field in project.fields %}
     _phyDatas.push_back(new {{field.fieldDataClassName}}(this));
 {% endfor %}
+{% for mt in project.mateTypes %}
+    _mateConstitutive["{{ mt.name }}"] = { {% for p in mt.params %}"{{p}}"{% if not loop.last %}, {% endif %}{% endfor %} };
+{% endfor %}
 }
 
 {{femDataClassName}}::~{{femDataClassName}}() {

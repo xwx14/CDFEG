@@ -37,3 +37,37 @@ def test_DataEleSub_fromDict_legacy_no_mateTypeName():
     legacy = {"name": "E", "nNodes": 4, "paramNames": ["a"]}
     e = DataEleSub.fromDict(legacy)
     assert e.mateTypeName == ""
+
+import jinja2
+import os
+
+TEMPLATE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "template"))
+
+
+def _render(tpl, ctx):
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
+                             trim_blocks=True, lstrip_blocks=True)
+    return env.get_template(tpl).render(**ctx)
+
+
+def test_elesub_template_renders_mateTypeName():
+    ele = {"name": "HeatQ4g", "gidName": "HelQ4g", "mateTypeName": "HelQ4g",
+           "dispNames": ["T"], "paramNames": ["ek"], "initCode": "",
+           "vtkCellType": None, "nNodes": 4, "dim": 2,
+           "gaussPoints": [[0,0]], "gaussWeights": [1.0]}
+    ctx = {"ele": ele, "project": type("P", (), {"coordVars": ["x", "y"]})(),
+           "femDataClassName": "hel2dData", "field": type("F", (), {"fieldDataClassName": "HeatFieldData"})(),
+           "baseClass": "IsoEleBase", "headerGuard": "HEATQ4G_H",
+           "baseClassParam": "4, pData", "dim": 2, "shapeFuns": []}
+    out = _render("elesub.cpp.j2", ctx)
+    assert '_mateTypeName = "HelQ4g";' in out
+    assert "_paramNames" not in out
+
+
+def test_domaindata_template_renders_mateConstitutive():
+    project = {"name": "hel2d", "dim": 2,
+               "fields": [{"fieldDataClassName": "HeatFieldData"}],
+               "mateTypes": [{"name": "HelQ4g", "params": ["ek", "pe"], "defaults": []}]}
+    ctx = {"femDataClassName": "hel2dData", "project": project}
+    out = _render("domaindata.cpp.j2", ctx)
+    assert '_mateConstitutive["HelQ4g"] = { "ek", "pe" };' in out
