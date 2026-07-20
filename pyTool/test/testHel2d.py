@@ -26,6 +26,12 @@ from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 project = DataProject("hel2d", 2)
 
+# 显式声明统一本构类型 HelQ4g（热+弹性全量 10 参数），热场/位移场共享
+project.addMateType(
+    "HelQ4g",
+    ["ek", "ec", "q", "pe", "pv", "fu", "fv", "rou", "alpha", "alfa"],
+    defaults=[1.0, 1.0, 0.0, 1.0e10, 0.3, 0.0, 0.0, 3000.0, 0.6, 0.6])
+
 s = 1 / (3**0.5)
 
 # 第一个场为温度场
@@ -36,8 +42,7 @@ hele1 = DataEleSubG("HeatQ4g", 4)
 hele1.type = 2
 hele1.gidName = "HelQ4g"
 hele1.dispNames = ["T"]
-hele1.paramNames = ["ek", "ec","q"]
-hele1.paramValues=[1.0, 1.0, 0.0]
+hele1.mateTypeName = "HelQ4g"
 hele1.gaussPoints = [
     [s, s], 
     [s, -s],
@@ -61,9 +66,7 @@ dele1.gidName = "HelQ4g"
 dele1.type = 2
 dele1.dispNames = ["u", "v"]
 dele1.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY", "volume"]
-# alfa为热膨胀系数
-dele1.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha","alfa"]
-dele1.paramValues = [ 1.0e10, 0.3, 0.0, 0.0, 3000.0, 0.6, 0.6]
+dele1.mateTypeName = "HelQ4g"
 dele1.gaussPoints = [
     [s, s],
     [s, -s],

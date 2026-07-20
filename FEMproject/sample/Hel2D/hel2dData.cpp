@@ -6,6 +6,8 @@ hel2dData::hel2dData() {
     _dim = 2;
     _phyDatas.push_back(new HeatFieldData(this));
     _phyDatas.push_back(new DelDispFieldData(this));
+    // 注册统一本构类型 HelQ4g（热场 ek/ec/q + 弹性场 pe/pv/fu/fv/rou/alpha/alfa）
+    _mateConstitutive["HelQ4g"] = { "ek", "ec", "q", "pe", "pv", "fu", "fv", "rou", "alpha", "alfa" };
 }
 
 hel2dData::~hel2dData() {

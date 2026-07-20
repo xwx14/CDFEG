@@ -5,11 +5,10 @@
 DelQ4g::DelQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
     // 同域热固耦合：GiD 中仅定义一种单元 HelQ4g，热场与位移场共用。
-    _name="HelQ4g";
+    _name="DelQ4g";
     _dispNames = { "u", "v" };
-    // 全量材料参数（热场 ek/ec/q + 弹性场 pe/pv/fu/fv/rou/alpha/alfa），
-    // 供 readMate 为统一材料段 mat_HelQ4g 命名；run/uEle 仅按名取所需。
-    _paramNames ={ "ek", "ec", "q", "pe", "pv", "fu", "fv", "rou", "alpha", "alfa" };
+    // 本构类型 HelQ4g 由 hel2dData 注册；run/uEle 按名取所需（pe/pv/fu/fv/alfa）
+    _mateTypeName = "HelQ4g";
     _types.insert("DelQ4g");
     _types.insert("HelQ4g");
 
