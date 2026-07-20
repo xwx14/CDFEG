@@ -5,7 +5,7 @@
 HeatQ4g::HeatQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
     // 同域热固耦合：GiD 中仅定义一种单元 HelQ4g，热场与位移场共用。
-    // 单元名取 GiD 类型名 "HelQ4g"，使 readMate 能匹配统一材料段 mat_HelQ4g。
+    // 单元 _name 恢复真实 HeatQ4g；材料段经本构类型 HelQ4g 命名（hel2dData 注册）。
     _name="HeatQ4g";
     _dispNames = { "T" };
     // 本构类型 HelQ4g 由 hel2dData 注册全量 10 参数；run 仅按名取所需（ek/q）
