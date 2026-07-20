@@ -70,3 +70,43 @@ def test_table_editor_empty_rows_dropped(qapp):
     te = TableEditor(["a"])
     te.setRows([["x"], [""], ["y"]])
     assert te.rows() == [["x"], ["y"]]
+
+
+from widgets.csv_line_edit import CsvLineEdit
+
+
+def test_csv_line_edit_roundtrip(qapp):
+    le = CsvLineEdit("广义位移")
+    le.setItems(["u", "v", "w"])
+    assert le.items() == ["u", "v", "w"]
+
+
+def test_csv_line_edit_chinese_comma(qapp):
+    le = CsvLineEdit()
+    le._edit.setText("u，v，w")  # 中文全角逗号
+    assert le.items() == ["u", "v", "w"]
+
+
+def test_csv_line_edit_filters_empty(qapp):
+    le = CsvLineEdit()
+    le._edit.setText("u,, v ,")  # 连续逗号 / 首尾逗号 / 空白
+    assert le.items() == ["u", "v"]
+    le._edit.setText("")
+    assert le.items() == []
+
+
+def test_csv_line_edit_setitems_does_not_emit(qapp):
+    le = CsvLineEdit()
+    hits = []
+    le.itemsChanged.connect(lambda: hits.append(1))
+    le.setItems(["a", "b"])
+    assert hits == []  # setItems 不触发（与 ListEditor 一致）
+
+
+def test_csv_line_edit_editingfinished_emits(qapp):
+    le = CsvLineEdit()
+    hits = []
+    le.itemsChanged.connect(lambda: hits.append(1))
+    le._edit.setText("a, b")
+    le._edit.editingFinished.emit()  # 模拟失焦/回车
+    assert len(hits) >= 1
