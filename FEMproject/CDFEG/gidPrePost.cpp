@@ -185,13 +185,13 @@ namespace CDFEG {
 		}
 		else
 		{
-			// 回退（旧机制）：按 mat_<单元 _name> 找单元，用其 _paramNames
+			// 回退（旧机制）：按 <单元 _name> 找单元，用其 _paramNames
 			ElementBase* curEle = nullptr;
 			for (PhyFieldData* f : _femData->_phyDatas)
 			{
 				for (ElementBase* e : f->_eleSubs)
 				{
-					if ("mat_" + e->_name == name) { curEle = e; break; }
+					if (e->_name == name) { curEle = e; break; }
 				}
 				if (curEle) break;
 			}

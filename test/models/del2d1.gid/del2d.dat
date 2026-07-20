@@ -4,9 +4,9 @@
 0.1 1.0
 * name=newmark,structure="F64"
 0.5 0.25
-* name=mat_DelQ4g,structure="F64*6",type="mat",index=0
+* name=DelQ4g,structure="F64*6",type="mat",index=0
 10000000000.0 0.3 0.0 0.0 3000.0 0.6 
-* name=mat_StressBL2g,structure="F64*2",type="mat",index=0
+* name=StressBL2g,structure="F64*2",type="mat",index=0
 100.0 0.0 
 * name=coord,structure="I32*1 F64*2",type="coord",index=1
        1  -1.227340e+01 5.023850e+00

@@ -145,7 +145,7 @@ void CDFEG::DomainData::setEleMateByName(int eleId, const std::string& name)
 	int mateId = -1;
 	for (size_t i = 0; i < _mateNames.size(); i++)
 	{
-		if (_mateNames[i] == "mat_"+name)
+		if (_mateNames[i] == name)
 		{
 			mateId = static_cast<int>(i);
 			break;
@@ -164,7 +164,7 @@ void CDFEG::DomainData::setEleMateByInternal(int internalId, const std::string& 
 	int mateId = -1;
 	for (size_t i = 0; i < _mateNames.size(); i++)
 	{
-		if (_mateNames[i] == "mat_" + name)
+		if (_mateNames[i] == name)
 		{
 			mateId = static_cast<int>(i);
 			break;
