@@ -512,6 +512,52 @@ namespace CDFEG {
 		int nNodes = _femData->_nPts;
 		for (GidResItem& item : _resItems)
 		{
+			if (item._loc == GidLocation::OnGaussPoints)
+			{
+				// 单元结果（如应力）：按单元子程序分组输出，每组 1 个 GaussPoints 定义 + 1 个 Result 块
+				if (item._iFields.empty()) continue;
+				PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
+				std::string typeStr = gidResultTypeToStr(item._type);
+				// 各分量取值指针（单元结果存于物理场 _elemRes，按单元内部索引取值）
+				std::vector<std::vector<double>*> valPtrs;
+				valPtrs.reserve(item._ValNames.size());
+				for (const std::string& vn : item._ValNames)
+					valPtrs.push_back(&(phy->_elemRes[vn]));
+				for (ElementBase* eleSub : phy->_eleSubs)
+				{
+					std::string gpName = "GP_" + eleSub->_name;
+					std::string gidType = vtkCellTypeToGidElemType(eleSub->_vtkCellType);
+					// GaussPoints 定义仅首步写入（GiD 后续步复用同名定义）
+					if (it == 0)
+					{
+						outFile << "GaussPoints \"" << gpName << "\" ElemType " << gidType << std::endl;
+						outFile << "Number Of Gauss Points: 1" << std::endl;
+						outFile << "Natural Coordinates: Internal" << std::endl;
+						outFile << "End GaussPoints" << std::endl;
+					}
+					outFile << "Result \"" << item._name << "\" \"Load Analysis\"  ";
+					outFile << std::setw(10) << it + 1 << " ";
+					outFile << typeStr << " OnGaussPoints \"" << gpName << "\"" << std::endl;
+					outFile << "ComponentNames ";
+					for (const std::string& vn : item._ValNames)
+						outFile << "\"" << vn << "\" ";
+					outFile << std::endl;
+					outFile << "Values" << std::endl;
+					for (int id : eleSub->_eleIds)
+					{
+						outFile << std::setw(10) << id + 1;
+						outFile << std::setw(16) << std::scientific << std::setprecision(7);
+						for (auto* pv : valPtrs)
+						{
+							if (id >= 0 && id < (int)pv->size()) outFile << " " << (*pv)[id];
+							else outFile << " " << 0.0;
+						}
+						outFile << std::endl;
+					}
+					outFile << "End Values" << std::endl;
+				}
+				continue;
+			}
 			outFile << "Result \"" << item._name << "\" \"Load Analysis\"  ";
 			outFile << std::setw(10) << it + 1 << " ";
 			outFile << gidResultTypeToStr(item._type) << " OnNodes" << std::endl;

@@ -51,6 +51,7 @@ def build_cases(cfg, args):
                 case_dir=TEST_DIR / c["case_dir"], baseline=c["baseline"],
                 output=c["output"], tol=Tolerance(c["tol_atol"], c.get("tol_rtol", 0.0)),
                 builder=builder, dll_dirs=cfg.toolchain.dll_dirs,
+                format=c.get("format", "gid"),
             ))
     if "unit" in suites:
         for c in cfg.suite_unit():

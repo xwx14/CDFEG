@@ -16,6 +16,7 @@
 
 #include "Truss3DData.h"
 #include "Truss3DDispFieldData.h"
+#include <iostream>
 
 Truss3DData::Truss3DData() {
     _dim = 3;

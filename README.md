@@ -12,7 +12,7 @@
 │   │   ├── EquationSystem.h   # 方程组求解
 │   │   ├── MatrixFun.h       # 常用的计算函数
 │   │   ├── PhyFieldData.h   # 物理场数据基类
-│   │   ├── DomainData.h        # 有限元空间数据基类
+│   │   ├── DomainData.h        # 有限元空间域数据基类
 │   │   └── gidProPost.h    # GID前后处理接口
 │   └── sample/        # 示例程序
 ├── pyTool/            # Python 代码生成工具
@@ -32,7 +32,9 @@
 
 ## 核心库 CDFEG
 
-CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单元类型扩展与多物理场分析。
+CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单元类型扩展与多物理场分析。其数据以面向对象的方式组织：
++ DomainData (有限元空间域数据)存储本域的有限元网格、材料属性等数据，其中中包含一个或多个PhyFieldData (物理场数据)
++ PhyFieldData (物理场数据)存储一个物理场的，中包含一个或多个EleSubBase (单元子程序基类)
 
 ### 类层次结构
 
@@ -40,7 +42,7 @@ CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单�
 EleSubBase (单元子程序基类)
     └── IsoEleBase (等参元基类)
 PhyFieldData (物理场数据)
-DomainData (有限元空间数据)
+DomainData (有限元空间域数据)
 EquationSystem (方程组求解)
 ```
 

@@ -37,6 +37,79 @@ output = "el.post.res"
 tol_atol = 1e-12
 tol_rtol = 0.0
 
+[[suite.e2e.cases]]
+name = "elt3_1"
+target = "ElasticT3"
+project = "ElasticT3"
+case_dir = "models/elt3_1.gid"
+baseline = "ElasticT3.post.res"
+output = "ElasticT3.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
+[[suite.e2e.cases]]
+name = "elt3_4x4"
+target = "ElasticT3"
+project = "ElasticT3_4x4"
+case_dir = "models/elt3_4x4.gid"
+baseline = "ElasticT3_4x4.post.res"
+output = "ElasticT3_4x4.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
+[[suite.e2e.cases]]
+name = "truss1D1"
+target = "Truss1D"
+project = "Truss1D"
+case_dir = "models/truss1D1.gid"
+baseline = "Truss1D.txt"
+output = "Truss1D.txt"
+tol_atol = 1e-12
+tol_rtol = 0.0
+format = "truss_txt"
+
+[[suite.e2e.cases]]
+name = "truss2D1"
+target = "Truss2D"
+project = "Truss2D"
+case_dir = "models/truss2D1.gid"
+baseline = "Truss2D.txt"
+output = "Truss2D.txt"
+tol_atol = 1e-12
+tol_rtol = 0.0
+format = "truss_txt"
+
+[[suite.e2e.cases]]
+name = "truss3D1"
+target = "Truss3D"
+project = "Truss3D"
+case_dir = "models/truss3D1.gid"
+baseline = "Truss3D.txt"
+output = "Truss3D.txt"
+tol_atol = 1e-12
+tol_rtol = 0.0
+format = "truss_txt"
+
+[[suite.e2e.cases]]
+name = "el2d_bf1"
+target = "el2d"
+project = "el2d_bf"
+case_dir = "models/el2d_bf1.gid"
+baseline = "el2d_bf.post.res"
+output = "el2d_bf.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
+[[suite.e2e.cases]]
+name = "el2_mfel1"
+target = "el2d"
+project = "el2_mfel"
+case_dir = "models/el2_mfel1.gid"
+baseline = "el2_mfel.post.res"
+output = "el2_mfel.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
 [suite.unit]
 cases = [ { name = "core", binary = "cdfeg_unit_test" } ]
 

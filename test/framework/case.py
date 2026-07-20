@@ -5,6 +5,7 @@ import shutil
 from typing import Protocol
 
 from framework.parser import parse_res_file
+from framework.txt_parser import parse_truss_txt
 from framework.comparator import compare
 from framework.runner import run as _runner_run_default, RunResult
 from framework.tolerance import Tolerance
@@ -31,7 +32,7 @@ class E2ECase:
     suite = "e2e"
 
     def __init__(self, name, target, project, case_dir, baseline, output,
-                 tol: Tolerance, builder, timeout=600, dll_dirs=None):
+                 tol: Tolerance, builder, timeout=600, dll_dirs=None, format="gid"):
         self.name = name
         self.target = target
         self.project = project
@@ -42,6 +43,7 @@ class E2ECase:
         self.builder = builder
         self.timeout = timeout
         self.dll_dirs = dll_dirs or []
+        self.format = format
         self._runner_run = _runner_run_default  # 可被测试替换
 
     def _prepare_work_dir(self) -> Path:
@@ -51,9 +53,17 @@ class E2ECase:
             shutil.rmtree(work_dir)
         work_dir.mkdir(parents=True)
         for f in self.case_dir.iterdir():
-            if f.is_file() and ".post.res" not in f.name and not f.name.endswith(".bak"):
+            if (f.is_file() and ".post.res" not in f.name
+                    and not f.name.endswith(".bak") and f.name != self.baseline):
                 shutil.copy2(f, work_dir / f.name)
         return work_dir
+
+    def _parse(self, path):
+        """按 format 选解析器：gid→GiD .post.res；truss_txt→分节文本。两者都产出
+        dict[(name,step), ResBlock]，复用 comparator。"""
+        if self.format == "truss_txt":
+            return parse_truss_txt(path)
+        return parse_res_file(path)
 
     def run(self, ctx) -> CaseResult:
         try:
@@ -72,12 +82,12 @@ class E2ECase:
         if self.output not in rr.outputs:
             return CaseResult(self.name, self.suite, "error",
                               detail=f"未产出 {self.output}")
-        actual = parse_res_file(rr.outputs[self.output])
+        actual = self._parse(rr.outputs[self.output])
         baseline_path = self.case_dir / self.baseline
         if not baseline_path.exists():
             return CaseResult(self.name, self.suite, "error",
                               detail=f"基准缺失: {baseline_path}")
-        baseline = parse_res_file(baseline_path)
+        baseline = self._parse(baseline_path)
         cr = compare(actual, baseline, self.tol)
         if not cr.structural_ok:
             return CaseResult(self.name, self.suite, "fail",

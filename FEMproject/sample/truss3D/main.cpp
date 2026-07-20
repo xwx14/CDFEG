@@ -60,10 +60,17 @@ int makeData(Truss3DData& data) {
     data.addEle(11, { 7, 8 }, "Truss3D"); // 7->8
     data.addEle(12, { 5, 6 }, "Truss3D"); // 5->6
     // 对角支撑
-    data.addEle(13, { 1, 4 }, "Truss3D"); // 对角支撑1
-    data.addEle(14, { 3, 6 }, "Truss3D"); // 对角支撑2
-    data.addEle(15, { 7, 2 }, "Truss3D"); // 对角支撑3
-    data.addEle(16, { 5, 8 }, "Truss3D"); // 对角支撑4
+    data.addEle(13, { 1, 4 }, "Truss3D"); // 前面(y=0)面对角
+    data.addEle(14, { 3, 6 }, "Truss3D"); // 体对角
+    data.addEle(15, { 7, 2 }, "Truss3D"); // 体对角
+    data.addEle(16, { 5, 8 }, "Truss3D"); // 后面(y=4)面对角
+    // 面对角支撑：6 面皆三角形化以消除几何可变（机构）。
+    // 空间桁架静定必要条件 m ≥ 3j-r = 3*8-6 = 18；原 16 杆 < 18 必为机构，
+    // 总刚奇异致结果无意义。补 4 根面对角（底/顶/左/右），m=20 超静定稳定。
+    data.addEle(17, { 1, 7 }, "Truss3D"); // 底面(z=0)面对角
+    data.addEle(18, { 2, 8 }, "Truss3D"); // 顶面(z=3)面对角
+    data.addEle(19, { 1, 6 }, "Truss3D"); // 左面(x=0)面对角
+    data.addEle(20, { 3, 8 }, "Truss3D"); // 右面(x=3)面对角
 
     // 材料信息
     std::map<std::string, double> param;
@@ -72,17 +79,22 @@ int makeData(Truss3DData& data) {
     data.addMate(param);
 
     // 单元材料信息
-    for (int i = 1; i <= 16; i++) {
+    for (int i = 1; i <= 20; i++) {
         data.setEleMateId(i, 0);
     }
 
     Truss3DDispFieldData* phydata = static_cast<Truss3DDispFieldData*>(data._phyDatas[0]);
 
     // 边界条件设置 (第一类边界条件 - 固定位移)
-    // 固定节点1的所有自由度 (u=0, v=0, w=0)
+    // 固定节点1的所有自由度 (u=0, v=0, w=0)——约束 3 平动刚体自由度
     phydata->setFirstBoundry(1, 0.0, 0);  // u = 0
     phydata->setFirstBoundry(1, 0.0, 1);  // v = 0
     phydata->setFirstBoundry(1, 0.0, 2);  // w = 0
+    // 防刚体转动（节点1 仅约束平动，3D 还需约束 3 转动）：
+    // 节点2(0,0,3) 在 z 轴上，约束 u,v 防绕 x,y 转动；节点3(3,0,0) 在 x 轴上，约束 v 防绕 z 转动
+    phydata->setFirstBoundry(2, 0.0, 0);  // 节点2 u
+    phydata->setFirstBoundry(2, 0.0, 1);  // 节点2 v
+    phydata->setFirstBoundry(3, 0.0, 1);  // 节点3 v
 
     // 荷载条件设置 (第二类边界条件 - 施加荷载)
     // 在节点8施加荷载: Fx = 10000N, Fy = 5000N, Fz = -3000N

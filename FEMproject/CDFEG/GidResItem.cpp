@@ -111,8 +111,8 @@ namespace CDFEG {
 		}
 	}
 
-	GidResItem::GidResItem(const std::string& name, GidResultType type)
-		: _name(name), _type(type)
+	GidResItem::GidResItem(const std::string& name, GidResultType type, GidLocation loc)
+		: _name(name), _type(type), _loc(loc)
 	{
 	}
 

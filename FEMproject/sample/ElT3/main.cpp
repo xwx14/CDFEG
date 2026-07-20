@@ -19,6 +19,12 @@ int main(int argc, char* argv[]) {
 	resItem1.addVal(0, "u");
 	resItem1.addVal(0, "v");
 	gidPrePost._resItems.push_back(resItem1);
+	// 单元应力结果（OnGaussPoints）：分量取自物理场 _elemRes 的 Sxx/Syy/Sxy
+	CDFEG::GidResItem resItem2("stress", CDFEG::GidResultType::Vector3, CDFEG::GidLocation::OnGaussPoints);
+	resItem2.addVal(0, "Sxx");
+	resItem2.addVal(0, "Syy");
+	resItem2.addVal(0, "Sxy");
+	gidPrePost._resItems.push_back(resItem2);
     gidPrePost.post2();
     return 0;
 }

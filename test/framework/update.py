@@ -8,6 +8,7 @@ from framework.config import Config
 from framework.builder import Builder
 from framework.runner import run
 from framework.parser import parse_res_file
+from framework.txt_parser import parse_truss_txt
 from framework.comparator import compare
 from framework.tolerance import Tolerance
 
@@ -30,7 +31,8 @@ def _run_in_work_dir(builder, c, case_dir, build_dir, dll_dirs) -> Path:
         shutil.rmtree(work_dir)
     work_dir.mkdir(parents=True)
     for f in case_dir.iterdir():
-        if f.is_file() and ".post.res" not in f.name and not f.name.endswith(".bak"):
+        if (f.is_file() and ".post.res" not in f.name
+                and not f.name.endswith(".bak") and f.name != c["baseline"]):
             shutil.copy2(f, work_dir / f.name)
     exes = builder.build([c["target"]])
     rr = run(exes[c["target"]], [c["project"], "."], work_dir, [c["output"]],
@@ -62,7 +64,8 @@ def update_baseline(cfg: Config, case_name: str, proj_root: Path) -> int:
     # diff 摘要（若旧基准存在）
     max_delta = 0.0
     if baseline_path.exists():
-        cr = compare(parse_res_file(actual_path), parse_res_file(baseline_path),
+        _parse = parse_truss_txt if c.get("format", "gid") == "truss_txt" else parse_res_file
+        cr = compare(_parse(actual_path), _parse(baseline_path),
                      Tolerance(atol=0.0, rtol=0.0))
         max_delta = cr.max_abs_err
         print(f"[diff] {case_name}: max|Δ|={cr.max_abs_err:.3e} "

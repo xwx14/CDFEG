@@ -55,12 +55,14 @@ namespace CDFEG {
 	class CDFEG_API GidResItem
 	{
 	public:
-		GidResItem(const std::string& name, GidResultType type);
+		GidResItem(const std::string& name, GidResultType type, GidLocation loc = GidLocation::OnNodes);
 		~GidResItem();
 		void addVal(int iField, const std::string& valName);
 
 		std::string _name;
 		GidResultType _type;
+		// 结果位置：OnNodes=节点结果(取_nodeRes)，OnGaussPoints=单元结果(取_elemRes，每单元1个积分点)
+		GidLocation _loc = GidLocation::OnNodes;
 		std::vector<int> _iFields;
 		std::vector<std::string> _ValNames;
 	};

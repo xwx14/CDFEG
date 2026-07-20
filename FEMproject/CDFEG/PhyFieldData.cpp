@@ -17,6 +17,7 @@
 #include "PhyFieldData.h"
 #include "ElementBase.h"
 #include "DomainData.h"
+#include <algorithm>
 #include <set>
 #include <iostream>
 #include <map>
@@ -38,8 +39,9 @@ namespace CDFEG {
 
 	int PhyFieldData::eProgram_el()
 	{
+		std::fill(_equSys._data.begin(), _equSys._data.end(), 0.0);
+		std::fill(_equSys._f.begin(), _equSys._f.end(), 0.0);
 		int dim = _femData->_dim;
-		int kNode = _femData->_nPts;
 		int nEleSub = _eleSubs.size();
 		// 填充刚度矩阵
 		for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
@@ -84,10 +86,17 @@ namespace CDFEG {
 					}
 				}
 				_equSys.adda(estifn, lm);
+				// eload → 右端项 _f（单元载荷向量，如体力/面力等效节点载荷）
+				for (int i = 0; i < k; ++i)
+				{
+					int inv = lm[i];
+					if (inv >= 0) _equSys._f[inv] += outData.eload[i];
+				}
 			}
 		}
 
-		// 边界条件添加
+		// 边界条件：_data 已清零重装，强制 applyFirstBCs 重建基线缓存
+		_equSys._bSavedData0 = false;
 		_equSys.applyFirstBCs(_nodeBC1s, _ida);
 		_equSys.applySecondBCs(_nodeBC2s, _ida);
 		return 1;
