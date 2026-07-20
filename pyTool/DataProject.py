@@ -33,6 +33,13 @@ class DataProject:
         self.caculateCode = ""
         # 结构为多个{"name":"pr1","params":[]}
         self.preParams=[]
+        # 材料本构类型表：[{name, params, defaults}]
+        self.mateTypes = []
+
+    def addMateType(self, name, params, defaults=None):
+        """注册材料本构类型（参数 schema），供多个单元共享。"""
+        self.mateTypes.append({'name': name, 'params': list(params),
+                               'defaults': list(defaults or [])})
 
     def addField(self,field0):
         if type(field0) == str:
@@ -68,7 +75,8 @@ class DataProject:
             'fields': fields_data,
             'caculateCode': self.caculateCode,
             # 预处理参数，结构为多个{"name":"pr1","params":[]}
-            'preParams': self.preParams
+            'preParams': self.preParams,
+            'mateTypes': self.mateTypes,
         }
 
     @classmethod
@@ -98,6 +106,9 @@ class DataProject:
 
         # 恢复预处理参数（结构为多个{"name":"pr1","params":[]}）
         project.preParams = data.get('preParams', [])
+
+        # 恢复材料本构类型表
+        project.mateTypes = data.get('mateTypes', [])
 
         return project
 
