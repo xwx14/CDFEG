@@ -17,7 +17,8 @@
 # pyTool 配置式生成器主窗口
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QSplitter, QTreeWidget, QTreeWidgetItem,
-    QStackedWidget, QVBoxLayout, QFileDialog, QMessageBox, QInputDialog,
+    QStackedWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QFileDialog, QMessageBox, QInputDialog,
 )
 from PySide6.QtCore import Qt
 
@@ -42,10 +43,24 @@ class MainWindow(QMainWindow):
         self._model = ProjectModel()
         self._currentFile = None
 
-        # ---- 左：树 ----
+        # ---- 左：树 + 按钮栏 ----
         self._tree = QTreeWidget()
         self._tree.setHeaderLabels(["项目结构"])
         self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
+
+        self._btnAddField = QPushButton("添加场")
+        self._btnAddEle = QPushButton("添加单元")
+        self._btnDelete = QPushButton("删除")
+        btnBar = QHBoxLayout()
+        for b in (self._btnAddField, self._btnAddEle, self._btnDelete):
+            btnBar.addWidget(b)
+        btnBar.addStretch(1)
+
+        leftPanel = QWidget()
+        leftLayout = QVBoxLayout(leftPanel)
+        leftLayout.setContentsMargins(0, 0, 0, 0)
+        leftLayout.addWidget(self._tree)
+        leftLayout.addLayout(btnBar)
 
         # ---- 右：堆叠面板 ----
         self._projPanel = ProjectPanel(self._model)
@@ -57,7 +72,7 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._elePanel)     # 2
 
         splitter = QSplitter(Qt.Horizontal)
-        splitter.addWidget(self._tree)
+        splitter.addWidget(leftPanel)
         splitter.addWidget(self._stack)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 3)
@@ -75,6 +90,11 @@ class MainWindow(QMainWindow):
         self._tree.currentItemChanged.connect(self._onTreeCurrentChanged)
         self._model.dirtyChanged.connect(self._updateTitle)
         self._model.structureChanged.connect(self.refreshTree)
+
+        # 按钮栏：复用「编辑」菜单的 slot
+        self._btnAddField.clicked.connect(self._addField)
+        self._btnAddEle.clicked.connect(self._addEleSub)
+        self._btnDelete.clicked.connect(self._deleteSelected)
 
         self._buildMenus()
         self.newProject()
@@ -223,8 +243,23 @@ class MainWindow(QMainWindow):
         self._tree.addTopLevelItem(root)
         self._tree.expandAll()
         self._updateTitle()
+        self._updateActionButtons()
+
+    def _updateActionButtons(self):
+        """依选中节点类型动态启用/禁用左栏按钮。"""
+        item = self._tree.currentItem()
+        kind = None
+        if item is not None:
+            data = item.data(0, Qt.UserRole)
+            if data:
+                kind = data[0]
+        hasFieldCtx = kind in ("field", "ele")
+        self._btnAddField.setEnabled(True)
+        self._btnAddEle.setEnabled(hasFieldCtx)
+        self._btnDelete.setEnabled(hasFieldCtx)
 
     def _onTreeCurrentChanged(self, cur, _prev):
+        self._updateActionButtons()
         if cur is None:
             return
         data = cur.data(0, Qt.UserRole)

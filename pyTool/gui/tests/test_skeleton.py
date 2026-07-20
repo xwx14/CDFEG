@@ -61,3 +61,56 @@ def test_main_window_switch_panel_on_select(qapp):
     win._tree.setCurrentItem(ele_node)
     assert win._stack.currentIndex() == win._STACK_ELE
     win.deleteLater()
+
+
+def test_main_window_left_button_bar_exists(qapp):
+    """左栏有横向按钮栏：添加场/添加单元/删除。"""
+    win = MainWindow()
+    assert win._btnAddField.text() == "添加场"
+    assert win._btnAddEle.text() == "添加单元"
+    assert win._btnDelete.text() == "删除"
+    win.deleteLater()
+
+
+def test_main_window_buttons_initial_state(qapp):
+    """初始选中项目根：仅添加场启用，添加单元/删除禁用。"""
+    win = MainWindow()
+    win.newProject()
+    win.refreshTree()
+    win._tree.setCurrentItem(win._tree.topLevelItem(0))  # 项目根
+    assert win._btnAddField.isEnabled() is True
+    assert win._btnAddEle.isEnabled() is False
+    assert win._btnDelete.isEnabled() is False
+    win.deleteLater()
+
+
+def test_main_window_buttons_enable_on_field_select(qapp):
+    """选中场节点后，添加单元/删除启用。"""
+    win = MainWindow()
+    win.newProject()
+    f = win._model.addField("F")
+    win._model.addEleSub(f, "T", gauss=False)
+    win.refreshTree()
+    root = win._tree.topLevelItem(0)
+    field_node = root.child(0)
+    win._tree.setCurrentItem(field_node)
+    assert win._btnAddField.isEnabled() is True
+    assert win._btnAddEle.isEnabled() is True
+    assert win._btnDelete.isEnabled() is True
+    win.deleteLater()
+
+
+def test_main_window_buttons_enable_on_ele_select(qapp):
+    """选中单元叶节点后，添加单元/删除同样启用（回溯到所属场）。"""
+    win = MainWindow()
+    win.newProject()
+    f = win._model.addField("F")
+    win._model.addEleSub(f, "T", gauss=False)
+    win.refreshTree()
+    root = win._tree.topLevelItem(0)
+    field_node = root.child(0)
+    ele_node = field_node.child(0)
+    win._tree.setCurrentItem(ele_node)
+    assert win._btnAddEle.isEnabled() is True
+    assert win._btnDelete.isEnabled() is True
+    win.deleteLater()
