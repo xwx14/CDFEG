@@ -105,6 +105,9 @@ def format_timing_list(case_name, rows):
 
 
 def main():
+    # Windows 终端默认 GBK，强制 stdout/stderr 用 UTF-8，避免中文报告乱码
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description="CDFEG 测试系统")
     ap.add_argument("--suite", default="all", choices=["all", "e2e", "unit", "generator", "analytical"])
     ap.add_argument("--case", default=None, help="只跑指定用例名")
