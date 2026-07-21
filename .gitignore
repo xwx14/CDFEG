@@ -83,6 +83,7 @@ Thumbs.db
 # 测试系统构建与报告产物
 /test/build/
 /test/reports/
+/test/timing.db
 .superpowers/
 /docs/设计
 /docs/自有文件
