@@ -2,7 +2,7 @@
 
 # FEMproject/sample — 有限元示例集
 
-> 路径 `FEMproject/sample/`；6 个独立 CMake 子项目，各链接 CDFEG 核心库，演示三层架构派生用法兼作回归基线。
+> 路径 `FEMproject/sample/`；7 个独立 CMake 子项目，各链接 CDFEG 核心库，演示三层架构派生用法兼作回归基线。
 
 ## 示例索引
 
@@ -14,13 +14,14 @@
 | El2D | 2D | 平面应力静力 | `ElQ4g`/`ElT3g`/`StressBL2g` | GiD | 否 | 是 |
 | ElT3 | 2D | 弹性力学 | `ElT3` | — | 否 | 是 |
 | DEl2D | 2D | Newmark-β 动力学 | `DelQ4g` | GiD | **是** | **是（框架生成，逻辑手填）** |
+| Hel2D | 2D | 热弹耦合（温度场+位移场） | `HeatQ4g`/`DelQ4g` | GiD | **是** | **是（框架生成，逻辑手填）** |
 
 ## 入口形式
 
 | 形式 | mainMode | 代表 | 逻辑 |
 | --- | --- | --- | --- |
 | makeData | 0 | truss1D | `main()` 内手工 `addNode/addEle`，无文件依赖 |
-| GiD 数据文件 | 1 | El2D、DEl2D | 命令行 `<project> <path>`，`GidPrePost.pre()` 读 `<project>.dat` |
+| GiD 数据文件 | 1 | El2D、DEl2D、Hel2D | 命令行 `<project> <path>`，`GidPrePost.pre()` 读 `<project>.dat` |
 
 ## 关联
 
