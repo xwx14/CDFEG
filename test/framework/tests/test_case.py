@@ -1,6 +1,7 @@
 from pathlib import Path
 import sys
 import shutil
+import time
 from unittest.mock import MagicMock
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from framework.case import E2ECase
@@ -40,6 +41,7 @@ def test_e2e_pass_when_identical(tmp_path):
     case._runner_run = fake_run
     r = case.run(None)
     assert r.status == "pass"
+    assert r.secs >= 0.0
 
 
 def test_e2e_work_dir_isolated_from_baseline(tmp_path):
@@ -75,3 +77,28 @@ def test_e2e_error_when_output_missing(tmp_path):
     case._runner_run = MagicMock(return_value=RunResult(0, "", "", {}))  # 无产出
     r = case.run(None)
     assert r.status == "error"
+
+
+def test_e2e_records_secs_on_pass(tmp_path):
+    case_dir = _setup_case_dir(tmp_path)
+    _, case = _make_case(case_dir, tmp_path)
+
+    def fake_run(exe, args, cwd, expect, timeout=600, **kwargs):
+        out = Path(cwd) / "del2d.post.res"
+        shutil.copy(FIXTURE, out)
+        return RunResult(0, "", "", {"del2d.post.res": out})
+
+    case._runner_run = fake_run
+    r = case.run(None)
+    assert r.status == "pass"
+    assert r.secs >= 0.0  # 计时已回填
+
+
+def test_e2e_secs_zero_when_build_fails(tmp_path):
+    """build 失败时不应计时（secs 保持 0）。"""
+    case_dir = _setup_case_dir(tmp_path)
+    builder, case = _make_case(case_dir, tmp_path)
+    builder.build.side_effect = RuntimeError("cmake 失败")
+    r = case.run(None)
+    assert r.status == "error"
+    assert r.secs == 0.0

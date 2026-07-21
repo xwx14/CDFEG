@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
+import time
 from typing import Protocol
 
 from framework.parser import parse_res_file
@@ -18,6 +19,9 @@ class CaseResult:
     status: str        # "pass" | "fail" | "error" | "skip"
     metric: dict = field(default_factory=dict)
     detail: str = ""
+    secs: float = 0.0              # 用例耗时（build 之后，秒）；skip/error-on-build 为 0
+    timing_regress: bool = False   # 是否触发性能回归（由 run_tests 检测后回填）
+    timing_detail: str = ""        # 回归说明文本
 
 
 class Case(Protocol):
@@ -70,6 +74,12 @@ class E2ECase:
             exes = self.builder.build([self.target])
         except Exception as e:
             return CaseResult(self.name, self.suite, "error", detail=f"构建失败: {e}")
+        t0 = time.perf_counter()
+        result = self._run_after_build(exes)
+        result.secs = time.perf_counter() - t0
+        return result
+
+    def _run_after_build(self, exes) -> CaseResult:
         work_dir = self._prepare_work_dir()
         rr: RunResult = self._runner_run(exes[self.target], [self.project, "."], work_dir,
                                          [self.output], timeout=self.timeout,
@@ -116,13 +126,17 @@ class UnitCase:
             exes = self.builder.build([self.binary])
         except Exception as e:
             return CaseResult(self.name, self.suite, "error", detail=f"构建失败: {e}")
+        t0 = time.perf_counter()
         rr = _runner_run_default(exes[self.binary], [], Path("."), [], timeout=self.timeout,
                                  extra_dll_dirs=self.dll_dirs)
         if rr.returncode == 0:
-            return CaseResult(self.name, self.suite, "pass",
-                              detail=rr.stdout[-200:] if rr.stdout else "")
-        return CaseResult(self.name, self.suite, "fail",
-                          detail=f"Catch2 断言失败:\n{(rr.stdout or '')[:500]}")
+            result = CaseResult(self.name, self.suite, "pass",
+                                detail=rr.stdout[-200:] if rr.stdout else "")
+        else:
+            result = CaseResult(self.name, self.suite, "fail",
+                                detail=f"Catch2 断言失败:\n{(rr.stdout or '')[:500]}")
+        result.secs = time.perf_counter() - t0
+        return result
 
 
 class GeneratorCase:
@@ -135,11 +149,15 @@ class GeneratorCase:
 
     def run(self, ctx) -> CaseResult:
         import subprocess
+        t0 = time.perf_counter()
         r = subprocess.run(["python", "-m", "pytest", str(self.pytest_dir), "-v"],
                            capture_output=True, text=True)
         if r.returncode == 0:
-            return CaseResult(self.name, self.suite, "pass")
-        return CaseResult(self.name, self.suite, "fail", detail=r.stdout[:500])
+            result = CaseResult(self.name, self.suite, "pass")
+        else:
+            result = CaseResult(self.name, self.suite, "fail", detail=r.stdout[:500])
+        result.secs = time.perf_counter() - t0
+        return result
 
 
 class AnalyticalCase:
