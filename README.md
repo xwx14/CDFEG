@@ -1,48 +1,50 @@
 # 创刀有限元程序生成系统
 
-创刀有限元程序生成系统是一款专业有限元程序生成系统。它由C++有限元核心库和程序生成工具组成。有限元核心库中实现了有限元程序所需的各种通用类及方法，仅依赖Eigen3.4一个第三方库。程序生成工具采用Python编写，基于Jinja2模板库。希望此库可以发展成一个像**创刀**一样可以实现随用随创，在使用中不断扩展出新的能力。
+创刀有限元程序生成系统（CDFEG = Chuang-Dao Finite Element Program Generator）是一款专业有限元程序生成系统。它由 C++ 有限元核心库（DLL）与 Python 代码生成工具链组成。有限元核心库实现了有限元程序所需的各类通用类与方法，仅依赖 Eigen 3.4 一个第三方库；程序生成工具基于 Jinja2 模板。希望此库可以像**创刀**一样随用随创，在使用中不断扩展出新的能力。
 
 ## 项目结构
 
 ```
-├── FEMproject/          # C++ 有限元程序
-│   ├── CDFEG/         # 有限元程序核心库 (DLL)
-│   │   ├── EleSubBase.h        # 单元子程序基类
-│   │   ├── IsoEleBase.h      # 等参元基类
-│   │   ├── EquationSystem.h   # 方程组求解
-│   │   ├── MatrixFun.h       # 常用的计算函数
-│   │   ├── PhyFieldData.h   # 物理场数据基类
-│   │   ├── DomainData.h        # 有限元空间域数据基类
-│   │   └── gidProPost.h    # GID前后处理接口
-│   └── sample/        # 示例程序
-├── pyTool/            # Python 代码生成工具
-    ├── MakerBase.py          # 代码生成器基类
-    ├── MakerCpp.py           # C++ 代码生成器（CMake）
-    ├── MakerGidFile.py       # GID 文件生成器
-    ├── DataProject.py        # 项目数据结构
-    ├── DataField.py          # 物理场数据结构
-    ├── DataEleSub.py         # 单元数据结构
-    ├── DataEleSubG.py        # 高斯积分单元数据结构
-    ├── DataSch.py            # 求解方案数据结构
-    ├── vtkCellType.py        # VTK单元类型
-    ├── test/                 # 测试用例
-    └── template/             # Jinja2 模板
-
+CDFEG/
+├── FEMproject/                 # C++ 有限元工程
+│   ├── CDFEG/                  # 有限元核心库 (DLL)
+│   │   ├── ElementBase.h       # 单元基类
+│   │   ├── IsoEleBase.h        # 等参元基类
+│   │   ├── PhyFieldData.h      # 物理场数据基类
+│   │   ├── DomainData.h        # 有限元域数据基类
+│   │   ├── EquationSystem.h    # 方程组（稀疏矩阵求解）
+│   │   ├── MatrixFun.h         # 矩阵运算工具
+│   │   ├── gidPrePost.h        # GiD 前后处理接口
+│   │   ├── inpReader.h         # Abaqus INP 读取
+│   │   └── vtkPost.h           # VTK 后处理
+│   ├── sample/                 # 示例集（7 个独立 CMake 子项目）
+│   │   ├── truss1D/2D/3D/      #   桁架静力（1D/2D/3D）
+│   │   ├── El2D/               #   平面应力静力
+│   │   ├── ElT3/               #   弹性力学（T3）
+│   │   ├── DEl2D/              #   Newmark-β 动力学
+│   │   └── Hel2D/              #   热弹耦合（温度场 + 位移场）
+│   └── third/Eigen/            # Eigen 3.4.0（header-only）
+├── pyTool/                     # Python 代码生成工具（Jinja2 模板）
+├── test/                       # 回归测试框架（pytest + SQLite 计时）
+├── DevTool/                    # 开发辅助工具
+└── docs/                       # 文档
 ```
 
 ## 核心库 CDFEG
 
-CDFEG  是一个有限元程序基础库，采用面向对象设计，支持单元类型扩展与多物理场分析。其数据以面向对象的方式组织：
-+ DomainData (有限元空间域数据)存储本域的有限元网格、材料属性等数据，其中中包含一个或多个PhyFieldData (物理场数据)
-+ PhyFieldData (物理场数据)存储一个物理场的，中包含一个或多个EleSubBase (单元子程序基类)
+CDFEG 是有限元基础库，采用面向对象**三层架构**，支持单元类型扩展与多物理场分析。数据按三层组织：
+
+- **DomainData**（域数据）：存储网格、材料、物理场集合与流程控制，包含一个或多个 PhyFieldData
+- **PhyFieldData**（物理场）：自由度编号、边界条件、方程组装/求解与后处理，包含一个或多个单元
+- **ElementBase**（单元）：`run()` 计算单刚/质量/阻尼/载荷，`uEle()` 后处理
 
 ### 类层次结构
 
 ```
-EleSubBase (单元子程序基类)
+ElementBase (单元基类)
     └── IsoEleBase (等参元基类)
 PhyFieldData (物理场数据)
-DomainData (有限元空间域数据)
+DomainData (域数据)
 EquationSystem (方程组求解)
 ```
 
@@ -50,153 +52,133 @@ EquationSystem (方程组求解)
 
 | 文件 | 功能 |
 |------|------|
-| `EleSubBase.h` | 单元子程序基类，定义 `run()` 接口计算单元刚度矩阵、质量矩阵、阻尼矩阵和外力向量；`uEle()` 用于后处理计算 |
-| `IsoEleBase.h` | 等参单元基类，提供形函数计算(`shapeFun`)、坐标转换(`coordTransFun`)、雅各比矩阵计算(`dcoor`)等核心功能 |
-| `EquationSystem.h` | 基于 Eigen 库的稀疏矩阵求解器，支持总刚组装、`addFirstBC()`/`addSecondBC()` 施加边界条件 |
-| `MatrixFun.h` | 矩阵运算工具库：行列式、逆矩阵、矩阵乘法、转置、向量运算、方向余弦计算等 |
-| `PhyFieldData.h` | 物理场数据管理，每个物理场包含若干单元类型；管理自由度编号与边界条件 |
-| `DomainData.h` | 有限元空间数据：节点坐标(`addNode`)、单元连接(`addEle`)、材料属性管理 |
-| `gidProPost.h` | GID 前后处理接口，支持网格导入与结果可视化 |
-| `InpDataStructures.h` | Abaqus INP 文件读取器 |
+| `ElementBase.h` | 单元基类，定义 `run()` 计算单元刚度/质量/阻尼/载荷、`uEle()` 后处理 |
+| `IsoEleBase.h` | 等参元基类，形函数(`shapeFun`)、坐标变换、雅可比(`dcoor`) |
+| `PhyFieldData.h` | 物理场：自由度编号、边界条件、`eProgram_el()` 装配总刚+右端、`solve()`、`uPhy()` |
+| `DomainData.h` | 域数据：节点(`addNode`)、单元(`addEle`)、材料本构(`_mateConstitutive`)、多场数据传递(`getCoef`) |
+| `EquationSystem.h` | 基于 Eigen 稀疏矩阵的方程组：总刚组装(`adda`)、一/二类边界、LDLT 求解 |
+| `MatrixFun.h` | 矩阵工具：行列式、逆、乘法、转置、方向余弦 |
+| `gidPrePost.h` | GiD 前后处理：读 `.dat`、写 `.post.res`/`.post.msh` |
+| `inpReader.h` | Abaqus INP 文件读取 |
+
+### 材料本构机制
+
+材料参数走**本构类型表**（不再使用 `_paramNames`）：
+
+- 单元构造里声明 `_mateTypeName`（本构类型名）与 `_types`（单元类型集合）
+- DomainData 用 `_mateConstitutive[本构名] = {参数名...}` 注册本构参数
+- `run()` 内 `matParams.at("参数名")` 按名取值（前处理按本构名从 dat 材料段回填）
+
+### 多物理场数据传递（`_coefNames`）
+
+耦合问题中，某物理场的单元需要读取其他场的结果（如热弹耦合：位移场读温度场）：
+
+- 物理场构造里声明依赖：`_coefNames[他场序号] = {"变量名"}`（例如 DelDisp 场 `_coefNames[0]={"T"}`）
+- 基类 `eProgram_el()` 按声明自动调用 `getCoef(nodeIds, _coefNames)` 取他场数据，以 `场名::变量名`（如 `Heat::T`）为键传入单元 `run()` 的 `coef`
+- 派生物理场**无需重写 `eProgram`** 手动装配 coef——线性椭圆场直接复用基类即可
 
 ### 开发示例：实现一维桁架单元
 
-基于核心库实现一个新的单元类型，典型工作流程如下：
-
-#### 1. 定义单元类（继承 EleSubBase）
+#### 1. 定义单元类（继承 ElementBase）
 
 ```cpp
 // Truss1D.h
-#include "CDFEG/EleSubBase.h"
-class Truss1D : public CDFEG::EleSubBase {
+#include "CDFEG/ElementBase.h"
+class Truss1D : public CDFEG::ElementBase {
 public:
     Truss1D(CDFEG::PhyFieldData* pData);
     CDFEG::EleSubResult& run(
-        const std::vector<double>& r,      // 节点坐标
-        const std::map<std::string, std::vector<double>>& coef,  // 形函数系数
-        const std::map<std::string, double>& matParams  // 材料参数
+        const std::vector<double>& r,                                    // 节点坐标
+        const std::map<std::string, std::vector<double>>& coef,          // 他场数据（单场问题可空）
+        const std::map<std::string, double>& matParams                   // 材料参数（按本构表回填）
     ) override;
-    CDFEG::uResult uEle(...) override;  // 后处理计算
+    CDFEG::uResult uEle(...) override;                                   // 后处理
 };
 ```
 
-#### 2. 实现单元计算逻辑
+#### 2. 实现单元计算（材料走本构表）
 
 ```cpp
 // Truss1D.cpp
-Truss1D::Truss1D(CDFEG::PhyFieldData* pData) 
-    : CDFEG::EleSubBase(2, pData) {
+Truss1D::Truss1D(CDFEG::PhyFieldData* pData)
+    : CDFEG::ElementBase(2, pData) {        // 2 = 节点数
     _name = "Truss1D";
     _dispNames = {"u"};
-    _paramNames = {"E", "A"};
+    _mateTypeName = "Truss";                // 本构类型名
     _types.insert("Truss1D");
 }
 
 CDFEG::EleSubResult& Truss1D::run(...) {
-    double E = matParams.at("E");
+    double E = matParams.at("E");           // 由本构表 "Truss" → {E, A} 回填
     double A = matParams.at("A");
-    double L = abs(r[0] - r[1]);
+    double L = std::abs(r[0] - r[1]);
     double X = E * A / L;
-    _result.estif = {X, -X, -X, X};  // 单元刚度矩阵
-    _result.eload = {0, 0};          // 单元外力向量
-    _result.nodeIds = {...};
+    _result.estif = {X, -X, -X, X};         // 单元刚度矩阵
+    _result.eload = {0, 0};                 // 单元载荷向量
     return _result;
 }
 ```
 
-#### 3. 定义物理场（继承 PhyFieldData）
+#### 3. 组装域数据并求解
 
 ```cpp
-// Truss1DDispFieldData.h
-class Truss1DDispFieldData : public CDFEG::PhyFieldData {
-public:
-    Truss1DDispFieldData(CDFEG::DomainData* femData);
-};
-```
-
-```cpp
-// Truss1DDispFieldData.cpp
-Truss1DDispFieldData::Truss1DDispFieldData(CDFEG::DomainData* femData)
-    : CDFEG::PhyFieldData(1, femData) {  // 1 = 每节点1个自由度
-    _name = "Truss1DDisp";
-    _dispNames = {"u"};
-    _eleSubs.push_back(new Truss1D(this));  // 注册单元类型
-    _eleResNames = {"T"};  // 输出结果名称：温度/应力
-}
-```
-
-#### 4. 定义数据类与执行计算
-
-```cpp
-// 定义数据类
 class Truss1DData : public CDFEG::DomainData {
 public:
     Truss1DData() {
         _dim = 1;
-        _phyDatas.push_back(new Truss1DDispFieldData(this));
+        auto* f = new CDFEG::PhyFieldData(1, this);   // 1 = 每节点 1 自由度
+        f->_name = "Truss1DDisp";
+        f->_dispNames = {"u"};
+        f->addEleSub(new Truss1D(f));                 // 注册单元
+        _phyDatas.push_back(f);
+        _mateConstitutive["Truss"] = {"E", "A"};      // 注册本构参数名
     }
     int caculate() {
-        auto* f = static_cast<Truss1DDispFieldData*>(_phyDatas[0]);
-        f->initMatrix();      // 初始化矩阵结构
-        f->eProgram_el();    // 组装总刚
-        f->solve();          // 求解方程
-        f->uPhy();           // 后处理
-        f->_equSys.calRightVals();  // 计算节点力
+        auto* f = _phyDatas[0];
+        f->initMatrix();      // 方程编号 + 稀疏骨架
+        f->eProgram_el();     // 装配总刚 + 右端项（含边界）
+        f->solve();           // LDLT 求解
+        f->uPhy();            // 后处理回填
         return 1;
     }
 };
-```
-
-#### 5. 创建模型与求解
-
-```cpp
-int main() {
-    Truss1DData data;
-    // 添加节点
-    data.addNode(1, 0.0);
-    data.addNode(2, 0.6);
-    data.addNodeEnd();
-    // 添加单元
-    data.addEle(1, {1, 2}, "Truss1D");
-    // 添加材料
-    data.addMate({{"E", 2e11}, {"A", 6e-4}});
-    data.setEleMateId(1, 0);
-    // 设置边界条件
-    auto* phydata = static_cast<Truss1DDispFieldData*>(data._phyDatas[0]);
-    phydata->setFirstBoundry(1, 0.0);   // 第一类边界: u=0
-    phydata->setSecondBoundry(2, 15000); // 第二类边界: q=15000
-    // 求解
-    data.caculate();
-    return 0;
-}
 ```
 
 ### 关键接口说明
 
 | 接口 | 作用 |
 |------|------|
-| `EleSubBase::run()` | 单元计算核心，返回单元刚度矩阵、阻尼矩阵、质量矩阵、外力向量 |
-| `EleSubBase::uEle()` | 后处理计算，如应力、应变 |
-| `PhyFieldData::eProgram_el()` | 组装总刚矩阵与右端项 |
-| `PhyFieldData::solve()` | 求解方程组 |
-| `DomainData::addNode()` | 添加节点 |
-| `DomainData::addEle()` | 添加单元 |
+| `ElementBase::run()` | 单元计算，返回单刚/质量/阻尼/载荷 |
+| `ElementBase::uEle()` | 后处理（应力、应变等） |
+| `PhyFieldData::eProgram_el()` | 线性椭圆问题装配总刚+右端（含 eload、边界、`_coefNames` 多场数据） |
+| `PhyFieldData::solve()` | LDLT 求解 |
+| `PhyFieldData::uPhy()` | 回填节点结果 + 单元后处理 |
+| `DomainData::getCoef()` | 多场数据传递（按 `_coefNames` 取他场结果） |
+| `DomainData::addNode()/addEle()` | 建立网格 |
 
+## 回归测试
+
+`test/` 是基于 pytest 的回归测试框架，端到端验证各示例（构建 → 运行 → 对比基准，判据 `max|Δ|`），并含 Catch2 单元测试：
+
+```bash
+python test/run_tests.py                            # 跑 e2e + unit（默认）
+python test/run_tests.py --suite e2e --case hel2d1  # 单个用例
+python test/run_tests.py --timing-list e2e.hel2d1   # 查某用例历史耗时
+```
+
+框架自动把每个用例的耗时（不含编译）写入 SQLite（`test/timing.db`），并与同用例上次 `pass` 对比做**性能回归检测**（阈值 5%，仅告警 `⚠`、不影响退出码）。
 
 ## 编译
 
-### CMake
-
-使用 `MakerCpp`（`mode='new'`）生成的项目自带 CMakeLists.txt，编译方式：
+### CMake（MinGW）
 
 ```bash
-mkdir build && cd build
-cmake .. -G "MinGW Makefiles"   # 或其他生成器
-cmake --build .
+cmake -B build -G "MinGW Makefiles" \
+      -DCMAKE_MAKE_PROGRAM=C:/dev/mingw64/bin/mingw32-make.exe
+cmake --build build --target <示例名> -j
 ```
 
-也可通过 `mode='add'` 将新项目追加到现有解决方案的 CMakeLists.txt 中。
-
+可执行程序与全部 DLL（含第三方运行时）统一输出到 `build/out/Release` 或 `build/out/Debug`。源文件 UTF-8 编码，MSVC 需 `/utf-8`。
 
 ## Python 代码生成工具
 
@@ -214,8 +196,10 @@ maker = MakerBase()
 maker.write2File("element.cpp.j2", "Truss2D.cpp", ele.toDict())
 ```
 
+---
+
 想获得商业授权或更多帮助，请联系作者。
 
 # 联系方式
 
-<img src="picture\weixin.png" style="zoom: 33%;" />
+<img src="picture/weixin.png" style="zoom: 33%;" />
