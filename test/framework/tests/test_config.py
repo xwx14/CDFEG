@@ -45,3 +45,27 @@ def test_load_config_reads_e2e_cases(tmp_path):
     c = cfg.suite_e2e()[0]
     assert c["name"] == "del2d1"
     assert c["tol_atol"] == 1e-12
+
+
+def test_load_config_reads_timing(tmp_path):
+    cfg_file = tmp_path / "config.toml"
+    cfg_file.write_text(
+        '[timing]\n'
+        'enabled = true\n'
+        'db_path = "test/timing.db"\n'
+        'regress_threshold = 0.05\n',
+        encoding="utf-8",
+    )
+    cfg = load_config(cfg_file)
+    assert cfg.timing.enabled is True
+    assert cfg.timing.db_path == "test/timing.db"
+    assert cfg.timing.regress_threshold == 0.05
+
+
+def test_load_config_timing_defaults_when_absent(tmp_path):
+    cfg_file = tmp_path / "config.toml"
+    cfg_file.write_text('[toolchain]\n', encoding="utf-8")
+    cfg = load_config(cfg_file)
+    assert cfg.timing.enabled is True
+    assert cfg.timing.db_path == "test/timing.db"
+    assert cfg.timing.regress_threshold == 0.05

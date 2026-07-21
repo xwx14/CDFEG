@@ -119,3 +119,8 @@ default_in_all = false
 
 [suite.analytical]
 cases = [ { name = "placeholder", skip = true } ]
+
+[timing]
+enabled = true
+db_path = "test/timing.db"
+regress_threshold = 0.05

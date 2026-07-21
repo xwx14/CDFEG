@@ -19,6 +19,13 @@ class Toolchain:
     dll_dirs: list[str] = field(default_factory=list)
 
 
+@dataclass
+class TimingConfig:
+    enabled: bool = True
+    db_path: str = "test/timing.db"
+    regress_threshold: float = 0.05
+
+
 class Config:
     def __init__(self, raw: dict, base_dir: Path):
         self._raw = raw
@@ -31,6 +38,12 @@ class Config:
             output_subdir=tc.get("output_subdir", "output"),
             make_program=tc.get("make_program", ""),
             dll_dirs=tc.get("dll_dirs", []),
+        )
+        tm = raw.get("timing", {})
+        self.timing = TimingConfig(
+            enabled=tm.get("enabled", True),
+            db_path=tm.get("db_path", "test/timing.db"),
+            regress_threshold=float(tm.get("regress_threshold", 0.05)),
         )
 
     def suite_e2e(self) -> list[dict]:
