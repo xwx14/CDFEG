@@ -9,6 +9,8 @@
 """
 import argparse
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
 
 TEST_DIR = Path(__file__).resolve().parent
@@ -20,6 +22,7 @@ from framework.tolerance import Tolerance
 from framework.builder import Builder
 from framework.case import E2ECase, UnitCase, GeneratorCase, AnalyticalCase, SkipCase
 from framework.report import aggregate
+from framework.timing import TimingDb, detect_regress, git_short_commit
 
 
 def build_cases(cfg, args):
@@ -75,6 +78,32 @@ def _resolve_suites(args):
     return [args.suite]
 
 
+def persist_timing(db, results, threshold, run_id, ts, git_commit):
+    """先查上次 pass → 回归检测 → 批量写入。顺序固定，避免查到本次自身。"""
+    for r in results:
+        if r.status == "pass" and r.secs > 0:
+            last = db.last_pass_secs(r.name)
+            reg, detail = detect_regress(r.secs, last, threshold)
+            if reg:
+                r.timing_regress = True
+                r.timing_detail = detail
+    for r in results:
+        db.insert(r, run_id=run_id, ts=ts, git_commit=git_commit)
+
+
+def format_timing_list(case_name, rows):
+    """rows: iterable of (ts, status, secs, git_commit)。"""
+    lines = [f"=== {case_name} 历史耗时 ==="]
+    rows = list(rows)
+    if not rows:
+        lines.append("（无记录）")
+        return "\n".join(lines)
+    lines.append(f"{'TS':<22} {'STATUS':<8} {'SECS':<8} GIT")
+    for ts, status, secs, git_commit in rows:
+        lines.append(f"{ts:<22} {status:<8} {secs:<8.2f} {git_commit or ''}")
+    return "\n".join(lines)
+
+
 def main():
     ap = argparse.ArgumentParser(description="CDFEG 测试系统")
     ap.add_argument("--suite", default="all", choices=["all", "e2e", "unit", "generator", "analytical"])
@@ -82,6 +111,7 @@ def main():
     ap.add_argument("--rebuild", action="store_true", help="强制重新 cmake configure")
     ap.add_argument("-v", "--verbose", action="store_true")
     ap.add_argument("--update", default=None, help="刷新指定 e2e 用例基准（Task 13）")
+    ap.add_argument("--timing-list", default=None, help="列出指定用例的历史耗时记录")
     args = ap.parse_args()
 
     if args.update:
@@ -90,11 +120,27 @@ def main():
         return update_baseline(cfg, args.update, PROJ_ROOT)
 
     cfg = load_config(TEST_DIR / "config.toml")
+    if args.timing_list:
+        db = TimingDb(PROJ_ROOT / cfg.timing.db_path)
+        db.init()
+        rows = db.list_history(args.timing_list)
+        print(format_timing_list(args.timing_list, rows))
+        return 0
     cases, _ = build_cases(cfg, args)
     if not cases:
         print("无匹配用例")
         return 0
     results = [c.run(None) for c in cases]
+
+    if cfg.timing.enabled:
+        run_id = time.strftime("%Y%m%d_%H%M%S")
+        ts = datetime.now().isoformat(timespec="seconds")
+        commit = git_short_commit()
+        db = TimingDb(PROJ_ROOT / cfg.timing.db_path)
+        db.init()
+        persist_timing(db, results, cfg.timing.regress_threshold,
+                       run_id=run_id, ts=ts, git_commit=commit)
+
     return aggregate(results)
 
 
