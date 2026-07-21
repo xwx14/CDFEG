@@ -19,24 +19,31 @@ def aggregate(results: list[CaseResult]) -> int:
 
 def print_report(results: list[CaseResult]):
     print("\n" + "=" * 70)
-    print(f"{'CASE':<28} {'STATUS':<8} {'METRIC'}")
+    print(f"{'CASE':<28} {'STATUS':<8} {'METRIC':<22} {'TIME(s)'}")
     print("-" * 70)
     for r in results:
         metric_str = ""
         if r.status == "pass" and r.metric.get("max_abs_err") is not None:
             metric_str = f"max|Δ|={r.metric['max_abs_err']:.2e}"
-        elif r.status == "fail":
-            metric_str = r.detail[:40]
-        elif r.status == "error":
-            metric_str = r.detail[:40]
-        print(f"{r.name:<28} {r.status:<8} {metric_str}")
+        elif r.status in ("fail", "error"):
+            metric_str = r.detail[:20]
+        time_str = f"{r.secs:.2f}" if r.secs > 0 else ""
+        print(f"{r.name:<28} {r.status:<8} {metric_str:<22} {time_str}")
     print("=" * 70)
     n_pass = sum(1 for r in results if r.status == "pass")
     n_fail = sum(1 for r in results if r.status == "fail")
     n_err = sum(1 for r in results if r.status == "error")
     n_skip = sum(1 for r in results if r.status == "skip")
+    total_secs = sum(r.secs for r in results)
     print(f"合计: {n_pass} pass / {n_fail} fail / {n_err} error / {n_skip} skip")
+    print(f"总耗时: {total_secs:.2f}s")
     # 失败详情
     for r in results:
         if r.status in ("fail", "error") and r.detail:
             print(f"\n[{r.status.upper()}] {r.name}\n      {r.detail}")
+    # 性能回归（仅告警，不影响退出码）
+    regress = [r for r in results if r.timing_regress]
+    if regress:
+        print("\n⚠ 性能回归:")
+        for r in regress:
+            print(f"      {r.name}  {r.timing_detail}")
