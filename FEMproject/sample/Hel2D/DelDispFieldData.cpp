@@ -13,82 +13,11 @@ DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     _eleSubs.push_back(new DelQ4g(this));
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
     _resForm = "Vector OnNodes";
+    _coefNames[0] = { "T" }; // 需要从 Heat 场取温度
 }
 
 DelDispFieldData::~DelDispFieldData() {
 
-}
-
-// 取 Heat 场（_phyDatas[0]）的节点温度，按 nodeIds 构造 coef["T"]
-static void fillTempCoef(CDFEG::DomainData* femData,
-                         const std::vector<int>& nodeIds,
-                         std::map<std::string, std::vector<double>>& coef)
-{
-    CDFEG::PhyFieldData* heatField = femData->_phyDatas[0];
-    auto it = heatField->_nodeRes.find("T");
-    if (it == heatField->_nodeRes.end()) return;
-    const std::vector<double>& Tres = it->second;
-    std::vector<double> T;
-    T.reserve(nodeIds.size());
-    for (int nid : nodeIds)
-        T.push_back((nid >= 0 && nid < (int)Tres.size()) ? Tres[nid] : 0.0);
-    coef["T"] = std::move(T);
-}
-
-// E 程序：组装弹性总刚 + 体力/热载荷 → 右端项
-int DelDispFieldData::eProgram()
-{
-    std::fill(_equSys._data.begin(), _equSys._data.end(), 0.0);
-    std::fill(_equSys._f.begin(), _equSys._f.end(), 0.0);
-
-    int dim = _femData->_dim;
-    int nEleSub = _eleSubs.size();
-    for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
-    {
-        CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
-        int nNode = eleSub->getnNodesPerEle();
-        int k = nNode * _dof;
-
-        for (int eleID : eleSub->_eleIds)
-        {
-            std::vector<double> r;
-            std::vector<int> nodeIds;
-            for (int i = _femData->_elePt[eleID]; i < _femData->_elePt[eleID + 1]; ++i)
-            {
-                int nodeId = _femData->_eleNodes[i];
-                nodeIds.push_back(nodeId);
-                int iCoor = dim * nodeId;
-                for (int iDim = 0; iDim < dim; ++iDim)
-                    r.push_back(_femData->_nodes[iCoor + iDim]);
-            }
-            const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
-            // 取 Heat 场温度构造 coef["T"]，供 DelQ4g::run 计算热载荷
-            std::map<std::string, std::vector<double>> coef;
-            fillTempCoef(_femData, nodeIds, coef);
-            CDFEG::EleSubResult& outData = eleSub->run(r, coef, matParams);
-
-            std::vector<int> lm;
-            for (int nodi : nodeIds)
-            {
-                int iStart = nodi * _dof;
-                for (int iDof = 0; iDof < _dof; ++iDof)
-                    lm.push_back(_ida[iStart + iDof]);
-            }
-
-            _equSys.adda(outData.estif, lm);
-
-            // eload（体力 + 热载荷）→ 右端项 _f
-            for (int i = 0; i < k; ++i)
-            {
-                int inv = lm[i];
-                if (inv >= 0) _equSys._f[inv] += outData.eload[i];
-            }
-        }
-    }
-    _equSys._bSavedData0 = false;
-    _equSys.applyFirstBCs(_nodeBC1s, _ida);
-    _equSys.applySecondBCs(_nodeBC2s, _ida);
-    return 1;
 }
 
 // u 程序：回填位移 + 应力恢复（应力在位移场后处理计算）
@@ -139,8 +68,6 @@ int DelDispFieldData::uPhy()
                 for (int iDim = 0; iDim < dim; ++iDim)
                     r.push_back(_femData->_nodes[iCoor + iDim]);
             }
-            // 追加温度 coef["T"]（供 DelQ4g::uEle 扣除热项）
-            fillTempCoef(_femData, nodeIds, coef);
             const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
             CDFEG::uResult res = eleSub->uEle(r, coef, matParams);
 

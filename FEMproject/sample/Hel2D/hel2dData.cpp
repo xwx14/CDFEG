@@ -29,7 +29,7 @@ int hel2dData::caculate() {
     heatField->uPhy();
 
     // b 场（DelDisp）：组装弹性总刚 + 体力/热载荷（取温度）→ 求解位移 → 回填位移 + 应力
-    delField->eProgram();
+    delField->eProgram_el();
     delField->solve();
     delField->uPhy();
 

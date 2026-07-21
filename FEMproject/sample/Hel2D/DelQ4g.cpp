@@ -67,7 +67,7 @@ CDFEG::EleSubResult& DelQ4g::run(
     double shear = 0.5 - pv;
 
     // 节点温度（由 Heat 场经 coef 传入）
-    const std::vector<double>& T = coef.at("T");
+    const std::vector<double>& T = coef.at("Heat::T");
 
     for (int iGaus = 0; iGaus < _nGaus; ++iGaus)
     {

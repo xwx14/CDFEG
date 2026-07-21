@@ -108,6 +108,8 @@ namespace CDFEG {
 		 */
 		std::vector<double> getNodeDisps(const std::vector<int>& nodeIds);
 		std::vector<double> getNodeDisps(const std::vector<int>& nodeIds, int iDof);
+		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
+		double getParam(const std::string& group, const std::string& param) const;
 	public:
 		std::string _name;
 		std::string _resForm;
@@ -150,8 +152,8 @@ namespace CDFEG {
 		std::vector<std::vector<std::string>> _addParams;
 		// 从前处理读回的参数值，key=组名，value 按该组 _addParams 参数名顺序对齐
 		std::map<std::string, std::vector<double>> _paramValues;
-		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
-		double getParam(const std::string& group, const std::string& param) const;
+		// 记录所需的其他场的数据，key为场号，value为场内数据名序列
+		std::map<int,std::vector<std::string>> _coefNames;
 	};
 }
 #endif

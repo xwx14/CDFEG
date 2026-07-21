@@ -67,7 +67,10 @@ namespace CDFEG {
 				}
 				const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
 				std::map<std::string, std::vector<double>> coef;
-				//coef = getCoef(nodeIds);
+				if(_femData&&_coefNames.size()>0)
+				{
+					coef=_femData->getCoef(nodeIds, _coefNames);
+				}
 				CDFEG::EleSubResult& outData = eleSub->run(r, coef, matParams);
 				std::vector<double>& estifn = outData.estif;
 				// ida和u中的序号
