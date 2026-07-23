@@ -101,7 +101,7 @@ namespace CDFEG {
 			return "Triangle";
 		}
 	}
-	GidPrePost::GidPrePost(DomainData* data) :Processor(data,nullptr)
+	GidPrePost::GidPrePost(DomainData* data) :Processor(data)
 	{
 		for (PhyFieldData* f : _femData->_phyDatas)
 		{

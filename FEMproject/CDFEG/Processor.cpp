@@ -17,10 +17,10 @@
 #include "PhyFieldData.h"
 #include "DomainData.h"
 namespace CDFEG {
-	Processor::Processor(DomainData* data, PhyFieldData* fieldData)
+	Processor::Processor(DomainData* data)
 	{
 		_femData = data;
-		_phyFieldData = fieldData;
+		_femData->_processors.push_back(this);
 	}
 
 	int Processor::pre()

@@ -24,7 +24,7 @@
 namespace CDFEG {
 
 inpReader::inpReader(DomainData* data, PhyFieldData* fieldData)
-    : Processor(data, fieldData)
+    : Processor(data)
     , _hasPartAssembly(false)
     , _logLevel(1)
 {
@@ -782,28 +782,28 @@ void inpReader::convertToDomainData()
     }
     
     // 转换边界条件到PhyFieldData
-    if (_phyFieldData) {
-        for (const InpBoundary& bc : _boundaries) {
-            // 查找节点集
-            // std::map<std::string, InpNodeSet>::iterator
-            auto nsetIt = _nodeSets.find(bc.nodeSetName);
-            if (nsetIt != _nodeSets.end()) {
-                for (int nodeId : nsetIt->second.nodeIds) {
-                    // std::map<int, int>::iterator
-                    auto nodeMapIt = _femData->_nodeIdMap.find(nodeId);
-                    if (nodeMapIt != _femData->_nodeIdMap.end()) {
-                        int internalNodeId = nodeMapIt->second;
-                        for (const auto& compPair : bc.components) {
-                            int dof = compPair.first;
-                            double value = compPair.second;
-                            // 设置边界条件
-                            //_phyFieldData->addTypeIBC(internalNodeId, dof - 1, value);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //if (_phyFieldData) {
+    //    for (const InpBoundary& bc : _boundaries) {
+    //        // 查找节点集
+    //        // std::map<std::string, InpNodeSet>::iterator
+    //        auto nsetIt = _nodeSets.find(bc.nodeSetName);
+    //        if (nsetIt != _nodeSets.end()) {
+    //            for (int nodeId : nsetIt->second.nodeIds) {
+    //                // std::map<int, int>::iterator
+    //                auto nodeMapIt = _femData->_nodeIdMap.find(nodeId);
+    //                if (nodeMapIt != _femData->_nodeIdMap.end()) {
+    //                    int internalNodeId = nodeMapIt->second;
+    //                    for (const auto& compPair : bc.components) {
+    //                        int dof = compPair.first;
+    //                        double value = compPair.second;
+    //                        // 设置边界条件
+    //                        //_phyFieldData->addTypeIBC(internalNodeId, dof - 1, value);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 } // namespace CDFEG

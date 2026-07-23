@@ -19,7 +19,7 @@
 #include "PhyFieldData.h"
 #include "DomainData.h"
 namespace CDFEG {
-	vtkPost::vtkPost(DomainData* data, PhyFieldData* fieldData):Processor(data, fieldData)
+	vtkPost::vtkPost(DomainData* data):Processor(data)
 	{
 
 	}
@@ -124,7 +124,23 @@ namespace CDFEG {
 			}
 		}
 		ofs << "      </PointData>" << std::endl;
-		//todo:  输出单元数据
+		// 输出单元数据（每单元1个标量值，取自各物理场 _elemRes，按 _eleResNames 遍历）
+		ofs << "      <CellData>" << std::endl;
+		for (PhyFieldData* p : _femData->_phyDatas)
+		{
+			for (const std::string& name : p->_eleResNames) {
+				ofs << "        <DataArray type=\"Float64\" Name=\"" << name << "\" format=\"ascii\">" << std::endl;
+				ofs << "          ";
+				for (int iEle = 0; iEle < nEle; iEle++)
+				{
+					ofs << p->_elemRes[name][iEle];
+					if (iEle < nEle - 1) ofs << " ";
+				}
+				ofs << std::endl;
+				ofs << "        </DataArray>" << std::endl;
+			}
+		}
+		ofs << "      </CellData>" << std::endl;
 		
 		// 关闭标签
 		ofs << "    </Piece>" << std::endl;

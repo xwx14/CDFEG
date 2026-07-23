@@ -20,6 +20,7 @@
 #include <map>
 #include "Truss2DDispFieldData.h"
 #include "Truss2DData.h"
+#include "CDFEG/vtkPost.h"
 int makeData(Truss2DData& data) {
     // 节点信息
     data.addNode(1, 0.0, 0.0);
@@ -63,7 +64,8 @@ int main() {
     std::map<int, int> nodeProgToFile;
     for (const auto& it : data._nodeIdMap)
         nodeProgToFile[it.second] = it.first;
-
+    CDFEG::vtkPost vtkpost(&data);
+    vtkpost.post();
     std::ofstream fout("Truss2D.txt");
     fout << std::setprecision(6) << std::fixed;
     fout << "========== 节点位移 ==========" << std::endl;

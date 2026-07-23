@@ -32,7 +32,7 @@ namespace CDFEG {
 	class CDFEG_API Processor
 	{
 	public:
-		Processor(DomainData* data, PhyFieldData* fieldData);
+		Processor(DomainData* data);
 		virtual~Processor();
 		/**
 		 * @brief 前处理
@@ -49,7 +49,6 @@ namespace CDFEG {
 
 	public:
 		DomainData* _femData;
-		PhyFieldData* _phyFieldData;
 		bool _bNeedTime = false;
 		int _nPts = 0;
 		int _nEles = 0;

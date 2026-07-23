@@ -20,6 +20,7 @@
 #include <map>
 #include "Truss1DDispFieldData.h"
 #include "Truss1DData.h"
+#include "CDFEG/vtkPost.h"
 int makeData(Truss1DData& data1) {
     // TODO: 添加测试数据
 	// 节点信息
@@ -57,7 +58,8 @@ int main() {
     Truss1DData data;
     makeData(data);
     data.caculate();
-
+	CDFEG::vtkPost vtkpost(&data);
+	vtkpost.post();
     Truss1DDispFieldData* phy = static_cast<Truss1DDispFieldData*>(data._phyDatas[0]);
 
     std::map<int, int> nodeProgToFile;
