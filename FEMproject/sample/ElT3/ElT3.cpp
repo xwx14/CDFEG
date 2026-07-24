@@ -98,21 +98,28 @@ CDFEG::uResult ElT3::uEle(
     const auto& u = coef.at("u");
     const auto& v = coef.at("v");
     double disp[6] = { u[0], v[0], u[1], v[1], u[2], v[2] };
-    double ll;
+    // 常应变三角形：应力在整个单元内为常数
+    const char* stressNames[3] = { "Sxx", "Syy", "Sxy" };
+    double sigma[3] = { 0.0, 0.0, 0.0 };
     for (int i = 0; i < 3; i++) {
-        double stress_i = 0;
         for (int k = 0; k < 6; k++) {
             double DB_val = 0;
             for (int m = 0; m < 3; m++) {
                 DB_val += D[i][m] * Bmat[m][k];
             }
-            ll= DB_val * disp[k];
-            stress_i +=ll;
+            sigma[i] += DB_val * disp[k];
         }
-        if (i == 0) res.eleResult["Sxx"] = stress_i;
-        else if (i == 1) res.eleResult["Syy"] = stress_i;
-        else res.eleResult["Sxy"] = stress_i;
+        res.eleResult[stressNames[i]] = sigma[i];
     }
+
+    // 节点应力外推：常应变→3 节点应力相同；nodeResult 存"已乘权"的应力贡献（与 ElT3g 约定一致，
+    // uPhy 再做 sum(σ·w)/sum(w) 加权平均），权 = ∫N_i dA = Area/3（线性形函数）
+    double w = Area / 3.0;
+    for (int i = 0; i < 3; ++i) {
+        double sw = sigma[i] * w;
+        res.nodeResult[stressNames[i]] = { sw, sw, sw };
+    }
+    res.nodeResult["weight"] = { w, w, w };
 
     return res;
 }

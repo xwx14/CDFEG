@@ -12,19 +12,16 @@ Values
          8                5.0000000e-04 -3.0000000e-04
          9                1.0000000e-03 -3.0000000e-04
 End Values
-GaussPoints "GP_ElT3" ElemType Triangle
-Number Of Gauss Points: 1
-Natural Coordinates: Internal
-End GaussPoints
-Result "stress" "Load Analysis"           1 Vector:3 OnGaussPoints "GP_ElT3"
+Result "stress" "Load Analysis"           1 Matrix OnNodes
 ComponentNames "Sxx" "Syy" "Sxy" 
 Values
          1                1.0000000e+03 0.0000000e+00 0.0000000e+00
          2                1.0000000e+03 0.0000000e+00 0.0000000e+00
          3                1.0000000e+03 0.0000000e+00 0.0000000e+00
          4                1.0000000e+03 0.0000000e+00 0.0000000e+00
-         5                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         5                1.0000000e+03 -1.8947806e-14 9.4739031e-15
          6                1.0000000e+03 0.0000000e+00 0.0000000e+00
          7                1.0000000e+03 0.0000000e+00 0.0000000e+00
-         8                1.0000000e+03 -1.1368684e-13 5.6843419e-14
+         8                1.0000000e+03 -3.7895613e-14 1.8947806e-14
+         9                1.0000000e+03 -5.6843419e-14 2.8421709e-14
 End Values
