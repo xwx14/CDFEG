@@ -66,16 +66,14 @@ void DelDispFieldData::setNewmarkParams(double gamma, double beta, double dt)
 void DelDispFieldData::calcNewmarkConstants()
 {
     // 标准 Newmark-β 积分常数
-    double o = _gamma;
-    double aa = _beta;
-    _a0 = 1.0 / (_dt * _dt * aa);
-    _a1 = o / (aa * _dt);
-    _a2 = 1.0 / (aa * _dt);
-    _a3 = 1.0 / (2.0 * aa) - 1.0;
-    _a4 = o / aa - 1.0;
-    _a5 = _dt / 2.0 * (o / aa - 2.0);
-    _a6 = _dt * (1.0 - o);
-    _a7 = _dt * o;
+    _a0 = 1.0 / (_dt * _dt * _beta);
+    _a1 = _gamma / (_beta * _dt);
+    _a2 = 1.0 / (_beta * _dt);
+    _a3 = 1.0 / (2.0 * _beta) - 1.0;
+    _a4 = _gamma / _beta - 1.0;
+    _a5 = _dt / 2.0 * (_gamma / _beta - 2.0);
+    _a6 = _dt * (1.0 - _gamma);
+    _a7 = _dt * _gamma;
 }
 
 void DelDispFieldData::setInitialDisp(int nodeId, double u, double v)

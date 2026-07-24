@@ -23,12 +23,12 @@ from DataEleSub import DataEleSub
 from MakerCpp import MakerCpp
 
 # 总体数据
-project = DataProject("Truss2D",2)
+project = DataProject("Truss3D",3)
 # 物理场
-field = DataField("Truss2DDisp")
+field = DataField("Truss3DDisp")
 # 单元子程序
-ele = DataEleSub("Truss2D")
-ele.dispNames=["u","v"]
+ele = DataEleSub("Truss3D")
+ele.dispNames=["u","v","w"]
 ele.eleResNames=["T"]
 ele.paramNames=["E","A"]
 # 添加单元
@@ -36,6 +36,6 @@ field.addEleSub(ele)
 # 添加场
 project.addField(field)
 # 生成器
-outPath="sample/truss2D"
+outPath="sample/truss3D"
 maker=MakerCpp(project,outPath)
 maker.makeAll()

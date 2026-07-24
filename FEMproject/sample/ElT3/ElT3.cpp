@@ -1,17 +1,17 @@
 #include "ElT3.h"
+#include "CDFEG/MatrixFun.h"
 #include "ElasticT3Data.h"
 #include "Elastic2DDispFieldData.h"
 #include <cmath>
 #include <vector>
 
-static void calcBD(double b1, double b2, double b3,
-                   double c1, double c2, double c3,
-                   double E, double nu,
-                   double D[3][3]) {
+static std::vector<std::vector<double>> calcBD(double E, double nu) {
     double coeff = E / (1.0 - nu * nu);
-    D[0][0] = coeff;            D[0][1] = coeff * nu;      D[0][2] = 0;
-    D[1][0] = coeff * nu;       D[1][1] = coeff;           D[1][2] = 0;
-    D[2][0] = 0;                D[2][1] = 0;               D[2][2] = coeff * (1.0 - nu) / 2.0;
+    return {
+        { coeff,      coeff * nu, 0                        },
+        { coeff * nu, coeff,      0                        },
+        { 0,          0,          coeff * (1.0 - nu) / 2.0 }
+    };
 }
 
 ElT3::ElT3(CDFEG::PhyFieldData* pData)
@@ -45,29 +45,18 @@ CDFEG::EleSubResult& ElT3::run(
     double fx = matParams.at("fx");
     double fy = matParams.at("fy");
 
-    double D[3][3];
-    calcBD(b1, b2, b3, c1, c2, c3, E, nu, D);
+    auto D = calcBD(E, nu);
 
     double inv2A = 1.0 / (2.0 * Area);
-    double Bmat[3][6] = {
+    std::vector<std::vector<double>> Bmat = {
         { b1*inv2A, 0,        b2*inv2A, 0,        b3*inv2A, 0        },
         { 0,        c1*inv2A, 0,        c2*inv2A, 0,        c3*inv2A },
         { c1*inv2A, b1*inv2A, c2*inv2A, b2*inv2A, c3*inv2A, b3*inv2A }
     };
 
+    // 单元刚度矩阵 Ke = t * Area * B^T * D * B（行主序一维，直接写入 estif）
     int n = 6;
-    _result.estif.assign(n * n, 0.0);
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 6; j++) {
-            double val = 0;
-            for (int k = 0; k < 3; k++) {
-                for (int m = 0; m < 3; m++) {
-                    val += Bmat[k][i] * D[k][m] * Bmat[m][j];
-                }
-            }
-            _result.estif[i * n + j] = t * Area * val;
-        }
-    }
+    _result.estif = CDFEG::computeBTDB(t * Area, Bmat, D);
 
     _result.eload.resize(n, 0.0);
     for (int i = 0; i < 3; i++) {
@@ -97,11 +86,10 @@ CDFEG::uResult ElT3::uEle(
     double E = matParams.at("E");
     double nu = matParams.at("nu");
 
-    double D[3][3];
-    calcBD(b1, b2, b3, c1, c2, c3, E, nu, D);
+    auto D = calcBD(E, nu);
 
     double inv2A = 1.0 / (2.0 * Area);
-    double Bmat[3][6] = {
+    std::vector<std::vector<double>> Bmat = {
         { b1*inv2A, 0,        b2*inv2A, 0,        b3*inv2A, 0        },
         { 0,        c1*inv2A, 0,        c2*inv2A, 0,        c3*inv2A },
         { c1*inv2A, b1*inv2A, c2*inv2A, b2*inv2A, c3*inv2A, b3*inv2A }

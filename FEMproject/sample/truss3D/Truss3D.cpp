@@ -39,19 +39,15 @@ CDFEG::EleSubResult& Truss3D::run(
 ) {
     double E = matParams.at("E");
     double A = matParams.at("A");
-
     // 计算3D方向余弦
     std::array<double, 4> dirVal = CDFEG::calcDir3D2(r);
     double l = dirVal[0];  // cos(alpha) - x方向
     double m = dirVal[1];  // cos(beta) - y方向
     double n = dirVal[2];  // cos(gamma) - z方向
     double L = dirVal[3];  // 单元长度
-
     // 预计算系数
     double EA_L = A * E / L;
-
     // 3D桁架单元刚度矩阵 (6x6)
-    // 节点顺序: [u1, v1, w1, u2, v2, w2]
     _result.estif = {
         EA_L * l * l,     EA_L * l * m,     EA_L * l * n,    -EA_L * l * l,    -EA_L * l * m,    -EA_L * l * n,
         EA_L * m * l,     EA_L * m * m,     EA_L * m * n,    -EA_L * m * l,    -EA_L * m * m,    -EA_L * m * n,
@@ -60,9 +56,7 @@ CDFEG::EleSubResult& Truss3D::run(
        -EA_L * m * l,    -EA_L * m * m,    -EA_L * m * n,     EA_L * m * l,     EA_L * m * m,     EA_L * m * n,
        -EA_L * n * l,    -EA_L * n * m,    -EA_L * n * n,     EA_L * n * l,     EA_L * n * m,     EA_L * n * n
     };
-
     _result.eload.resize(6, 0.0);
-
     if (_bSaveResult) _results.push_back(_result);
     return _result;
 }

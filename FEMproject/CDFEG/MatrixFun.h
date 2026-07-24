@@ -184,6 +184,36 @@ namespace CDFEG {
 	 */
 	CDFEG_API std::array<double, 4> calcDir3D2(const std::vector<double>& r);
 
+	/**
+	 * @brief 计算单元刚度矩阵 Ke = scalar * B^T * D * B（行主序一维）
+	 * @param scalar 标量系数（如厚度 t、或 t*Area 等组合系数）
+	 * @param B 应变-位移矩阵 (kB × nB)
+	 * @param D 本构矩阵 (kB × kB)
+	 * @return 行主序一维刚度矩阵（长度 nB*nB，[i*nB+j] 即 Ke_ij）
+	 * @author Xie Wenxi
+	 * @date 2026-7-24
+	 */
+	CDFEG_API std::vector<double> computeBTDB(
+		double scalar,
+		const std::vector<std::vector<double>>& B,
+		const std::vector<std::vector<double>>& D
+	);
+
+	/**
+	 * @brief 计算单元刚度矩阵 Ke = scalar * B^T * D * B（二维）
+	 * @param scalar 标量系数（如厚度 t、或 t*Area 等组合系数）
+	 * @param B 应变-位移矩阵 (kB × nB)
+	 * @param D 本构矩阵 (kB × kB)
+	 * @return 二维刚度矩阵 (nB × nB)
+	 * @author Xie Wenxi
+	 * @date 2026-7-24
+	 */
+	CDFEG_API std::vector<std::vector<double>> computeBTDBy(
+		double scalar,
+		const std::vector<std::vector<double>>& B,
+		const std::vector<std::vector<double>>& D
+	);
+
 	CDFEG_API std::vector<std::vector<double>> multiplyTAT(
 		const std::vector<std::vector<double>>& T,
 		const std::vector<std::vector<double>>& A

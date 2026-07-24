@@ -19,7 +19,7 @@
 #include "Processor.h"
 
 namespace CDFEG {
-    class vtkPost :
+    class CDFEG_API vtkPost :
         public Processor
     {
         public:

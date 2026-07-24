@@ -287,6 +287,55 @@ namespace CDFEG {
 		return multiply(TtA, T);
 	}
 
+	// 计算单元刚度矩阵 Ke = scalar * B^T * D * B（行主序一维）
+	std::vector<double> computeBTDB(
+		double scalar,
+		const std::vector<std::vector<double>>& B,
+		const std::vector<std::vector<double>>& D
+	) {
+		if (B.empty() || D.empty()) return {};
+
+		int kB = B.size();          // B 的行数（应变分量数）
+		int nB = B[0].size();       // B 的列数（节点自由度数）
+
+		if ((int)D.size() != kB || (int)D[0].size() != kB) {
+			throw std::invalid_argument("computeBTDB: B 与 D 维度不匹配。");
+		}
+
+		std::vector<double> result(nB * nB, 0.0);
+		for (int i = 0; i < nB; ++i) {
+			for (int j = 0; j < nB; ++j) {
+				double val = 0.0;
+				for (int k = 0; k < kB; ++k) {
+					for (int m = 0; m < kB; ++m) {
+						val += B[k][i] * D[k][m] * B[m][j];
+					}
+				}
+				result[i * nB + j] = scalar * val;
+			}
+		}
+		return result;
+	}
+
+	// 计算单元刚度矩阵 Ke = scalar * B^T * D * B（二维，复用一维实现）
+	std::vector<std::vector<double>> computeBTDBy(
+		double scalar,
+		const std::vector<std::vector<double>>& B,
+		const std::vector<std::vector<double>>& D
+	) {
+		if (B.empty() || D.empty()) return {};
+
+		int nB = B[0].size();       // B 的列数（节点自由度数）
+		std::vector<double> flat = computeBTDB(scalar, B, D);
+		std::vector<std::vector<double>> result(nB, std::vector<double>(nB));
+		for (int i = 0; i < nB; ++i) {
+			for (int j = 0; j < nB; ++j) {
+				result[i][j] = flat[i * nB + j];
+			}
+		}
+		return result;
+	}
+
 	std::vector<double> multiplyT(
 		const std::vector<std::vector<double>>& T,
 		const std::vector<double>& v

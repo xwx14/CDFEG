@@ -28,7 +28,7 @@ field = DataField("Truss1DDisp")
 # 单元子程序
 ele = DataEleSub("Truss1D")
 ele.dispNames=["u"]
-ele.eleResNames=["T"]
+ele.eleResNames=["T","sigma"]
 ele.paramNames=["E","A"]
 # 添加单元
 field.addEleSub(ele)
@@ -37,6 +37,6 @@ project.addField(field)
 # 求解步骤
 project.cmds.append(("imp",0))
 # 生成器
-outPath="truss1D"
+outPath="sample/truss1D"
 maker=MakerCpp(project,outPath)
 maker.makeAll()

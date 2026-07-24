@@ -119,10 +119,10 @@ CDFEG::EleSubResult& StressBL2g::run(
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    // Step 1: 局部坐标下的单元矩阵（a2ll2）
+    // Step 1: 局部坐标下的单元矩阵
     std::vector<double> locEstif, locEmass, locEdamp, locEload;
     computeLocalMatrix(r, matParams, locEstif, locEmass, locEdamp, locEload);
-    // Step 2: 坐标转换局部→全局（a2gl2: smit + tkt/tmt/tl），写入 _result
+    // Step 2: 坐标转换局部→全局（ smit + tkt/tmt/tl），写入 _result
     coordTransform(r, locEstif, locEmass, locEdamp, locEload);
 
     if (_bSaveResult) _results.push_back(_result);

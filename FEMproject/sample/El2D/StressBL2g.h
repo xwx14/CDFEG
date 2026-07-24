@@ -18,15 +18,15 @@
 #define STRESS_BL2G_H
 #include "CDFEG/ElementBase.h"
 
-// 二维 2 节点边界面力载荷单元（参照 macs a2ll2 / a2gl2）
+// 二维 2 节点边界面力载荷单元
 // 纯载荷单元：刚度/质量/阻尼恒为 0，仅 eload 沿线积分把面力分配到 2 节点。
 // 材料参数：fu（沿线切向面力密度）、fv（沿线法向面力密度）。
 //
-// 计算分两步（与基准 a2ll2/a2gl2 分离一致）：
-//   1) computeLocalMatrix：局部坐标（切向/法向）下算单元矩阵（对应 a2ll2），
+// 计算分两步：
+//   1) computeLocalMatrix：局部坐标（切向/法向）下算单元矩阵，
 //      estif/emass/edamp=0，eload=∫N·(fu,fv)dΓ；
 //   2) coordTransform：smit 构造局部坐标轴→t 矩阵，tkt/tmt/tl 把局部矩阵
-//      变换到全局写入 _result（对应 a2gl2）。
+//      变换到全局写入 _result。
 class StressBL2g : public CDFEG::ElementBase {
 public:
     StressBL2g(CDFEG::PhyFieldData* pData);
