@@ -24,6 +24,6 @@ int main(int argc, char* argv[]) {
     resItem2.addVal(0, "sigmaYY");
     resItem2.addVal(0, "sigmaXY");
     gidPrePost._resItems.push_back(resItem2);
-    gidPrePost.post2();
+    gidPrePost.post();
     return 0;
 }

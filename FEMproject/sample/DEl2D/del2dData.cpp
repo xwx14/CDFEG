@@ -71,7 +71,7 @@ int del2dData::caculate() {
         if (_prePost)
         {
             // 按 GiD 步号输出本步位移/速度/加速度/应力
-            _prePost->post2(it);
+            _prePost->post(it);
         }
 
         time += _dt;

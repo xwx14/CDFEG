@@ -2,7 +2,7 @@
 9 8
 * name=time,structure="F64"
 1.0 1.0
-* name=mat_ElT3,structure="F64**5",type="mat",index=0
+* name=ElT3,structure="F64**5",type="mat",index=0
 1000000.0 0.3 1.0 0.0 0.0
 * name=coord,structure="I32*1 F64*2",type="coord",index=1
 1 0.0 0.0

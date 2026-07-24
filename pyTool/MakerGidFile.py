@@ -33,7 +33,6 @@ class MakerGidFile(MakerBase):
     def __init__(self,arg1,arg2,arg3=None):
         # 初始化基类
         super().__init__()
-
         # 根据参数类型选择初始化方式
         if isinstance(arg1, DataProject):
             self._initFromProject(arg1, arg2)

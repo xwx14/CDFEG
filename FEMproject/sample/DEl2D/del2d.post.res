@@ -319,3 +319,35 @@ Values
          3                0.0000000e+00 0.0000000e+00 0.0000000e+00
          4                0.0000000e+00 0.0000000e+00 0.0000000e+00
 End Values
+Result "disp" "Load Analysis"          11 Vector OnNodes
+ComponentNames "u" "v" 
+Values
+         1                0.0000000e+00 0.0000000e+00
+         2                0.0000000e+00 0.0000000e+00
+         3                0.0000000e+00 0.0000000e+00
+         4                0.0000000e+00 0.0000000e+00
+End Values
+Result "velocity" "Load Analysis"          11 Vector OnNodes
+ComponentNames "velU" "velV" 
+Values
+         1                0.0000000e+00 0.0000000e+00
+         2                0.0000000e+00 0.0000000e+00
+         3                0.0000000e+00 0.0000000e+00
+         4                0.0000000e+00 0.0000000e+00
+End Values
+Result "acceleration" "Load Analysis"          11 Vector OnNodes
+ComponentNames "accU" "accV" 
+Values
+         1                0.0000000e+00 0.0000000e+00
+         2                0.0000000e+00 0.0000000e+00
+         3                0.0000000e+00 0.0000000e+00
+         4                0.0000000e+00 0.0000000e+00
+End Values
+Result "stress" "Load Analysis"          11 Matrix OnNodes
+ComponentNames "sigmaXX" "sigmaYY" "sigmaXY" 
+Values
+         1                0.0000000e+00 0.0000000e+00 0.0000000e+00
+         2                0.0000000e+00 0.0000000e+00 0.0000000e+00
+         3                0.0000000e+00 0.0000000e+00 0.0000000e+00
+         4                0.0000000e+00 0.0000000e+00 0.0000000e+00
+End Values

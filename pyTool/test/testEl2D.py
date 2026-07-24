@@ -90,6 +90,10 @@ field.addEleSub(ele3)
 
 project.addField(field)
 
+# GiD 后处理输出项（与 sample/El2D/main.cpp 一致）
+project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
+project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
+
 outPath = "sample/El2D"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
 maker.mainMode=1

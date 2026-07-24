@@ -5,7 +5,9 @@
 #include "{{project.name}}Data.h"
 int makeData({{femDataClassName}}& data) {
     // TODO: 添加测试数据
-
+{% for mt in project.mateTypes %}
+    // 本构模型 {{ mt.name }}: 参数 {{ mt.params | join(", ") }}
+{% endfor %}
 
     return 0;
 }

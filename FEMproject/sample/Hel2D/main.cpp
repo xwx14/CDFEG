@@ -33,6 +33,6 @@ int main(int argc, char* argv[]) {
     stressItem.addVal(1, "sigmaXY");
     gidPrePost._resItems.push_back(stressItem);
 
-    gidPrePost.post2();
+    gidPrePost.post();
     return 0;
 }

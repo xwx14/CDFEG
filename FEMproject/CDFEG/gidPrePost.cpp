@@ -432,62 +432,9 @@ namespace CDFEG {
 		return 1;
 	}
 
-	int GidPrePost::post(int it)
-	{
-		std::ofstream outFile;
-		gidMsh();
-		// 使用ios::out模式打开文件
-		if (it == 0)
-		{
-			outFile.open(_gidResFn, std::ios::out);
-			if (!outFile.is_open())return 0;
-			outFile << "GID Post Results File 1.0" << std::endl;
-		}
-		else
-		{
-			outFile.open(_gidResFn, std::ios::app);
-			if (!outFile.is_open())return 0;
-		}
-		int nPhy = _femData->_phyDatas.size();
-		int nNodes = _femData->_nPts;
-		int dof;
-		for (int iPhy = 0; iPhy < nPhy; ++iPhy)
-		{
-			PhyFieldData* phyData = _femData->_phyDatas[iPhy];
-			if (phyData->_nodeRes.size() == 0)continue;
-			dof = phyData->_dof;
-			outFile << "Result \""<<phyData->_name<<"\" \"Load Analysis\"  ";
-			outFile << std::setw(10) << it+1 << " ";
-			outFile << phyData->_resForm << std::endl;
-			outFile << "ComponentNames ";
-			for (const std::string& disp : phyData->_dispNames)
-			{
-				outFile << "\"" << disp << "\" ";
-			}
-			outFile << std::endl;
-			outFile << "Values" << std::endl;
-			int iValue = -1;
-			for (int iNode = 0; iNode < nNodes; ++iNode)
-			{
-				outFile << std::setw(10) << iNode + 1;
-				outFile << std::setw(16) << std::scientific << std::setprecision(7);
-				for (const std::string& disp : phyData->_dispNames)
-				{
-					outFile <<" " << phyData->_nodeRes[disp][iNode];
-				}
-				for (int iDof = 0; iDof < dof; ++iDof)
-				{
-					//todo: 结果输出需修改为对应物理场的数据
-					//outFile << std::setw(16) << std::scientific << std::setprecision(7) << phyData->_nodeRes[++iValue];
-				}
-				outFile << std::endl;
-			}
-			outFile << "End Values" << std::endl;
-		}
-		return 1;
-	}
 
-	int GidPrePost::post2(int it)
+
+	int GidPrePost::post(int it)
 	{
 		std::ofstream outFile;
 		gidMsh();

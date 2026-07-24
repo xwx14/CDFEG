@@ -74,6 +74,13 @@ field.addEleSub(ele3)
 
 project.addField(field)
 
+# GiD 后处理输出项（注册项与 sample/DEl2D/main.cpp 一致；注意 sample 用动态 setPost 模式，
+# 生成器当前仅生成静态 post 模式 main——DEl2D 的 per-step post 属手填逻辑，见 pyTool 能力边界）
+project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
+project.addOutputItem("velocity", "Vector", "OnNodes", [(0, "velU"), (0, "velV")])
+project.addOutputItem("acceleration", "Vector", "OnNodes", [(0, "accU"), (0, "accV")])
+project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
+
 outPath = "sample/DEl2D"
 maker = MakerCpp(project, outPath, mode='new', sln_cmake_path="CMakeLists.txt")
 maker.mainMode=1

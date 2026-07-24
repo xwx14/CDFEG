@@ -2,9 +2,9 @@
 190 162
 * name=time,structure="F64"
 1.0 1.0
-* name=mat_ElQ4g,structure="F64*6",type="mat",index=1
+* name=ElQ4g,structure="F64*6",type="mat",index=1
 1.0e10 0.3 0.0 0.0 3000.0 0.6
-* name=mat_StressBL2g,structure="F64*2",type="mat",index=1
+* name=StressBL2g,structure="F64*2",type="mat",index=1
 0.0 100.0
 * name=coord,structure="I32*1 F64*2",type="coord",index=1
 1 1.000000000000e+02 5.000000000000e+01

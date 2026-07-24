@@ -8,3 +8,8 @@ End coordinates
 Elements
      1     1     2     3     4  1
 End elements
+Mesh "StressBL2g" Dimension 2 Elemtype Line Nnode  2
+Coordinates
+End coordinates
+Elements
+End elements

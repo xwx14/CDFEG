@@ -35,11 +35,29 @@ class DataProject:
         self.preParams=[]
         # 材料本构类型表：[{name, params, defaults}]
         self.mateTypes = []
+        # GiD 后处理输出项：[{name, type, location, vals:[(fieldIndex,valName),...]}]
+        self.outputItems = []
 
     def addMateType(self, name, params, defaults=None):
         """注册材料本构类型（参数 schema），供多个单元共享。"""
         self.mateTypes.append({'name': name, 'params': list(params),
                                'defaults': list(defaults or [])})
+
+    def addOutputItem(self, name, type, location="OnNodes", vals=None):
+        """注册一个 GiD 后处理输出项，生成 main 中 GidResItem 注册语句。
+
+        Args:
+            name: 结果名（如 "disp"、"stress"）
+            type: GidResultType 枚举名（如 "Vector"、"Vector3"、"Scalar"、"Matrix"）
+            location: "OnNodes"（默认，节点结果）或 "OnGaussPoints"（单元结果）
+            vals: 分量列表 [(fieldIndex, valName), ...]，如 [(0,"u"),(0,"v")]
+        """
+        self.outputItems.append({
+            'name': name,
+            'type': type,
+            'location': location,
+            'vals': [tuple(v) for v in (vals or [])]
+        })
 
     def addField(self,field0):
         if type(field0) == str:
@@ -98,6 +116,7 @@ class DataProject:
             # 预处理参数，结构为多个{"name":"pr1","params":[]}
             'preParams': self.preParams,
             'mateTypes': self.mateTypes,
+            'outputItems': self.outputItems,
         }
 
     @classmethod
@@ -130,6 +149,9 @@ class DataProject:
 
         # 恢复材料本构类型表
         project.mateTypes = data.get('mateTypes', [])
+
+        # 恢复 GiD 后处理输出项
+        project.outputItems = data.get('outputItems', [])
 
         return project
 

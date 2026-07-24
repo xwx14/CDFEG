@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     // 例：初值全零；如有初速度/初加速度可在此循环调用 field->setInitialVel / setInitialAcc
 
     // 注册 GiD 结果项：位移、速度、加速度、应力（按节点输出）
-    // post2 内按 GidResItem._iFields 指向物理场、_ValNames 指向节点结果列
+    // post 内按 GidResItem._iFields 指向物理场、_ValNames 指向节点结果列
     CDFEG::GidResItem dispItem("disp", CDFEG::GidResultType::Vector);
     dispItem.addVal(0, "u");
     dispItem.addVal(0, "v");
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     stressItem.addVal(0, "sigmaXY");
     gidPrePost._resItems.push_back(stressItem);
 
-    // 将后处理器交给数据类，供 caculate 每步调用 post2 输出
+    // 将后处理器交给数据类，供 caculate 每步调用 post 输出
     data.setPost(&gidPrePost);
 
     data.caculate();

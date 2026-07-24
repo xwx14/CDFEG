@@ -55,7 +55,6 @@ namespace CDFEG {
 		int gidMsh();
 		int writeNodes(std::ofstream& outFile, int dim);
 		virtual int post(int it = 0);
-		virtual int post2(int it = 0);
 	public:
 		// 网格文件
 		std::string _datFn;

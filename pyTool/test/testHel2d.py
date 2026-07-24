@@ -79,6 +79,11 @@ dele1.shapeFuns = [
 field2.addEleSub(dele1)
 project.addField(field2)
 
+# GiD 后处理输出项（与 sample/Hel2D/main.cpp 一致：temperature@场0，disp/stress@场1）
+project.addOutputItem("temperature", "Scalar", "OnNodes", [(0, "T")])
+project.addOutputItem("disp", "Vector", "OnNodes", [(1, "u"), (1, "v")])
+project.addOutputItem("stress", "Matrix", "OnNodes", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
+
 outPath="E:\\myProject\\CDFEG\\FEMproject\\sample\\Hel2D"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="E:\\myProject\\CDFEG\\FEMproject\\CMakeLists.txt")
 maker.mainMode=1
