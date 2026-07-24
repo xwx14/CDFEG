@@ -35,6 +35,7 @@ ele.paramNames=["E","A"]
 field.addEleSub(ele)
 # 添加场
 project.addField(field)
+project.cmds.append(("imp",0))
 # 生成器
 outPath="sample/truss2D"
 maker=MakerCpp(project,outPath)
