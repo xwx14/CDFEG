@@ -29,7 +29,7 @@ field = DataField("Truss3DDisp")
 # 单元子程序
 ele = DataEleSub("Truss3D")
 ele.dispNames=["u","v","w"]
-ele.eleResNames=["T"]
+ele.eleResNames=["T","sigma"]
 ele.paramNames=["E","A"]
 # 添加单元
 field.addEleSub(ele)
