@@ -44,11 +44,11 @@ class DataProject:
                                'defaults': list(defaults or [])})
 
     def addOutputItem(self, name, type, location="OnNodes", vals=None):
-        """注册一个 GiD 后处理输出项，生成 main 中 GidResItem 注册语句。
+        """注册一个 GiD 后处理输出项，生成 main 中 ResItem 注册语句。
 
         Args:
             name: 结果名（如 "disp"、"stress"）
-            type: GidResultType 枚举名（如 "Vector"、"Vector3"、"Scalar"、"Matrix"）
+            type: ResType 枚举名（如 "Vector"、"Vector3"、"Scalar"、"Matrix"）
             location: "OnNodes"（默认，节点结果）或 "OnGaussPoints"（单元结果）
             vals: 分量列表 [(fieldIndex, valName), ...]，如 [(0,"u"),(0,"v")]
         """

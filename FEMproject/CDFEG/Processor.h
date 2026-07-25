@@ -19,7 +19,9 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 #include <string>
+#include <vector>
 #include "CDFEG.h"
+#include "ResItem.h"
 /**
  * @class Processor
  * @brief 前后处理器基类
@@ -49,6 +51,8 @@ namespace CDFEG {
 
 	public:
 		DomainData* _femData;
+		// 本 processor 要输出的结果项（由 main 注册，post 内消费）
+		std::vector<ResItem> _resItems;
 		bool _bNeedTime = false;
 		int _nPts = 0;
 		int _nEles = 0;

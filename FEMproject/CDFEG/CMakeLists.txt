@@ -8,7 +8,7 @@ set(SOURCES
     DomainData.cpp
 
     GidPrePost2.cpp
-    GidResItem.cpp
+    ResItem.cpp
     gidPrePost.cpp
     inpReader.cpp
     IsoEleBase.cpp
@@ -26,7 +26,7 @@ set(HEADERS
     DomainData.h
 
     GidPrePost2.h
-    GidResItem.h
+    ResItem.h
     gidPrePost.h
     InpDataStructures.h
     inpReader.h

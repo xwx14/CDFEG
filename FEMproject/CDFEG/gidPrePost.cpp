@@ -450,14 +450,14 @@ namespace CDFEG {
 			if (!outFile.is_open())return 0;
 		}
 		int nNodes = _femData->_nPts;
-		for (GidResItem& item : _resItems)
+		for (ResItem& item : _resItems)
 		{
-			if (item._loc == GidLocation::OnGaussPoints)
+			if (item._loc == ResLocation::OnGaussPoints)
 			{
 				// 单元结果（如应力）：按单元子程序分组输出，每组 1 个 GaussPoints 定义 + 1 个 Result 块
 				if (item._iFields.empty()) continue;
 				PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
-				std::string typeStr = gidResultTypeToStr(item._type);
+				std::string typeStr = resTypeToStr(item._type);
 				// 各分量取值指针（单元结果存于物理场 _elemRes，按单元内部索引取值）
 				std::vector<std::vector<double>*> valPtrs;
 				valPtrs.reserve(item._ValNames.size());
@@ -500,7 +500,7 @@ namespace CDFEG {
 			}
 			outFile << "Result \"" << item._name << "\" \"Load Analysis\"  ";
 			outFile << std::setw(10) << it + 1 << " ";
-			outFile << gidResultTypeToStr(item._type) << " OnNodes" << std::endl;
+			outFile << resTypeToStr(item._type) << " OnNodes" << std::endl;
 			outFile << "ComponentNames ";
 			for (const std::string& vn : item._ValNames)
 			{

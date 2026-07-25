@@ -34,7 +34,7 @@ ele1.eleResNames=["Sxx","Syy","Sxy"]
 ele1.paramNames=["E","nu","t","fx","fy"]
 field.addEleSub(ele1)
 project.addField(field)
-# GiD 后处理输出项（生成 main 的 GidResItem 注册，与 sample/ElT3/main.cpp 一致）
+# GiD 后处理输出项（生成 main 的 ResItem 注册，与 sample/ElT3/main.cpp 一致）
 project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
 project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
 # 生成器

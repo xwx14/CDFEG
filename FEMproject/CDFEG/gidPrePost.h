@@ -16,7 +16,7 @@
 // 
 #ifndef GID_PREPOST_H
 #define GID_PREPOST_H
-#include "GidResItem.h"
+#include "ResItem.h"
 #include "Processor.h"
 #include <string>
 #include <map>
@@ -67,7 +67,6 @@ namespace CDFEG {
 		std::vector<ElementBase*> _mshOutEle;
 		std::map< ElementBase*, int> _matStartID2;
 		std::vector<ElementBase*> _mshOutEle2;
-		std::vector<GidResItem> _resItems;
 		// 额外参数声明表：组名(小写) → {目标层 _paramValues 指针, 该组 _addParams 行(首元素为原始组名)}
 		// 注意：持有的 _paramValues 裸指针仅在 pre() 执行期间有效（owner 对象生命周期长于 GidPrePost）；
 		//       pre() 结束时会 clear()，避免常驻悬垂指针。

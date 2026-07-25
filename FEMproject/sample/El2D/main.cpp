@@ -15,11 +15,11 @@ int main(int argc, char* argv[]) {
 	gidPrePost.setFilePath(path, project);
 	gidPrePost.pre();
     data.caculate();
-	CDFEG::GidResItem resItem1("disp",CDFEG::GidResultType::Vector);
+	CDFEG::ResItem resItem1("disp",CDFEG::ResType::Vector);
 	resItem1.addVal(0, "u");
     resItem1.addVal(0, "v");
     gidPrePost._resItems.push_back(resItem1);
-    CDFEG::GidResItem resItem2("stress",CDFEG::GidResultType::Matrix);
+    CDFEG::ResItem resItem2("stress",CDFEG::ResType::Matrix);
     resItem2.addVal(0, "sigmaXX");
     resItem2.addVal(0, "sigmaYY");
     resItem2.addVal(0, "sigmaXY");

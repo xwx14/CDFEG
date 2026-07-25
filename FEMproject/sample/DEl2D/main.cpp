@@ -37,23 +37,23 @@ int main(int argc, char* argv[]) {
     // 例：初值全零；如有初速度/初加速度可在此循环调用 field->setInitialVel / setInitialAcc
 
     // 注册 GiD 结果项：位移、速度、加速度、应力（按节点输出）
-    // post 内按 GidResItem._iFields 指向物理场、_ValNames 指向节点结果列
-    CDFEG::GidResItem dispItem("disp", CDFEG::GidResultType::Vector);
+    // post 内按 ResItem._iFields 指向物理场、_ValNames 指向节点结果列
+    CDFEG::ResItem dispItem("disp", CDFEG::ResType::Vector);
     dispItem.addVal(0, "u");
     dispItem.addVal(0, "v");
     gidPrePost._resItems.push_back(dispItem);
 
-    CDFEG::GidResItem velItem("velocity", CDFEG::GidResultType::Vector);
+    CDFEG::ResItem velItem("velocity", CDFEG::ResType::Vector);
     velItem.addVal(0, "velU");
     velItem.addVal(0, "velV");
     gidPrePost._resItems.push_back(velItem);
 
-    CDFEG::GidResItem accItem("acceleration", CDFEG::GidResultType::Vector);
+    CDFEG::ResItem accItem("acceleration", CDFEG::ResType::Vector);
     accItem.addVal(0, "accU");
     accItem.addVal(0, "accV");
     gidPrePost._resItems.push_back(accItem);
 
-    CDFEG::GidResItem stressItem("stress", CDFEG::GidResultType::Matrix);
+    CDFEG::ResItem stressItem("stress", CDFEG::ResType::Matrix);
     stressItem.addVal(0, "sigmaXX");
     stressItem.addVal(0, "sigmaYY");
     stressItem.addVal(0, "sigmaXY");

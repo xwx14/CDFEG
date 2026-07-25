@@ -18,16 +18,16 @@ int main(int argc, char* argv[]) {
     data.caculate();
 
     // 注册 GiD 结果项：温度（Heat 场 index=0）、位移与应力（DelDisp 场 index=1）
-    CDFEG::GidResItem tempItem("temperature", CDFEG::GidResultType::Scalar);
+    CDFEG::ResItem tempItem("temperature", CDFEG::ResType::Scalar);
     tempItem.addVal(0, "T");
     gidPrePost._resItems.push_back(tempItem);
 
-    CDFEG::GidResItem dispItem("disp", CDFEG::GidResultType::Vector);
+    CDFEG::ResItem dispItem("disp", CDFEG::ResType::Vector);
     dispItem.addVal(1, "u");
     dispItem.addVal(1, "v");
     gidPrePost._resItems.push_back(dispItem);
 
-    CDFEG::GidResItem stressItem("stress", CDFEG::GidResultType::Matrix);
+    CDFEG::ResItem stressItem("stress", CDFEG::ResType::Matrix);
     stressItem.addVal(1, "sigmaXX");
     stressItem.addVal(1, "sigmaYY");
     stressItem.addVal(1, "sigmaXY");
