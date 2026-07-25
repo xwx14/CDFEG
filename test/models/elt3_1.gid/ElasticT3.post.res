@@ -1,4 +1,20 @@
 GID Post Results File 1.0
+GaussPoints "GP_ElT3" ElemType Triangle
+Number Of Gauss Points: 1
+Natural Coordinates: Internal
+End GaussPoints
+Result "eleStress" "Load Analysis"           1 Matrix OnGaussPoints "GP_ElT3"
+ComponentNames "Sxx" "Syy" "Sxy" 
+Values
+         1                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         2                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         3                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         4                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         5                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         6                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         7                1.0000000e+03 0.0000000e+00 0.0000000e+00
+         8                1.0000000e+03 -1.1368684e-13 5.6843419e-14
+End Values
 Result "disp" "Load Analysis"           1 Vector OnNodes
 ComponentNames "u" "v" 
 Values

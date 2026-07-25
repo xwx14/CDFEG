@@ -37,6 +37,7 @@ project.addField(field)
 # GiD 后处理输出项（生成 main 的 ResItem 注册，与 sample/ElT3/main.cpp 一致）
 project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
 project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
+project.addOutputItem("eleStress", "Matrix", "OnGaussPoints", [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
 # 生成器
 outPath="sample/ElT3"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
