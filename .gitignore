@@ -87,4 +87,6 @@ Thumbs.db
 .superpowers/
 /docs/设计
 /docs/自有文件
+# docs/ 根的技术文章草稿不入库（已迁至自有文档系统；superpowers/ 下的 spec/plan 不受影响）
+/docs/*.md
 /.codegraph
