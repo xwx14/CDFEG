@@ -86,7 +86,6 @@ project.addOutputItem("stress", "Matrix", "OnNodes", [(1, "sigmaXX"), (1, "sigma
 project.addOutputItem("eleStress", "Matrix", "OnGaussPoints", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
 project.addOutputItem("eleVolume", "Scalar", "OnGaussPoints", [(1, "volume")])
 
-
 outPath="E:\\myProject\\CDFEG\\FEMproject\\sample\\Hel2D"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="E:\\myProject\\CDFEG\\FEMproject\\CMakeLists.txt")
 maker.mainMode=1

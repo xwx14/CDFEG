@@ -152,13 +152,13 @@ project.addOutputItem("eleStress", "Matrix", "OnGaussPoints",
 | Hel2D 误把 eleStress 绑温度场（iField=0）→ 取空 `_elemRes` | Hel2D eleStress/eleVolume 必须 `addVal(1, ...)`（位移场） |
 | DEl2D 多步：每步 eleStress 段使基线膨胀 | 基线本就多步；parser 按 (name,step) 分键，无冲突；刷新即可 |
 | `testDEL2D.py`/`testHel2d.py` 重跑覆盖手填 main | 实施前确认 mainMode；必要时仅改 test*.py 的 addOutputItem 不重跑生成，或重跑后核对 main |
-| 多单元类型同场 → post 写同名 Result 多段、parser 后者覆盖 | 当前 4 示例算例均单单元类型，无影响；标注为已知限制（见 §7） |
+| 多单元类型同场 → post 写同名 Result 多段、parser 后者覆盖 | 6 个 El2D/DEl2D 算例触发覆盖（详见 §7）；Hel2D/ElT3 单 sub-type 无影响。物理 `.res` 输出正确，仅 e2e 回归对比盲区（非功能 bug） |
 | 基线刷新遗漏某算例 → 该算例回归报"新增结果段" | 按 §3.5 表逐个 `--update`，run_tests 全绿为准 |
 
 ## 7. 已知限制（本次不修）
 
 1. **每单元 1 高斯点**：OnGaussPoints 输出单元平均应力（`_elemRes` 单值模型），非逐高斯点应力。符合当前数据结构，未来逐高斯点输出需扩展 `_elemRes` 为多维。
-2. **多单元类型同场同名 Result 覆盖**：`post` 对每单元类型写一个同名 `Result` 段，parser 以 `(name,step)` 为 key 后者覆盖前者。当前算例均单单元类型无影响；未来混用需按单元类型拆 result_name 或扩展 parser。
+2. **多单元类型同场同名 Result 覆盖**：`post` 对每单元类型写一个同名 `Result` 段，parser 以 `(result_name, step)` 为 key，后者覆盖前者。实际 **6 个算例触发此覆盖**：el2d1、el2d_bf1、el2_mfel1、el2_mfel_noedge1（ElQ4g/ElT3g/StressBL2g 混用）、del2d1、del2d_mini1（DelQ4g/StressBL2g 混用）。后果：GiD `.res` 物理输出本身正确（各 sub-type 段独立，GiD 可见体单元真实应力），仅 e2e 回归对比存在盲区——体单元（ElQ4g/ElT3g/DelQ4g）真实应力在 parser 层被边单元 StressBL2g 段（全 0）覆盖，max|Δ|=0 为虚假通过。仅 Hel2D（位移场单 DelQ4g）、ElT3（单 ElT3）无此问题。改进方向（后续独立 task）：parser `test/framework/parser.py` 的 key 由 `(result_name, step)` 扩展为含 GaussPoints 名的维度，或 `gidPrePost::post` 按 sub-type 拼 result_name（如 `eleStress_ElQ4g`）；任一改动需重刷 10 基线。
 
 ## 8. 行为变化小结
 
