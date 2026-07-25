@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 	resItem1.addVal(0, "u");
 	resItem1.addVal(0, "v");
 	data._prePostConfig._nodeResItems.push_back(resItem1);
-	// 节点应力结果（OnNodes）：常应变三角形无高斯点，应力经节点加权平均外推
+	// 节点应力结果（OnNodes）
 	CDFEG::ResItem resItem2("stress", CDFEG::ResType::Matrix);
 	resItem2.addVal(0, "Sxx");
 	resItem2.addVal(0, "Syy");

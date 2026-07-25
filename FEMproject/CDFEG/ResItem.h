@@ -45,7 +45,7 @@ namespace CDFEG {
 
         std::string _name;
         ResType _type;
-        // 结果位置：OnNodes=节点结果(取_nodeRes)，OnGaussPoints=单元结果(取_elemRes)
+        // 结果位置：OnNodes=节点结果(取_nodeRes)，OnGaussPoints=高斯点结果
         ResLocation _loc = ResLocation::OnNodes;
         std::vector<int> _iFields;
         std::vector<std::string> _ValNames;
