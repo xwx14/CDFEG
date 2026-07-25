@@ -110,6 +110,26 @@ output = "el2_mfel.post.res"
 tol_atol = 1e-12
 tol_rtol = 0.0
 
+[[suite.e2e.cases]]
+name = "el2_mfel_noedge1"
+target = "el2d"
+project = "el2_mfel_noedge"
+case_dir = "models/el2_mfel_noedge1.gid"
+baseline = "el2_mfel_noedge.post.res"
+output = "el2_mfel_noedge.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
+[[suite.e2e.cases]]
+name = "del2d_mini1"
+target = "del2d"
+project = "del2d_mini"
+case_dir = "models/del2d_mini1.gid"
+baseline = "del2d_mini.post.res"
+output = "del2d_mini.post.res"
+tol_atol = 1e-12
+tol_rtol = 0.0
+
 [suite.unit]
 cases = [ { name = "core", binary = "cdfeg_unit_test" } ]
 
