@@ -13,142 +13,167 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-// 
 #include "vtkPost.h"
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 #include "PhyFieldData.h"
 #include "DomainData.h"
+#include "ResItem.h"
 namespace CDFEG {
-	vtkPost::vtkPost(DomainData* data):Processor(data)
-	{
+    vtkPost::vtkPost(DomainData* data):Processor(data)
+    {
+    }
 
-	}
+    vtkPost::~vtkPost()
+    {
+    }
 
-	vtkPost::~vtkPost()
-	{
-	}
-	int vtkPost::post(int it) {
-		if (it == 0)writeVTK("result.vtk");
+    void vtkPost::setFilePath(const std::string& parentPath, const std::string& baseName)
+    {
+        _outPath = parentPath;
+        _baseName = baseName;
+    }
 
-		return 0;
-	}
+    int vtkPost::post(int it)
+    {
+        std::ostringstream oss;
+        oss << _outPath << "/" << _baseName << "_" << std::setw(4) << std::setfill('0') << it << ".vtu";
+        std::string vtuFn = oss.str();
+        if (writeVTU(vtuFn) != 0) return -1;
+        double time = it * _femData->_dt;
+        _steps.push_back({it, time});
+        std::string pvdFn = _outPath + "/" + _baseName + ".pvd";
+        return writePVD(pvdFn);
+    }
 
-	int vtkPost::writeVTK(const std::string& fn)
-	{
-		std::ofstream ofs(fn);
-		if (!ofs.is_open())return -1;
-		int dim = _femData->_dim;
-		int nPt = _femData->_nPts;
-		int nEle = _femData->_nElem;
+    int vtkPost::writeVTU(const std::string& fn)
+    {
+        std::ofstream ofs(fn);
+        if (!ofs.is_open()) return -1;
+        ofs << std::setprecision(15) << std::scientific;   // 高精度，支撑紧回归容差
+        int dim = _femData->_dim;
+        int nPt = _femData->_nPts;
+        int nEle = _femData->_nElem;
 
-		// XML VTU 文件头
-		ofs << "<?xml version=\"1.0\"?>" << std::endl;
-		ofs << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
-		ofs << "  <UnstructuredGrid>" << std::endl;
-		ofs << "    <Piece NumberOfPoints=\"" << nPt << "\" NumberOfCells=\"" << nEle << "\">" << std::endl;
+        // XML VTU 文件头
+        ofs << "<?xml version=\"1.0\"?>" << std::endl;
+        ofs << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
+        ofs << "  <UnstructuredGrid>" << std::endl;
+        ofs << "    <Piece NumberOfPoints=\"" << nPt << "\" NumberOfCells=\"" << nEle << "\">" << std::endl;
 
-		// 输出节点坐标
-		ofs << "      <Points>" << std::endl;
-		ofs << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-		ofs << "          ";
-		for (int iPt = 0; iPt < nPt; iPt++)
-		{
-			//ofs << _femData->_nodes[3 * iPt] << " " << _femData->_nodes[3 * iPt + 1] << " " << _femData->_nodes[3 * iPt + 2];
-			for(int iDim = 0; iDim < dim; iDim++)
-			{
-				ofs << _femData->_nodes[dim * iPt + iDim] << " ";
-			}
-			for (int iDim = dim; iDim < 3; iDim++)
-			{
-				ofs << 0.0 << " ";
-			}
-			if (iPt < nPt - 1) ofs << " ";
-		}
-		ofs << std::endl;
-		ofs << "        </DataArray>" << std::endl;
-		ofs << "      </Points>" << std::endl;
+        // 输出节点坐标
+        ofs << "      <Points>" << std::endl;
+        ofs << "        <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+        ofs << "          ";
+        for (int iPt = 0; iPt < nPt; iPt++)
+        {
+            for (int iDim = 0; iDim < dim; iDim++)
+            {
+                ofs << _femData->_nodes[dim * iPt + iDim] << " ";
+            }
+            for (int iDim = dim; iDim < 3; iDim++)
+            {
+                ofs << 0.0 << " ";
+            }
+        }
+        ofs << std::endl;
+        ofs << "        </DataArray>" << std::endl;
+        ofs << "      </Points>" << std::endl;
 
-		// 输出单元连接关系
-		ofs << "      <Cells>" << std::endl;
+        // 输出单元连接关系
+        ofs << "      <Cells>" << std::endl;
+        ofs << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">" << std::endl;
+        ofs << "          ";
+        for (size_t i = 0; i < _femData->_eleNodes.size(); i++)
+        {
+            ofs << _femData->_eleNodes[i] << " ";
+        }
+        ofs << std::endl;
+        ofs << "        </DataArray>" << std::endl;
+        ofs << "        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">" << std::endl;
+        ofs << "          ";
+        for (int iEle = 0; iEle < nEle; iEle++)
+        {
+            ofs << _femData->_elePt[iEle + 1] << " ";
+        }
+        ofs << std::endl;
+        ofs << "        </DataArray>" << std::endl;
+        ofs << "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">" << std::endl;
+        ofs << "          ";
+        for (int iEle = 0; iEle < nEle; iEle++)
+        {
+            ofs << static_cast<int>(_femData->_eleTypes[iEle]) << " ";
+        }
+        ofs << std::endl;
+        ofs << "        </DataArray>" << std::endl;
+        ofs << "      </Cells>" << std::endl;
 
-		// connectivity
-		ofs << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">" << std::endl;
-		ofs << "          ";
-		for (size_t i = 0; i < _femData->_eleNodes.size(); i++)
-		{
-			ofs << _femData->_eleNodes[i];
-			if (i < _femData->_eleNodes.size() - 1) ofs << " ";
-		}
-		ofs << std::endl;
-		ofs << "        </DataArray>" << std::endl;
+        // 节点结果（OnNodes）与单元结果（OnGaussPoints），均按 _resItems 输出
+        ofs << "      <PointData>" << std::endl;
+        for (ResItem& item : _resItems)
+        {
+            if (item._loc != ResLocation::OnNodes || item._iFields.empty()) continue;
+            PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
+            ofs << "        <DataArray type=\"Float64\" Name=\"" << item._name
+                << "\" NumberOfComponents=\"" << item._ValNames.size() << "\" format=\"ascii\">" << std::endl;
+            ofs << "          ";
+            for (int iPt = 0; iPt < nPt; iPt++)
+            {
+                for (const std::string& vn : item._ValNames)
+                {
+                    auto& col = phy->_nodeRes[vn];
+                    ofs << (iPt < (int)col.size() ? col[iPt] : 0.0) << " ";
+                }
+            }
+            ofs << std::endl;
+            ofs << "        </DataArray>" << std::endl;
+        }
+        ofs << "      </PointData>" << std::endl;
 
-		// offsets
-		ofs << "        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">" << std::endl;
-		ofs << "          ";
-		for (int iEle = 0; iEle < nEle; iEle++)
-		{
-			ofs << _femData->_elePt[iEle + 1];
-			if (iEle < nEle - 1) ofs << " ";
-		}
-		ofs << std::endl;
-		ofs << "        </DataArray>" << std::endl;
+        ofs << "      <CellData>" << std::endl;
+        for (ResItem& item : _resItems)
+        {
+            if (item._loc != ResLocation::OnGaussPoints || item._iFields.empty()) continue;
+            PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
+            ofs << "        <DataArray type=\"Float64\" Name=\"" << item._name
+                << "\" NumberOfComponents=\"" << item._ValNames.size() << "\" format=\"ascii\">" << std::endl;
+            ofs << "          ";
+            for (int iEle = 0; iEle < nEle; iEle++)
+            {
+                for (const std::string& vn : item._ValNames)
+                {
+                    auto& col = phy->_elemRes[vn];
+                    ofs << (iEle < (int)col.size() ? col[iEle] : 0.0) << " ";
+                }
+            }
+            ofs << std::endl;
+            ofs << "        </DataArray>" << std::endl;
+        }
+        ofs << "      </CellData>" << std::endl;
 
-		// types
-		ofs << "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">" << std::endl;
-		ofs << "          ";
-		
-		for (int iEle = 0; iEle < nEle; iEle++)
-		{
-			ofs << static_cast<int>(_femData->_eleTypes[iEle]);
-			if (iEle < nEle - 1) ofs << " ";
-		}
-		ofs << std::endl;
-		ofs << "        </DataArray>" << std::endl;
-		ofs << "      </Cells>" << std::endl;
+        // 关闭标签
+        ofs << "    </Piece>" << std::endl;
+        ofs << "  </UnstructuredGrid>" << std::endl;
+        ofs << "</VTKFile>" << std::endl;
+        return 0;
+    }
 
-		// 输出节点数据
-		ofs << "      <PointData>" << std::endl;
-		for (PhyFieldData* p : _femData->_phyDatas)
-		{
-			for (const std::string& name : p->_dispNames) {
-				ofs << "        <DataArray type=\"Float64\" Name=\"" <<name << "\" format=\"ascii\">" << std::endl;
-				ofs << "          ";
-				for (int iPt = 0; iPt < nPt; iPt++)
-				{
-
-					ofs << p->_nodeRes[name][iPt];
-					if (iPt < nPt - 1) ofs << " ";
-				}
-				ofs << std::endl;
-				ofs << "        </DataArray>" << std::endl;
-			}
-		}
-		ofs << "      </PointData>" << std::endl;
-		// 输出单元数据（每单元1个标量值，取自各物理场 _elemRes，按 _eleResNames 遍历）
-		ofs << "      <CellData>" << std::endl;
-		for (PhyFieldData* p : _femData->_phyDatas)
-		{
-			for (const std::string& name : p->_eleResNames) {
-				ofs << "        <DataArray type=\"Float64\" Name=\"" << name << "\" format=\"ascii\">" << std::endl;
-				ofs << "          ";
-				for (int iEle = 0; iEle < nEle; iEle++)
-				{
-					ofs << p->_elemRes[name][iEle];
-					if (iEle < nEle - 1) ofs << " ";
-				}
-				ofs << std::endl;
-				ofs << "        </DataArray>" << std::endl;
-			}
-		}
-		ofs << "      </CellData>" << std::endl;
-		
-		// 关闭标签
-		ofs << "    </Piece>" << std::endl;
-		ofs << "  </UnstructuredGrid>" << std::endl;
-		ofs << "</VTKFile>" << std::endl;
-
-		return 0;
-	}
-
+    int vtkPost::writePVD(const std::string& fn)
+    {
+        std::ofstream ofs(fn);
+        if (!ofs.is_open()) return -1;
+        ofs << "<?xml version=\"1.0\"?>" << std::endl;
+        ofs << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
+        ofs << "  <Collection>" << std::endl;
+        for (auto& s : _steps)
+        {
+            std::ostringstream vf;
+            vf << _baseName << "_" << std::setw(4) << std::setfill('0') << s.first << ".vtu";
+            ofs << "    <DataSet timestep=\"" << s.second << "\" part=\"0\" file=\"" << vf.str() << "\"/>" << std::endl;
+        }
+        ofs << "  </Collection>" << std::endl;
+        ofs << "</VTKFile>" << std::endl;
+        return 0;
+    }
 }
-

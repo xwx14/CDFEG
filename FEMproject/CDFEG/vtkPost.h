@@ -13,10 +13,12 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-
 #ifndef VTKPOST_H
 #define VTKPOST_H
 #include "Processor.h"
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace CDFEG {
     class CDFEG_API vtkPost :
@@ -26,8 +28,17 @@ namespace CDFEG {
         vtkPost(DomainData* data);
         ~vtkPost();
 
+        // 与 GidPrePost 一致：输出 parentPath/baseName_<it>.vtu + baseName.pvd
+        void setFilePath(const std::string& parentPath, const std::string& baseName);
         virtual int post(int it = 0);
-		int writeVTK(const std::string& fn);
+
+    private:
+        int writeVTU(const std::string& fn);
+        int writePVD(const std::string& fn);
+        std::string _outPath = ".";
+        std::string _baseName = "result";
+        // 已写步：(it, time=it*_dt)，供 pvd 汇总；每次 post 全量重写 pvd
+        std::vector<std::pair<int, double>> _steps;
     };
 }
 #endif

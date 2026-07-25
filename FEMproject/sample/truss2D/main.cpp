@@ -59,6 +59,17 @@ int main() {
     makeData(data);
     data.caculate();
     CDFEG::vtkPost vtkpost(&data);
+    {
+        CDFEG::ResItem disp("disp", CDFEG::ResType::Vector);
+        disp.addVal(0, "u"); disp.addVal(0, "v");
+        vtkpost._resItems.push_back(disp);
+        CDFEG::ResItem force("force", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnGaussPoints);
+        force.addVal(0, "T");
+        vtkpost._resItems.push_back(force);
+        CDFEG::ResItem stress("stress", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnGaussPoints);
+        stress.addVal(0, "sigma");
+        vtkpost._resItems.push_back(stress);
+    }
     data.post(0);
 
     Truss2DDispFieldData* phy = static_cast<Truss2DDispFieldData*>(data._phyDatas[0]);
