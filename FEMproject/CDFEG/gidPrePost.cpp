@@ -25,6 +25,20 @@
 #include <set>
 namespace CDFEG {
 
+	// 按 ResItem 分量配对收集结果列指针：fromElem=true 取各场 _elemRes（单元结果），否则取 _nodeRes（节点结果）。
+	// 单元结果项分量通常同场（iFields 全等），逐分量按 iFields[iv] 取，与节点分支一致。
+	static std::vector<std::vector<double>*> collectResValPtrs(const DomainData* fem, const ResItem& item, bool fromElem)
+	{
+		std::vector<std::vector<double>*> ptrs;
+		ptrs.reserve(item._ValNames.size());
+		for (size_t iv = 0; iv < item._ValNames.size(); ++iv)
+		{
+			PhyFieldData* phy = fem->_phyDatas[item._iFields[iv]];
+			ptrs.push_back(fromElem ? &phy->_elemRes[item._ValNames[iv]] : &phy->_nodeRes[item._ValNames[iv]]);
+		}
+		return ptrs;
+	}
+
 	static std::string vtkCellTypeToGidElemType(VTKCellType type)
 	{
 		switch (type)
@@ -458,10 +472,7 @@ namespace CDFEG {
 			if (item._iFields.empty()) continue;
 			PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
 			std::string typeStr = resTypeToStr(item._type);
-			std::vector<std::vector<double>*> valPtrs;
-			valPtrs.reserve(item._ValNames.size());
-			for (const std::string& vn : item._ValNames)
-				valPtrs.push_back(&(phy->_elemRes[vn]));
+			auto valPtrs = collectResValPtrs(_femData, item, true);
 			for (ElementBase* eleSub : phy->_eleSubs)
 			{
 				std::string gpName = "GP_" + eleSub->_name;
@@ -509,12 +520,7 @@ namespace CDFEG {
 			}
 			outFile << std::endl;
 			outFile << "Values" << std::endl;
-			std::vector<std::vector<double>*> valPtrs;
-			valPtrs.reserve(item._iFields.size());
-			for (size_t iv = 0; iv < item._iFields.size(); ++iv)
-			{
-				valPtrs.push_back(&(_femData->_phyDatas[item._iFields[iv]]->_nodeRes[item._ValNames[iv]]));
-			}
+			auto valPtrs = collectResValPtrs(_femData, item, false);
 			for (int iNode = 0; iNode < nNodes; ++iNode)
 			{
 				outFile << std::setw(10) << iNode + 1;
