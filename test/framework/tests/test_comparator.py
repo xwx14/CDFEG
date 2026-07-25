@@ -24,7 +24,7 @@ def test_identical_blocks_pass():
 def test_numeric_drift_detected():
     actual = _blocks()
     # 篡改 disp step1 node1 的 u 分量
-    actual[("disp", 1)].values[1][0] += 1e-5
+    actual[("disp", 1, "")].values[1][0] += 1e-5
     r = compare(actual, _blocks(), Tolerance(atol=1e-12))
     assert r.structural_ok
     assert not r.passed
@@ -35,7 +35,7 @@ def test_numeric_drift_detected():
 
 def test_structural_drift_step_missing():
     actual = _blocks()
-    del actual[("disp", 2)]
+    del actual[("disp", 2, "")]
     r = compare(actual, _blocks(), Tolerance(atol=1e-12))
     assert not r.structural_ok
     assert not r.passed
@@ -44,14 +44,14 @@ def test_structural_drift_step_missing():
 
 def test_structural_drift_component_change():
     actual = _blocks()
-    actual[("disp", 1)].components = ["u", "v", "w"]
+    actual[("disp", 1, "")].components = ["u", "v", "w"]
     r = compare(actual, _blocks(), Tolerance(atol=1e-12))
     assert not r.structural_ok
 
 
 def test_worst_point_tracked():
     actual = _blocks()
-    actual[("disp", 1)].values[1][0] += 1e-3
-    actual[("disp", 1)].values[2][0] += 1e-2  # 更大
+    actual[("disp", 1, "")].values[1][0] += 1e-3
+    actual[("disp", 1, "")].values[2][0] += 1e-2  # 更大
     r = compare(actual, _blocks(), Tolerance(atol=1e-12))
     assert abs(r.worst_delta - 1e-2) < 1e-13

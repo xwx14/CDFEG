@@ -55,13 +55,13 @@ def _compare_numeric(actual: Blocks, baseline: Blocks, tol: Tolerance) -> Compar
                 r.n_points += 1
                 if delta > r.worst_delta:
                     r.worst_delta = delta
-                    r.worst_point = f"result={key[0]} step={key[1]} node={node_id} comp={comp}"
+                    r.worst_point = f"result={key[0]} step={key[1]} gp={key[2]} node={node_id} comp={comp}"
                 if delta > r.max_abs_err:
                     r.max_abs_err = delta
                 if not tol.accept(a_v, b_v):
                     r.n_over_tol += 1
                     if r.first_over is None:
-                        r.first_over = f"result={key[0]} step={key[1]} node={node_id} comp={comp}"
+                        r.first_over = f"result={key[0]} step={key[1]} gp={key[2]} node={node_id} comp={comp}"
     r.passed = (r.n_over_tol == 0)
     return r
 

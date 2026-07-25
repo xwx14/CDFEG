@@ -28,8 +28,8 @@ def test_parse_vtu_point_data(tmp_path):
     p = tmp_path / "a.vtu"
     _write_vtu(p, [("disp", 2, "PointData", [1.0, 2.0, 3.0, 4.0])])  # 2 节点 × 2 分量
     blocks = parse_vtu_file(p, step=0)
-    assert ("disp", 0) in blocks
-    blk = blocks[("disp", 0)]
+    assert ("disp", 0, "") in blocks
+    blk = blocks[("disp", 0, "")]
     assert blk.components == ["comp_0", "comp_1"]
     assert blk.values[1] == [1.0, 2.0]   # 第一节点（entity_id 从 1 起，与 GiD res 一致）
     assert blk.values[2] == [3.0, 4.0]   # 第二节点
@@ -40,9 +40,9 @@ def test_parse_vtu_cell_data(tmp_path):
     p = tmp_path / "a.vtu"
     _write_vtu(p, [("stress", 3, "CellData", [10.0, 20.0, 30.0])])  # 1 单元 × 3 分量
     blocks = parse_vtu_file(p, step=5)
-    assert ("stress", 5) in blocks
-    assert blocks[("stress", 5)].values[1] == [10.0, 20.0, 30.0]
-    assert blocks[("stress", 5)].location == "OnCells"
+    assert ("stress", 5, "") in blocks
+    assert blocks[("stress", 5, "")].values[1] == [10.0, 20.0, 30.0]
+    assert blocks[("stress", 5, "")].location == "OnCells"
 
 
 def test_parse_pvd_collects_steps(tmp_path):
@@ -58,4 +58,4 @@ def test_parse_pvd_collects_steps(tmp_path):
         '</Collection></VTKFile>\n', encoding="utf-8")
     blocks = parse_pvd_file(pvd)
     assert sorted(k[1] for k in blocks) == [0, 1, 2]   # 顺序索引作 step
-    assert blocks[("disp", 2)].values[1] == [2.0]
+    assert blocks[("disp", 2, "")].values[1] == [2.0]

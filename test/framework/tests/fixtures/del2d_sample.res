@@ -18,3 +18,22 @@ ComponentNames "u" "v"
 Values
          1                -5.0607906e-05 -4.8384212e-05
 End Values
+GaussPoints "GP_DelQ4g" ElemType Quadrilateral
+Number Of Gauss Points: 1
+Natural Coordinates: Internal
+End GaussPoints
+GaussPoints "GP_StressBL2g" ElemType Line
+Number Of Gauss Points: 1
+Natural Coordinates: Internal
+End GaussPoints
+Result "eleStress" "Load Analysis"           1 Matrix OnGaussPoints "GP_DelQ4g"
+ComponentNames "sigmaXX" "sigmaYY" "sigmaXY"
+Values
+         1 1.0 2.0 3.0
+         2 4.0 5.0 6.0
+End Values
+Result "eleStress" "Load Analysis"           1 Matrix OnGaussPoints "GP_StressBL2g"
+ComponentNames "sigmaXX" "sigmaYY" "sigmaXY"
+Values
+         1 0.0 0.0 0.0
+End Values

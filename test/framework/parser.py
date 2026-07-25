@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
 
-RESULT_RE = re.compile(r'^Result\s+"([^"]+)"\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(\S+)')
+RESULT_RE = re.compile(r'^Result\s+"([^"]+)"\s+"([^"]+)"\s+(\d+)\s+(\S+)\s+(\S+)(?:\s+"([^"]+)")?')
 COMPONENT_RE = re.compile(r'"([^"]*)"')
 
 
@@ -23,13 +23,18 @@ class ResBlock:
     step: int
     result_type: str
     location: str
+    gp_name: str = ""  # OnGaussPoints 段的 GaussPoints 名（如 "GP_DelQ4g"）；OnNodes 段为 ""
     components: list[str] = field(default_factory=list)
     values: dict[int, list[float]] = field(default_factory=dict)
 
 
-def parse_res_file(path) -> dict[tuple[str, int], ResBlock]:
-    """解析 .res -> {(result_name, step): ResBlock}。"""
-    blocks: dict[tuple[str, int], ResBlock] = {}
+def parse_res_file(path) -> dict[tuple[str, int, str], ResBlock]:
+    """解析 .res -> {(result_name, step, gp_name): ResBlock}。
+
+    key 含 GaussPoints 名维度，避免同名 Result 多 GP 段（如 eleStress 的
+    GP_DelQ4g + GP_StressBL2g）后段覆盖前段；OnNodes 段 gp_name=""。
+    """
+    blocks: dict[tuple[str, int, str], ResBlock] = {}
     cur: ResBlock | None = None
     in_values = False
 
@@ -41,8 +46,9 @@ def parse_res_file(path) -> dict[tuple[str, int], ResBlock]:
                 cur = ResBlock(
                     result_name=m.group(1), analysis=m.group(2),
                     step=int(m.group(3)), result_type=m.group(4), location=m.group(5),
+                    gp_name=m.group(6) or "",
                 )
-                blocks[(cur.result_name, cur.step)] = cur
+                blocks[(cur.result_name, cur.step, cur.gp_name)] = cur
                 in_values = False
                 continue
             if line.startswith("ComponentNames") and cur is not None:
@@ -66,14 +72,14 @@ def parse_res_file(path) -> dict[tuple[str, int], ResBlock]:
     return blocks
 
 
-def parse_vtu_file(path, step) -> dict[tuple[str, int], ResBlock]:
-    """解析 .vtu -> {(name, step): ResBlock}。
+def parse_vtu_file(path, step) -> dict[tuple[str, int, str], ResBlock]:
+    """解析 .vtu -> {(name, step, ""): ResBlock}。
 
     PointData -> location='OnNodes'（按节点序，entity_id 从 1 起）；
     CellData  -> location='OnCells'（按单元序）。
     分量名统一 comp_N（VTU 不存分量名，actual/baseline 同规则即可对齐）。
     """
-    blocks: dict[tuple[str, int], ResBlock] = {}
+    blocks: dict[tuple[str, int, str], ResBlock] = {}
     tree = ET.parse(path)
     root = tree.getroot()
     piece = root.find(".//Piece")
@@ -92,13 +98,13 @@ def parse_vtu_file(path, step) -> dict[tuple[str, int], ResBlock]:
             blk.components = [f"comp_{i}" for i in range(ncomp)]
             for eid in range(len(vals) // ncomp):
                 blk.values[eid + 1] = vals[eid * ncomp:(eid + 1) * ncomp]
-            blocks[(name, step)] = blk
+            blocks[(name, step, "")] = blk
     return blocks
 
 
-def parse_pvd_file(path) -> dict[tuple[str, int], ResBlock]:
+def parse_pvd_file(path) -> dict[tuple[str, int, str], ResBlock]:
     """解析 .pvd，按 <DataSet> 顺序（索引即 step）逐个解析引用的 vtu，合并。"""
-    blocks: dict[tuple[str, int], ResBlock] = {}
+    blocks: dict[tuple[str, int, str], ResBlock] = {}
     base = Path(path).parent
     tree = ET.parse(path)
     for step, ds in enumerate(tree.findall(".//DataSet")):

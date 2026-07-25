@@ -6,7 +6,7 @@
   <id>\t<val1>\t<val2>\t...
   ...
 
-映射到与 parser.parse_res_file 相同的 dict[(name, step), ResBlock]，从而复用
+映射到与 parser.parse_res_file 相同的 dict[(name, step, gp_name), ResBlock]，从而复用
 comparator：节名→result_name（step 固定 1），表头去首列(实体号列)→components，
 数据行首列→实体号键，其余→数值列。comparator 只用 components + values 做对比，
 result_type/location 仅占位。
@@ -27,7 +27,7 @@ def parse_truss_txt(path) -> dict:
                 name = s.replace("=", "").strip()
                 cur = ResBlock(result_name=name, analysis="", step=1,
                                result_type="Scalar", location="OnNodes")
-                blocks[(name, 1)] = cur
+                blocks[(name, 1, "")] = cur
                 expect_header = True
                 continue
             if cur is None:
