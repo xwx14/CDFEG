@@ -116,6 +116,10 @@ namespace CDFEG {
 		std::vector<std::string> _dispNames;
 		std::vector<std::string> _nodeResNames;
 		std::vector<std::string> _eleResNames;
+		// 需节点外推的结果名（uEle 经 weight 加权最小二乘外推到 _nodeRes）
+		std::vector<std::string> _nodeExtrapNames;
+		// uPhy 末尾是否用 _nodeExtrapNames 前 3 个分量算 von Mises
+		bool _bVonMises = false;
 		// 总自由度数，节点数*场自由度数
 		int _kVar;
 		// 第一类边界条件 <dofId, val>
@@ -154,6 +158,13 @@ namespace CDFEG {
 		std::map<std::string, std::vector<double>> _paramValues;
 		// 记录所需的其他场的数据，key为场号，value为场内数据名序列
 		std::map<int,std::vector<std::string>> _coefNames;
+	protected:
+		// 单元结果 + 节点结果加权外推：遍历 _eleSubs×单元调 uEle，
+		// eleResult 写 _elemRes；nodeResult 含 "weight" 时按权重最小二乘外推到 _nodeRes
+		void extrapolateNodeResults(const std::vector<std::string>& nodeResNames);
+		// 由 3 个应力分量算 von Mises 等效应力，写 _nodeRes[outName]
+		void computeVonMises(const std::string& sXX, const std::string& sYY,
+		                     const std::string& sXY, const std::string& outName = "vonMises");
 	};
 }
 #endif

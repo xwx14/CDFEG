@@ -33,6 +33,7 @@ DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     _eleSubs.push_back(new StressBL2g(this));
     // 应力结果名
     _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
+    _nodeExtrapNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
     _resForm = "Vector OnNodes";
     // 声明从前处理读取的 Newmark 积分参数组（gamma/beta）
     _addParams = { {"newmark","gamma","beta"} };
@@ -230,84 +231,10 @@ int DelDispFieldData::uPhy()
     {
         _elemRes[str].resize(_femData->_nElem);
     }
-    std::vector<std::string> stressNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
-    std::map<std::string, std::vector<double>> nodeStressSum;
-    std::vector<double> nodeWeightSum(_femData->_nPts, 0.0);
-    for (const std::string& name : stressNames)
-    {
-        nodeStressSum[name].resize(_femData->_nPts, 0.0);
-    }
-
-    int dim = _femData->_dim;
-    int nEleSub = _eleSubs.size();
-    for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
-    {
-        CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
-        for (int eleID : eleSub->_eleIds)
-        {
-            std::vector<double> r;
-            std::vector<int> nodeIds;
-            std::map<std::string, std::vector<double>> coef;
-            for (int i = _femData->_elePt[eleID]; i < _femData->_elePt[eleID + 1]; ++i)
-            {
-                int nodeId = _femData->_eleNodes[i];
-                for (int iDof = 0; iDof < _dof; ++iDof)
-                {
-                    std::string dispName = _dispNames[iDof];
-                    coef[dispName].push_back(_u[nodeId * _dof + iDof]);
-                }
-                nodeIds.push_back(nodeId);
-                int iCoor = dim * nodeId;
-                for (int iDim = 0; iDim < dim; ++iDim)
-                {
-                    r.push_back(_femData->_nodes[iCoor + iDim]);
-                }
-            }
-            const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
-            CDFEG::uResult res = eleSub->uEle(r, coef, matParams);
-
-            for (const auto& it : res.eleResult)
-            {
-                _elemRes[it.first][eleID] = it.second;
-            }
-            if (res.nodeResult.find("weight") != res.nodeResult.end())
-            {
-                const std::vector<double>& weights = res.nodeResult.at("weight");
-                for (size_t i = 0; i < nodeIds.size(); ++i)
-                {
-                    int nodeId = nodeIds[i];
-                    nodeWeightSum[nodeId] += weights[i];
-                    for (const std::string& name : stressNames)
-                    {
-                        if (res.nodeResult.find(name) != res.nodeResult.end())
-                        {
-                            nodeStressSum[name][nodeId] += res.nodeResult.at(name)[i];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    for (const std::string& name : stressNames)
-    {
-        _nodeRes[name].resize(_femData->_nPts);
-        for (size_t iNode = 0; iNode < _femData->_nPts; ++iNode)
-        {
-            _nodeRes[name][iNode] = (nodeWeightSum[iNode] > 0.0)
-                ? nodeStressSum[name][iNode] / nodeWeightSum[iNode]
-                : 0.0;
-        }
-    }
-    // von Mises 等效应力
-    _nodeRes["vonMises"].resize(_femData->_nPts);
-    for (size_t iNode = 0; iNode < _femData->_nPts; ++iNode)
-    {
-        double sXX = _nodeRes["sigmaXX"][iNode];
-        double sYY = _nodeRes["sigmaYY"][iNode];
-        double sXY = _nodeRes["sigmaXY"][iNode];
-        _nodeRes["vonMises"][iNode] = sqrt(sXX * sXX - sXX * sYY + sYY * sYY + 3.0 * sXY * sXY);
-    }
+    // 4) 应力恢复（调基类辅助：uEle 由当前位移反求应力，weight 加权外推到节点）
+    //    注：coef 取 _nodeRes[disp]，其已在步骤 3 回填为 _u，与原直接取 _u 等价
+    extrapolateNodeResults(_nodeExtrapNames);
+    computeVonMises("sigmaXX", "sigmaYY", "sigmaXY");
 
     // 5) 当前步结果保存为下一步初值
     _u1 = _u;

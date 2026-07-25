@@ -7,9 +7,6 @@ public:
     DelDispFieldData(CDFEG::DomainData* femData);
     ~DelDispFieldData();
 
-    // 重写 uPhy：回填位移 + 应力恢复
-    virtual int uPhy() override;
-
 };
 
 #endif

@@ -166,6 +166,7 @@ namespace CDFEG {
 
 	int PhyFieldData::uPhy()
 	{
+		// 1) resize 节点/单元结果容器
 		for (const std::string& disp : _dispNames)
 		{
 			_nodeRes[disp].resize( _femData->_nPts);
@@ -174,6 +175,7 @@ namespace CDFEG {
 		{
 			_elemRes[str].resize(_femData->_nElem);
 		}
+		// 2) 回填节点位移（一类边界节点 _ida==-1，保持初值）
 		for (size_t iDof = 0; iDof < _dof; iDof++)
 		{
 			std::string& dispName = _dispNames[iDof];
@@ -182,14 +184,29 @@ namespace CDFEG {
 				if (id != -1)_nodeRes[dispName][iNode] = _equSys._rhs[id];
 			}
 		}
-		int dim = _femData->_dim;
-		int nEleSub = _eleSubs.size();
-		for (int iEleSub = 0; iEleSub < nEleSub; ++iEleSub)
+		// 3) 单元结果 + 节点结果加权外推（uEle 经 weight 最小二乘外推到节点）
+		extrapolateNodeResults(_nodeExtrapNames);
+		// 4) von Mises 等效应力（可选，由 _bVonMises 控）
+		if (_bVonMises && _nodeExtrapNames.size() >= 3)
 		{
-			CDFEG::ElementBase* eleSub = _eleSubs[iEleSub];
-			int nNode = eleSub->getnNodesPerEle();
-			int k = nNode * _dof;
-			const std::vector<int>& eleIds = eleSub->getEleIds();
+			computeVonMises(_nodeExtrapNames[0], _nodeExtrapNames[1], _nodeExtrapNames[2]);
+		}
+		return 1;
+	}
+
+	void PhyFieldData::extrapolateNodeResults(const std::vector<std::string>& nodeResNames)
+	{
+		// 节点结果加权累加：nodeResult["weight"] 为权，nodeResult[name] 为被外推量
+		std::map<std::string, std::vector<double>> nodeSum;
+		std::vector<double> nodeWeightSum(_femData->_nPts, 0.0);
+		for (const std::string& name : nodeResNames)
+		{
+			nodeSum[name].assign(_femData->_nPts, 0.0);
+		}
+
+		int dim = _femData->_dim;
+		for (CDFEG::ElementBase* eleSub : _eleSubs)
+		{
 			for (int eleID : eleSub->_eleIds)
 			{
 				std::vector<double> r;
@@ -204,7 +221,6 @@ namespace CDFEG {
 						coef[dispName].push_back(_nodeRes[dispName][nodeId]);
 					}
 					nodeIds.push_back(nodeId);
-					// 节点坐标赋值
 					int iCoor = dim * nodeId;
 					for (int iDim = 0; iDim < dim; ++iDim)
 					{
@@ -212,25 +228,54 @@ namespace CDFEG {
 					}
 				}
 				const std::map<std::string, double>& matParams = _femData->getElemMatParams(eleID, eleSub);
-				uResult res=eleSub->uEle(r, coef, matParams);
+				uResult res = eleSub->uEle(r, coef, matParams);
+				// 单元结果写 _elemRes
 				for (const auto& it : res.eleResult)
 				{
-					const std::string& resName = it.first;
-					auto eit = _elemRes.find(resName);
+					auto eit = _elemRes.find(it.first);
 					if (eit != _elemRes.end() && eleID < (int)eit->second.size())
 						eit->second[eleID] = it.second;
 				}
-				for (const auto& it : res.nodeResult)
+				// 节点结果加权累加（要求 uEle 返回 "weight"）
+				if (res.nodeResult.find("weight") != res.nodeResult.end())
 				{
-					const std::string& resName = it.first;
-					auto eit = _elemRes.find(resName);
-					const std::vector<double>& resVals = it.second;
-					if (eit != _elemRes.end() && resVals.size() == 1 && eleID < (int)eit->second.size())
-						eit->second[eleID] = resVals[0];
+					const std::vector<double>& weights = res.nodeResult.at("weight");
+					for (size_t i = 0; i < nodeIds.size(); ++i)
+					{
+						int nodeId = nodeIds[i];
+						nodeWeightSum[nodeId] += weights[i];
+						for (const std::string& name : nodeResNames)
+						{
+							if (res.nodeResult.find(name) != res.nodeResult.end())
+								nodeSum[name][nodeId] += res.nodeResult.at(name)[i];
+						}
+					}
 				}
 			}
 		}
-		return 1;
+		// 节点外推：应力 = 加权和 / 权和（最小二乘）
+		for (const std::string& name : nodeResNames)
+		{
+			_nodeRes[name].resize(_femData->_nPts);
+			for (int iNode = 0; iNode < _femData->_nPts; ++iNode)
+			{
+				_nodeRes[name][iNode] = (nodeWeightSum[iNode] > 0.0)
+					? nodeSum[name][iNode] / nodeWeightSum[iNode] : 0.0;
+			}
+		}
+	}
+
+	void PhyFieldData::computeVonMises(const std::string& sXX, const std::string& sYY,
+	                                   const std::string& sXY, const std::string& outName)
+	{
+		_nodeRes[outName].resize(_femData->_nPts);
+		for (int iNode = 0; iNode < _femData->_nPts; ++iNode)
+		{
+			double sx = _nodeRes[sXX][iNode];
+			double sy = _nodeRes[sYY][iNode];
+			double txy = _nodeRes[sXY][iNode];
+			_nodeRes[outName][iNode] = sqrt(sx * sx - sx * sy + sy * sy + 3.0 * txy * txy);
+		}
 	}
 
 
