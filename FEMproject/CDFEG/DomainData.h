@@ -130,6 +130,8 @@ namespace CDFEG {
 		virtual int caculate() { return -1; };
 		// main程序
 		virtual int main() { return -1; };
+		// 统一后处理：遍历 _processors 调各自 post(it)
+		void post(int it = 0);
 		// 取某组某参数的值；组或参数不存在、值未读到时返回 0.0
 		double getParam(const std::string& group, const std::string& param) const;
 		/*!

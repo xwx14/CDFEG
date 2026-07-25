@@ -58,8 +58,8 @@ int main() {
     Truss1DData data;
     makeData(data);
     data.caculate();
-	CDFEG::vtkPost vtkpost(&data);
-	vtkpost.post();
+    CDFEG::vtkPost vtkpost(&data);
+    data.post(0);
     Truss1DDispFieldData* phy = static_cast<Truss1DDispFieldData*>(data._phyDatas[0]);
 
     std::map<int, int> nodeProgToFile;

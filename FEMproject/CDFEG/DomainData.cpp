@@ -15,6 +15,7 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 #include "DomainData.h"
 #include "PhyFieldData.h"
+#include "Processor.h"
 CDFEG::DomainData::DomainData() {
 	_elePt.push_back(0);
 }
@@ -22,6 +23,12 @@ CDFEG::DomainData::~DomainData() {
 	for (PhyFieldData* p : _phyDatas)
 	{
 		delete p;
+	}
+}
+
+void CDFEG::DomainData::post(int it) {
+	for (Processor* p : _processors) {
+		p->post(it);
 	}
 }
 void CDFEG::DomainData::setNPts(int n)

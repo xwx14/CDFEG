@@ -59,9 +59,6 @@ int main(int argc, char* argv[]) {
     stressItem.addVal(0, "sigmaXY");
     gidPrePost._resItems.push_back(stressItem);
 
-    // 将后处理器交给数据类，供 caculate 每步调用 post 输出
-    data.setPost(&gidPrePost);
-
     data.caculate();
     return 0;
 }

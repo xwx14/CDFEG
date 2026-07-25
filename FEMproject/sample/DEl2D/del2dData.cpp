@@ -16,7 +16,6 @@
 
 #include "del2dData.h"
 #include "DelDispFieldData.h"
-#include "CDFEG/gidPrePost.h"
 #include <iostream>
 
 del2dData::del2dData() {
@@ -30,11 +29,6 @@ del2dData::del2dData() {
 
 del2dData::~del2dData() {
 
-}
-
-void del2dData::setPost(CDFEG::GidPrePost* prePost)
-{
-    _prePost = prePost;
 }
 
 int del2dData::caculate() {
@@ -68,11 +62,7 @@ int del2dData::caculate() {
         aField->solve();      // Eigen LDLT 求解
         aField->uPhy();       // 更新加速度/速度/位移历史 + 应力恢复
 
-        if (_prePost)
-        {
-            // 按 GiD 步号输出本步位移/速度/加速度/应力
-            _prePost->post(it);
-        }
+        post(it);   // 遍历 _processors（GidPrePost 等）输出本步结果
 
         time += _dt;
     }

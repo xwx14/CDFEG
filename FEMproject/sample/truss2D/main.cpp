@@ -58,14 +58,14 @@ int main() {
     Truss2DData data;
     makeData(data);
     data.caculate();
+    CDFEG::vtkPost vtkpost(&data);
+    data.post(0);
 
     Truss2DDispFieldData* phy = static_cast<Truss2DDispFieldData*>(data._phyDatas[0]);
 
     std::map<int, int> nodeProgToFile;
     for (const auto& it : data._nodeIdMap)
         nodeProgToFile[it.second] = it.first;
-    CDFEG::vtkPost vtkpost(&data);
-    vtkpost.post();
     std::ofstream fout("Truss2D.txt");
     fout << std::setprecision(6) << std::fixed;
     fout << "========== 节点位移 ==========" << std::endl;
