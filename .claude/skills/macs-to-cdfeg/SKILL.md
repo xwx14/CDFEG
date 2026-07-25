@@ -59,7 +59,7 @@ cd pyTool && python test/testMacs.py <项目名>
 ## 已知遗留（el 项目首次迁移）
 el 项目核心计算链路已验证（位移与独立有限元交叉验证达机器精度；elb 最小二乘应力平滑已对齐旧 `eelb.c` 的显式 `load/mass`、不 solve；cnd 结构一致），但以下功能尚未实现，迁移其他项目时注意：
 - **a2ll2 面力载荷**：`a2ll2::run` 空壳，面力未施加（约 30 行可补，参考 a2ll2.c 的 load 段 + 沿线积分分配到节点）。带面力工况需先补。
-- **单元结果输出**：`post()` 输出各场节点结果（含 elb 节点应力 dxx/dyy/dxy），但 `_elemRes`（高斯点/单元心应变等）未写 res 文件。需 `post2()` + 注册 `GidResItem`（参考 El2D main.cpp）。
+- **单元结果输出**：`post()` 输出各场节点结果（含 elb 节点应力 dxx/dyy/dxy），但 `_elemRes`（高斯点/单元心应变等）未写 res 文件。需 `post()` + 注册 `ResItem`（参考 El2D main.cpp）。
 - **readID 空实现**：一类边界靠 readUBF 工作；`id` 段精确自由度控制未实现（影响复杂边界）。
 - **pyTool 线单元 `_refc` 越界**：模板 `elesub.cpp.j2` 用 `range(ele.dim)` 渲染 `_refc`，但 `parseGes` 按 `nrefc` 截 `gaussPoints`，线单元（nrefc<dim）重新生成会产空值。macs/El/el/a2ll2.cpp 已手补；治本需修模板（range 改 nrefc）或 parseGes 补零。
 

@@ -124,7 +124,7 @@ python test/run_tests.py --suite e2e --case <case>   # 单个
 | 首次跑 `error: 基准缺失` | 未先 `--update` 冻结 | 先 `--update <case>` 生成基线 |
 | `未产出 <project>.post.res` | target/project/文件名不匹配 | 核对 sample main 的 argv 与 setFilePath，config 的 target/project 对齐 |
 | `max\|Δ\|` 大（>1e-8） | 基线与当前工具链不符 | 同 mingw 重新 `--update`；基线若来自 MSVC 则末位抖动，放宽 tol |
-| 单元结果（应力）没被对比 | sample main 未注册 `GidResItem`（`post2`） | 在 main 注册应力项（范例：`FEMproject/sample/ElT3/main.cpp` 的 `stress`/`OnGaussPoints`） |
+| 单元结果（应力）没被对比 | sample main 未注册 `ResItem`（`post`） | 在 main 注册应力项（范例：`FEMproject/sample/ElT3/main.cpp` 的 `stress`/`OnGaussPoints`） |
 | 改核心库后多测例 fail | 预期回归（真漂移） | 逐个 `--update` 重冻前，**先确认漂移合理**（对齐理论解/基准程序） |
 | `--update` 无反应 | 未输 `yes`（交互确认） | `echo yes \|` 管道喂入，或手动输 yes |
 | dat 被 Read 工具当二进制拒读 | 误判（CRLF/特殊字节） | dat 是文本文件，用 Bash `file`/`cat` 读（见根 CLAUDE.md） |
