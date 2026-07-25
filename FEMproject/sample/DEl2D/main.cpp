@@ -42,33 +42,31 @@ int main(int argc, char* argv[]) {
     DelDispFieldData* field = static_cast<DelDispFieldData*>(data._phyDatas[0]);
     // 例：初值全零；如有初速度/初加速度可在此循环调用 field->setInitialVel / setInitialAcc
 
-    // 注册结果项：位移、速度、加速度、应力（gid 与 vtk 两个 processor 各一份）
-    // post 内按 ResItem._iFields 指向物理场、_ValNames 指向节点结果列
-    auto registerItems = [](CDFEG::Processor& p) {
+    // 注册结果项：位移、速度、加速度、应力（写入 _prePostConfig，所有 processor 共享）
+    auto registerItems = [&data]() {
         CDFEG::ResItem dispItem("disp", CDFEG::ResType::Vector);
         dispItem.addVal(0, "u");
         dispItem.addVal(0, "v");
-        p._resItems.push_back(dispItem);
+        data._prePostConfig._nodeResItems.push_back(dispItem);
 
         CDFEG::ResItem velItem("velocity", CDFEG::ResType::Vector);
         velItem.addVal(0, "velU");
         velItem.addVal(0, "velV");
-        p._resItems.push_back(velItem);
+        data._prePostConfig._nodeResItems.push_back(velItem);
 
         CDFEG::ResItem accItem("acceleration", CDFEG::ResType::Vector);
         accItem.addVal(0, "accU");
         accItem.addVal(0, "accV");
-        p._resItems.push_back(accItem);
+        data._prePostConfig._nodeResItems.push_back(accItem);
 
-        // 节点应力（默认 OnNodes，与原 main 一致；GidPrePost 与 vtkPost 均走节点分支）
+        // 节点应力（OnNodes，与原 main 一致）
         CDFEG::ResItem stressItem("stress", CDFEG::ResType::Matrix);
         stressItem.addVal(0, "sigmaXX");
         stressItem.addVal(0, "sigmaYY");
         stressItem.addVal(0, "sigmaXY");
-        p._resItems.push_back(stressItem);
+        data._prePostConfig._nodeResItems.push_back(stressItem);
     };
-    registerItems(gidPrePost);
-    registerItems(vtkpost);
+    registerItems();
 
     data.caculate();   // 内部 post(it) 同时驱动 GidPrePost(res) + vtkPost(vtu/pvd)
     return 0;

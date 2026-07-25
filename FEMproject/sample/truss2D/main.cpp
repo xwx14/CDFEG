@@ -62,13 +62,13 @@ int main() {
     {
         CDFEG::ResItem disp("disp", CDFEG::ResType::Vector);
         disp.addVal(0, "u"); disp.addVal(0, "v");
-        vtkpost._resItems.push_back(disp);
+        data._prePostConfig._nodeResItems.push_back(disp);
         CDFEG::ResItem force("force", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnGaussPoints);
         force.addVal(0, "T");
-        vtkpost._resItems.push_back(force);
+        data._prePostConfig._eleResItems.push_back(force);
         CDFEG::ResItem stress("stress", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnGaussPoints);
         stress.addVal(0, "sigma");
-        vtkpost._resItems.push_back(stress);
+        data._prePostConfig._eleResItems.push_back(stress);
     }
     data.post(0);
 

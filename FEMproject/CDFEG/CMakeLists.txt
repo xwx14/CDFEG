@@ -33,6 +33,7 @@ set(HEADERS
     IsoEleBase.h
     MatrixFun.h
     PhyFieldData.h
+    PrePostConfig.h
     Processor.h
     TextReader.h
     vtkCellType.h

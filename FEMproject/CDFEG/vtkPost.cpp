@@ -109,11 +109,10 @@ namespace CDFEG {
         ofs << "        </DataArray>" << std::endl;
         ofs << "      </Cells>" << std::endl;
 
-        // 节点结果（OnNodes）与单元结果（OnGaussPoints），均按 _resItems 输出
         ofs << "      <PointData>" << std::endl;
-        for (ResItem& item : _resItems)
+        for (ResItem& item : _femData->_prePostConfig._nodeResItems)
         {
-            if (item._loc != ResLocation::OnNodes || item._iFields.empty()) continue;
+            if (item._iFields.empty()) continue;
             PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
             ofs << "        <DataArray type=\"Float64\" Name=\"" << item._name
                 << "\" NumberOfComponents=\"" << item._ValNames.size() << "\" format=\"ascii\">" << std::endl;
@@ -132,9 +131,9 @@ namespace CDFEG {
         ofs << "      </PointData>" << std::endl;
 
         ofs << "      <CellData>" << std::endl;
-        for (ResItem& item : _resItems)
+        for (ResItem& item : _femData->_prePostConfig._eleResItems)
         {
-            if (item._loc != ResLocation::OnGaussPoints || item._iFields.empty()) continue;
+            if (item._iFields.empty()) continue;
             PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
             ofs << "        <DataArray type=\"Float64\" Name=\"" << item._name
                 << "\" NumberOfComponents=\"" << item._ValNames.size() << "\" format=\"ascii\">" << std::endl;

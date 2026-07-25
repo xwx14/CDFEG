@@ -18,12 +18,12 @@ int main(int argc, char* argv[]) {
 	CDFEG::ResItem resItem1("disp",CDFEG::ResType::Vector);
 	resItem1.addVal(0, "u");
     resItem1.addVal(0, "v");
-    gidPrePost._resItems.push_back(resItem1);
+    data._prePostConfig._nodeResItems.push_back(resItem1);
     CDFEG::ResItem resItem2("stress",CDFEG::ResType::Matrix);
     resItem2.addVal(0, "sigmaXX");
     resItem2.addVal(0, "sigmaYY");
     resItem2.addVal(0, "sigmaXY");
-    gidPrePost._resItems.push_back(resItem2);
+    data._prePostConfig._nodeResItems.push_back(resItem2);
     data.post(0);
     return 0;
 }

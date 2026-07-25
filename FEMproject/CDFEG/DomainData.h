@@ -22,6 +22,7 @@
 #include "CDFEG.h"
 #include "ElementBase.h"
 #include "EquationSystem.h"
+#include "PrePostConfig.h"
 namespace CDFEG {
 	class PhyFieldData;
 	class ElementBase;
@@ -178,6 +179,8 @@ namespace CDFEG {
 		std::map<int, int> _edgeIdMap;
 		// 前后处理
 		std::vector<Processor*> _processors;
+		// 前后处理配置：所有 Processor 共享
+		PrePostConfig _prePostConfig;
 		// 需要从前处理输入的参数，每组参数第一个为此参数的组名，后面为参数名
 		std::vector<std::vector<std::string>> _addParams;
 		// 从前处理读回的参数值，key=组名，value 按该组 _addParams 参数名顺序对齐

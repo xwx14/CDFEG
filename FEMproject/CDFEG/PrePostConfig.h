@@ -13,46 +13,25 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-//
-//
-//
-#ifndef PROCESSOR_H
-#define PROCESSOR_H
+#ifndef PRE_POST_CONFIG_H
+#define PRE_POST_CONFIG_H
 #include <string>
 #include <vector>
 #include "CDFEG.h"
-/**
- * @class Processor
- * @brief 前后处理器基类
- * @author xwx
- * @date 2025-3-27
- */
+#include "ResItem.h"
 namespace CDFEG {
-	class DomainData;
-	class PhyFieldData;
-	class CDFEG_API Processor
-	{
-	public:
-		Processor(DomainData* data);
-		virtual~Processor();
-		/**
-		 * @brief 前处理
-		 * @author Xie Wenxi
-		 * @date 2025-3-27
-		 */
-		virtual int pre();
-		/**
-		 * @brief 后处理
-		 * @author Xie Wenxi
-		 * @date 2025-3-27
-		 */
-		virtual int post(int it = 0);
-
-	public:
-		DomainData* _femData;
-		int _nPts = 0;
-		int _nEles = 0;
-	};
+    // 前后处理配置：由 DomainData 持有，所有 Processor 共享遍历
+    class CDFEG_API PrePostConfig
+    {
+    public:
+        // 节点结果项（OnNodes，post 取各物理场 _nodeRes）
+        std::vector<ResItem> _nodeResItems;
+        // 单元结果项（OnGaussPoints，post 取各物理场 _elemRes）
+        std::vector<ResItem> _eleResItems;
+        // GiD 结果 analysis 名（gidPrePost 写 Result 头用，默认沿用原硬编码值）
+        std::string _analysisName = "Load Analysis";
+        // 预留：processor 是否需要时间信息（当前未启用）
+        bool _bNeedTime = false;
+    };
 }
-
 #endif
