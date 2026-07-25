@@ -12,12 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with CDFEG.  If not, see <https://www.gnu.org/licenses/>
+// along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
 #include "del2dData.h"
 #include "DelDispFieldData.h"
 #include "CDFEG/gidPrePost.h"
+#include "CDFEG/vtkPost.h"
+#include "CDFEG/Processor.h"
 
 int main(int argc, char* argv[]) {
 	if (argc < 3) {
@@ -32,33 +34,42 @@ int main(int argc, char* argv[]) {
     gidPrePost.setFilePath(path, project);
     gidPrePost.pre();
 
+    // VTK 后处理器：与 GidPrePost 并存，输出 del2d_<it>.vtu + del2d.pvd 多步时间序列
+    CDFEG::vtkPost vtkpost(&data);
+    vtkpost.setFilePath(path, project);
+
     // 前处理完成后设置初值（按程序内节点号，此处示例置零，可按需调用）
     DelDispFieldData* field = static_cast<DelDispFieldData*>(data._phyDatas[0]);
     // 例：初值全零；如有初速度/初加速度可在此循环调用 field->setInitialVel / setInitialAcc
 
-    // 注册 GiD 结果项：位移、速度、加速度、应力（按节点输出）
+    // 注册结果项：位移、速度、加速度、应力（gid 与 vtk 两个 processor 各一份）
     // post 内按 ResItem._iFields 指向物理场、_ValNames 指向节点结果列
-    CDFEG::ResItem dispItem("disp", CDFEG::ResType::Vector);
-    dispItem.addVal(0, "u");
-    dispItem.addVal(0, "v");
-    gidPrePost._resItems.push_back(dispItem);
+    auto registerItems = [](CDFEG::Processor& p) {
+        CDFEG::ResItem dispItem("disp", CDFEG::ResType::Vector);
+        dispItem.addVal(0, "u");
+        dispItem.addVal(0, "v");
+        p._resItems.push_back(dispItem);
 
-    CDFEG::ResItem velItem("velocity", CDFEG::ResType::Vector);
-    velItem.addVal(0, "velU");
-    velItem.addVal(0, "velV");
-    gidPrePost._resItems.push_back(velItem);
+        CDFEG::ResItem velItem("velocity", CDFEG::ResType::Vector);
+        velItem.addVal(0, "velU");
+        velItem.addVal(0, "velV");
+        p._resItems.push_back(velItem);
 
-    CDFEG::ResItem accItem("acceleration", CDFEG::ResType::Vector);
-    accItem.addVal(0, "accU");
-    accItem.addVal(0, "accV");
-    gidPrePost._resItems.push_back(accItem);
+        CDFEG::ResItem accItem("acceleration", CDFEG::ResType::Vector);
+        accItem.addVal(0, "accU");
+        accItem.addVal(0, "accV");
+        p._resItems.push_back(accItem);
 
-    CDFEG::ResItem stressItem("stress", CDFEG::ResType::Matrix);
-    stressItem.addVal(0, "sigmaXX");
-    stressItem.addVal(0, "sigmaYY");
-    stressItem.addVal(0, "sigmaXY");
-    gidPrePost._resItems.push_back(stressItem);
+        // 节点应力（默认 OnNodes，与原 main 一致；GidPrePost 与 vtkPost 均走节点分支）
+        CDFEG::ResItem stressItem("stress", CDFEG::ResType::Matrix);
+        stressItem.addVal(0, "sigmaXX");
+        stressItem.addVal(0, "sigmaYY");
+        stressItem.addVal(0, "sigmaXY");
+        p._resItems.push_back(stressItem);
+    };
+    registerItems(gidPrePost);
+    registerItems(vtkpost);
 
-    data.caculate();
+    data.caculate();   // 内部 post(it) 同时驱动 GidPrePost(res) + vtkPost(vtu/pvd)
     return 0;
 }
