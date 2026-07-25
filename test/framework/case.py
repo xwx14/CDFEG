@@ -5,7 +5,7 @@ import shutil
 import time
 from typing import Protocol
 
-from framework.parser import parse_res_file
+from framework.parser import parse_res_file, parse_pvd_file
 from framework.txt_parser import parse_truss_txt
 from framework.comparator import compare
 from framework.runner import run as _runner_run_default, RunResult
@@ -58,15 +58,18 @@ class E2ECase:
         work_dir.mkdir(parents=True)
         for f in self.case_dir.iterdir():
             if (f.is_file() and ".post.res" not in f.name
-                    and not f.name.endswith(".bak") and f.name != self.baseline):
+                    and not f.name.endswith(".bak") and f.name != self.baseline
+                    and not f.name.endswith(".vtu") and not f.name.endswith(".pvd")):
                 shutil.copy2(f, work_dir / f.name)
         return work_dir
 
     def _parse(self, path):
-        """按 format 选解析器：gid→GiD .post.res；truss_txt→分节文本。两者都产出
-        dict[(name,step), ResBlock]，复用 comparator。"""
+        """按 format 选解析器：gid→GiD .post.res；truss_txt→分节文本；pvd→VTU/PVD 时间序列。
+        三者都产出 dict[(name,step), ResBlock]，复用 comparator。"""
         if self.format == "truss_txt":
             return parse_truss_txt(path)
+        if self.format == "pvd":
+            return parse_pvd_file(path)
         return parse_res_file(path)
 
     def run(self, ctx) -> CaseResult:

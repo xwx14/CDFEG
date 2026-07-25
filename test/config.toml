@@ -130,6 +130,17 @@ output = "del2d_mini.post.res"
 tol_atol = 1e-12
 tol_rtol = 0.0
 
+[[suite.e2e.cases]]
+name = "del2d1_vtk"
+target = "del2d"
+project = "del2d"
+case_dir = "models/del2d1_vtk.gid"
+baseline = "del2d.pvd"
+output = "del2d.pvd"
+tol_atol = 1e-12
+tol_rtol = 0.0
+format = "pvd"
+
 [suite.unit]
 cases = [ { name = "core", binary = "cdfeg_unit_test" } ]
 

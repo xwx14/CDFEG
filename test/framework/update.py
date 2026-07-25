@@ -7,7 +7,7 @@ from pathlib import Path
 from framework.config import Config
 from framework.builder import Builder
 from framework.runner import run
-from framework.parser import parse_res_file
+from framework.parser import parse_res_file, parse_pvd_file
 from framework.txt_parser import parse_truss_txt
 from framework.comparator import compare
 from framework.tolerance import Tolerance
@@ -64,7 +64,13 @@ def update_baseline(cfg: Config, case_name: str, proj_root: Path) -> int:
     # diff 摘要（若旧基准存在）
     max_delta = 0.0
     if baseline_path.exists():
-        _parse = parse_truss_txt if c.get("format", "gid") == "truss_txt" else parse_res_file
+        fmt = c.get("format", "gid")
+        if fmt == "truss_txt":
+            _parse = parse_truss_txt
+        elif fmt == "pvd":
+            _parse = parse_pvd_file
+        else:
+            _parse = parse_res_file
         cr = compare(_parse(actual_path), _parse(baseline_path),
                      Tolerance(atol=0.0, rtol=0.0))
         max_delta = cr.max_abs_err
@@ -81,7 +87,19 @@ def update_baseline(cfg: Config, case_name: str, proj_root: Path) -> int:
         print("已取消，基准未改动。")
         return 1
 
-    shutil.copy2(actual_path, baseline_path)
+    if c.get("format") == "pvd":
+        # 多文件基线：拷贝 <project>.pvd + <project>_*.vtu 群，先清旧基线群
+        import glob
+        for old in glob.glob(str(case_dir / f"{c['project']}*.vtu")):
+            Path(old).unlink()
+        old_pvd = case_dir / c["baseline"]
+        if old_pvd.exists():
+            old_pvd.unlink()
+        for vtu in glob.glob(str(Path(actual_path).parent / f"{c['project']}_*.vtu")):
+            shutil.copy2(vtu, case_dir / Path(vtu).name)
+        shutil.copy2(actual_path, baseline_path)
+    else:
+        shutil.copy2(actual_path, baseline_path)
     # 记录更新日志
     log = test_dir / "reports" / "update_log.txt"
     log.parent.mkdir(parents=True, exist_ok=True)

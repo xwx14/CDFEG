@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<VTKFile type="Collection" version="0.1" byte_order="LittleEndian">
+  <Collection>
+    <DataSet timestep="0" part="0" file="del2d_0000.vtu"/>
+    <DataSet timestep="0.1" part="0" file="del2d_0001.vtu"/>
+    <DataSet timestep="0.2" part="0" file="del2d_0002.vtu"/>
+    <DataSet timestep="0.3" part="0" file="del2d_0003.vtu"/>
+    <DataSet timestep="0.4" part="0" file="del2d_0004.vtu"/>
+    <DataSet timestep="0.5" part="0" file="del2d_0005.vtu"/>
+    <DataSet timestep="0.6" part="0" file="del2d_0006.vtu"/>
+    <DataSet timestep="0.7" part="0" file="del2d_0007.vtu"/>
+    <DataSet timestep="0.8" part="0" file="del2d_0008.vtu"/>
+    <DataSet timestep="0.9" part="0" file="del2d_0009.vtu"/>
+    <DataSet timestep="1" part="0" file="del2d_0010.vtu"/>
+  </Collection>
+</VTKFile>
