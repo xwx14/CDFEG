@@ -80,6 +80,8 @@ project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
 project.addOutputItem("velocity", "Vector", "OnNodes", [(0, "velU"), (0, "velV")])
 project.addOutputItem("acceleration", "Vector", "OnNodes", [(0, "accU"), (0, "accV")])
 project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
+project.addOutputItem("eleStress", "Matrix", "OnGaussPoints", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
+project.addOutputItem("eleVolume", "Scalar", "OnGaussPoints", [(0, "volume")])
 
 outPath = "sample/DEl2D"
 maker = MakerCpp(project, outPath, mode='new', sln_cmake_path="CMakeLists.txt")
