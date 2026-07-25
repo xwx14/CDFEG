@@ -23,8 +23,8 @@ int main(int argc, char* argv[]) {
 {% for val in item.vals %}
     resItem{{ itemIdx }}.addVal({{ val[0] }}, "{{ val[1] }}");
 {% endfor %}
-    gidPrePost._resItems.push_back(resItem{{ itemIdx }});
+    data._prePostConfig.{% if item.location == "OnGaussPoints" %}_eleResItems{% else %}_nodeResItems{% endif %}.push_back(resItem{{ itemIdx }});
 {% endfor %}
-    gidPrePost.post();
+    data.post(0);
     return 0;
 }
