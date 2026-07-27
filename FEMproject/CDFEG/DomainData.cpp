@@ -119,7 +119,7 @@ void CDFEG::DomainData::addEdge(int id, const std::vector<int>& nodeIds, const s
 		_eleNodes.push_back(_nodeIdMap[id]);
 	}
 	_elePt.push_back(_eleNodes.size());
-	VTKCellType iEleType;
+	VTKCellType iEleType = VTKCellType::VTK_EMPTY_CELL;
 	if (eleType != "")
 	{
 		for (PhyFieldData* p : _phyDatas)
