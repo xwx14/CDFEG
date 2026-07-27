@@ -96,7 +96,7 @@ int CDFEG::DomainData::addEle(int id, const std::vector<int>& nodeIds, const std
 		{
 			for (ElementBase* pEle : p->_eleSubs)
 			{
-				if (pEle->_types.find(eleType) != pEle->_types.end())
+				if (nodeIds.size() == pEle->getnNodesPerEle() && pEle->_types.find(eleType) != pEle->_types.end())
 				{
 					pEle->_eleIds.push_back(i);
 					iEleType = pEle->_vtkCellType;
@@ -126,7 +126,7 @@ void CDFEG::DomainData::addEdge(int id, const std::vector<int>& nodeIds, const s
 		{
 			for (ElementBase* pEle : p->_eleSubs)
 			{
-				if (pEle->_types.find(eleType) != pEle->_types.end())
+				if (nodeIds.size()==pEle->getnNodesPerEle()&&pEle->_types.find(eleType) != pEle->_types.end())
 				{
 					pEle->_eleIds.push_back(i);
 					iEleType = pEle->_vtkCellType;
