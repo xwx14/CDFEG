@@ -78,10 +78,9 @@
 
 *end
 {%endfor %}
-{%- for elem in elems %}** name={{elem.name}},structure="I32**{{elem.nNodes+2}}",type="elem",index={{elem.index}}
+{%- for elem in elems %}** name={{elem.name}},type="elem",index={{elem.index}}
 *set cond {{elem.type}}-{{elem.name}} *elems
 *loop elems *OnlyIncond
 *ElemsNum *{{elem.idType}} *cond(1)
-*format "%10i {{ '%10i ' * elem.nNodes }}%10i "
 *end
 {%endfor%}
