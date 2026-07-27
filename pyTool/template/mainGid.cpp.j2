@@ -19,11 +19,11 @@ int main(int argc, char* argv[]) {
     data.caculate();
 {% for item in project.outputItems %}
 {% set itemIdx = loop.index %}
-    CDFEG::ResItem resItem{{ itemIdx }}("{{ item.name }}", CDFEG::ResType::{{ item.type }}{% if item.location == "OnGaussPoints" %}, CDFEG::ResLocation::OnGaussPoints{% endif %});
+    CDFEG::ResItem resItem{{ itemIdx }}("{{ item.name }}", CDFEG::ResType::{{ item.type }}{% if item.location == "OnElements" %}, CDFEG::ResLocation::OnElements{% endif %});
 {% for val in item.vals %}
     resItem{{ itemIdx }}.addVal({{ val[0] }}, "{{ val[1] }}");
 {% endfor %}
-    data._prePostConfig.{% if item.location == "OnGaussPoints" %}_eleResItems{% else %}_nodeResItems{% endif %}.push_back(resItem{{ itemIdx }});
+    data._prePostConfig.{% if item.location == "OnElements" %}_eleResItems{% else %}_nodeResItems{% endif %}.push_back(resItem{{ itemIdx }});
 {% endfor %}
     data.post(0);
     return 0;

@@ -26,7 +26,7 @@ namespace CDFEG {
     public:
         // 节点结果项（OnNodes，post 取各物理场 _nodeRes）
         std::vector<ResItem> _nodeResItems;
-        // 单元结果项（OnGaussPoints，post 取各物理场 _elemRes）
+        // 单元结果项（OnElements，post 取各物理场 _elemRes）
         std::vector<ResItem> _eleResItems;
         // GiD 结果 analysis 名（gidPrePost 写 Result 头用，默认沿用原硬编码值）
         std::string _analysisName = "Load Analysis";

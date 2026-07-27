@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
 	resItem2.addVal(0, "Syy");
 	resItem2.addVal(0, "Sxy");
 	data._prePostConfig._nodeResItems.push_back(resItem2);
-	// 单元应力（OnGaussPoints，单元平均；ElT3 分量名为 Sxx/Syy/Sxy，无 volume）
-	CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnGaussPoints);
+	// 单元应力（OnElements，单元平均；ElT3 分量名为 Sxx/Syy/Sxy，无 volume）
+	CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
 	eleStress.addVal(0, "Sxx");
 	eleStress.addVal(0, "Syy");
 	eleStress.addVal(0, "Sxy");

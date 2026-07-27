@@ -32,14 +32,14 @@ int main(int argc, char* argv[]) {
     stressItem.addVal(1, "sigmaYY");
     stressItem.addVal(1, "sigmaXY");
     data._prePostConfig._nodeResItems.push_back(stressItem);
-    // 单元应力（OnGaussPoints，位移场 index=1；温度场无单元量）
-    CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnGaussPoints);
+    // 单元应力（OnElements，位移场 index=1；温度场无单元量）
+    CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
     eleStress.addVal(1, "sigmaXX");
     eleStress.addVal(1, "sigmaYY");
     eleStress.addVal(1, "sigmaXY");
     data._prePostConfig._eleResItems.push_back(eleStress);
-    // 单元体积（OnGaussPoints，位移场 index=1）
-    CDFEG::ResItem eleVolume("eleVolume", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnGaussPoints);
+    // 单元体积（OnElements，位移场 index=1）
+    CDFEG::ResItem eleVolume("eleVolume", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnElements);
     eleVolume.addVal(1, "volume");
     data._prePostConfig._eleResItems.push_back(eleVolume);
 

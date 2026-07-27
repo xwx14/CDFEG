@@ -17,11 +17,11 @@
 import sys
 import json
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 from DataProject import DataProject
 from DataField import DataField
 from DataEleSub import DataEleSub
-from DataEleSubG import DataEleSubG
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 # 总体数据
@@ -34,13 +34,16 @@ ele1.eleResNames=["Sxx","Syy","Sxy"]
 ele1.paramNames=["E","nu","t","fx","fy"]
 field.addEleSub(ele1)
 project.addField(field)
-# GiD 后处理输出项（生成 main 的 ResItem 注册，与 sample/ElT3/main.cpp 一致）
-project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
-project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
-project.addOutputItem("eleStress", "Matrix", "OnGaussPoints", [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
+#后处理输出项
+project.addOutputItem("disp", "Vector", "OnNodes",
+                       [(0, "u"), (0, "v")])
+project.addOutputItem("stress", "Matrix", "OnNodes",
+                       [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
+project.addOutputItem("eleStress", "Matrix", "OnElements",
+                       [(0, "Sxx"), (0, "Syy"), (0, "Sxy")])
 # 生成器
 outPath="sample/ElT3"
-maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
+maker = MakerCpp(project, outPath, sln_cmake_path="CMakeLists.txt")
 maker.mainMode=1
 maker.makeAll()
 gidMaker=MakerGidFile(project,outPath+"/gid")

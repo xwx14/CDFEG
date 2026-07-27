@@ -50,7 +50,7 @@ class DataProject:
             name: 结果名（如 "disp"、"stress"）
             type: ResType 枚举名（如 "Vector"、"Vector3"、"Scalar"、"Matrix"）
             location: "OnNodes"（默认，节点结果，生成代码写入 data._prePostConfig._nodeResItems）
-                       或 "OnGaussPoints"（单元结果，写入 data._prePostConfig._eleResItems）
+                       或 "OnElements"（单元结果，写入 data._prePostConfig._eleResItems）
             vals: 分量列表 [(fieldIndex, valName), ...]，如 [(0,"u"),(0,"v")]
         """
         self.outputItems.append({

@@ -83,8 +83,8 @@ project.addField(field2)
 project.addOutputItem("temperature", "Scalar", "OnNodes", [(0, "T")])
 project.addOutputItem("disp", "Vector", "OnNodes", [(1, "u"), (1, "v")])
 project.addOutputItem("stress", "Matrix", "OnNodes", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
-project.addOutputItem("eleStress", "Matrix", "OnGaussPoints", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
-project.addOutputItem("eleVolume", "Scalar", "OnGaussPoints", [(1, "volume")])
+project.addOutputItem("eleStress", "Matrix", "OnElements", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
+project.addOutputItem("eleVolume", "Scalar", "OnElements", [(1, "volume")])
 
 outPath="E:\\myProject\\CDFEG\\FEMproject\\sample\\Hel2D"
 maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="E:\\myProject\\CDFEG\\FEMproject\\CMakeLists.txt")

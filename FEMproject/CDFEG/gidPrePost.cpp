@@ -466,7 +466,7 @@ namespace CDFEG {
 		int nNodes = _femData->_nPts;
 		const std::string& analysis = _femData->_prePostConfig._analysisName;
 
-		// —— 单元结果（OnGaussPoints）：遍历 _eleResItems ——
+		// —— 单元结果（OnElements）：遍历 _eleResItems ——
 		for (ResItem& item : _femData->_prePostConfig._eleResItems)
 		{
 			if (item._iFields.empty()) continue;

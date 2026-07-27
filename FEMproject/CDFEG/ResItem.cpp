@@ -21,7 +21,7 @@ namespace CDFEG {
         switch (loc)
         {
             case ResLocation::OnNodes: return "OnNodes";
-            case ResLocation::OnGaussPoints: return "OnGaussPoints";
+            case ResLocation::OnElements: return "OnGaussPoints";
         }
         return "OnNodes";
     }
@@ -30,7 +30,7 @@ namespace CDFEG {
     {
         std::string lower; lower.reserve(str.size());
         for (char c : str) lower.push_back((char)std::tolower((unsigned char)c));
-        if (lower == "ongausspoints") return ResLocation::OnGaussPoints;
+        if (lower == "ongausspoints") return ResLocation::OnElements;
         return ResLocation::OnNodes;
     }
 
