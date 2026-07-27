@@ -299,7 +299,7 @@ namespace CDFEG {
 		int nB = B[0].size();       // B 的列数（节点自由度数）
 
 		if ((int)D.size() != kB || (int)D[0].size() != kB) {
-			throw std::invalid_argument("computeBTDB: B 与 D 维度不匹配。");
+			throw std::invalid_argument("computeBTDB: B and D dimension mismatch.");
 		}
 
 		std::vector<double> result(nB * nB, 0.0);
