@@ -41,6 +41,7 @@ ele1.gaussPoints = [
     [-s, s],
     [-s, -s]
 ]
+ele1.gidName = "El"
 ele1.gaussWeights = [1.0, 1.0, 1.0, 1.0]
 ele1.shapeFuns = [
     "(1. - x[1]) / 2. * (1. - x[2]) / 2.",
@@ -53,6 +54,7 @@ field.addEleSub(ele1)
 # T3高斯积分三角形单元
 ele2 = DataEleSubG("ElT3g", 3)
 ele2.type = 2
+ele2.gidName = "El"
 ele2.dispNames = ["u", "v"]
 ele2.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY", "volume"]
 ele2.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
@@ -97,7 +99,7 @@ project.addOutputItem("eleStress", "Matrix", "OnElements", [(0, "sigmaXX"), (0, 
 project.addOutputItem("eleVolume", "Scalar", "OnElements", [(0, "volume")])
 
 outPath = "sample/El2D"
-maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="CMakeLists.txt")
+maker = MakerCpp(project, outPath)
 maker.mainMode=1
 maker.makeAll()
 gidMaker = MakerGidFile(project, outPath)
