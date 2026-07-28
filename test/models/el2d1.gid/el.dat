@@ -2,7 +2,7 @@
 25 16
 * name=time,structure="F64"
 0.0 0.0
-* name=ElQ4g,structure="F64*6",type="mat",index=1
+* name=El,structure="F64*6",type="mat",index=1
 1.0e6 0.3 0.0 0.0 0.0 0.0
 * name=coord,structure="I32*1 F64*2",type="coord",index=1
 1 0.0000 0.0000
@@ -47,7 +47,7 @@
 23 0.000500 0.0
 24 0.000750 0.0
 25 0.001000 0.0
-* name=ElQ4g,structure="I32*6",type="elem",index=1
+* name=El,structure="I32*6",type="elem",index=1
 1 1 2 7 6 1
 2 2 3 8 7 1
 3 3 4 9 8 1

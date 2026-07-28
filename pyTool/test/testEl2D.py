@@ -24,14 +24,14 @@ from DataEleSubG import DataEleSubG
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 
-project = DataProject("el", 2)
+project = DataProject("el2d", 2)
 field = DataField("ElDisp")
 s = 1 / (3**0.5)
 # Q4高斯积分四边形单元
 ele1 = DataEleSubG("ElQ4g", 4)
 ele1.type = 2
 ele1.dispNames = ["u", "v"]
-ele1.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY", "volume"]
+ele1.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY"]
 ele1.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
 ele1.gaussPoints = [
     [s, s],
