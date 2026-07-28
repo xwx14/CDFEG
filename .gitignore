@@ -61,6 +61,7 @@ Thumbs.db
 # new 模式生成的示例产物（含 CDFEG/third 库副本，与 FEMproject/sample 重复），整体不入库
 /sample/
 /pyTool/sample/
+/pyTool/test/sample/
 /slides
 /DevTool
 /plans

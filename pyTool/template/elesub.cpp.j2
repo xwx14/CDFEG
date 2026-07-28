@@ -29,7 +29,7 @@
     _refc[{{ i * ele.dim + j }}] = {{ ele.gaussPoints[i][j] }};
 {% endfor %}
 {% endfor %}
-    caculateShapeCoef({{ dim }});
+    caculateShapeCoef({{ ele.dim }});
     _result.emass.resize(_nVar);
     _result.eload.resize(_nVar);
     _result.estif.resize(_nVar * _nVar);
@@ -78,7 +78,7 @@ std::vector<double> {{ele.name}}::shapeFun(
     std::vector<double> shapes;
 {% if ele.shapeFuns is defined and ele.shapeFuns|length > 0 %}
     double fval;
-{% for i in range(dim) %}
+{% for i in range(ele.dim) %}
     double {{project.coordVars[i]}} = refc[{{i}}];
 {% endfor %}
 {% for sf in shapeFuns %}

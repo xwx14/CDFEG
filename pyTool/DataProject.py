@@ -21,6 +21,7 @@ class DataProject:
         self.name = name
         # 总体坐标维度
         self.dim = dim
+        self.gidName = name
         # 坐标变量名称列表，默认为 ['x', 'y']，根据维度自动调整
         self.coordVars = ['x', 'y', 'z'][:dim]
         # 单元类型
@@ -79,7 +80,7 @@ class DataProject:
         multiField = len(self.fields) > 1
         for field in self.fields:
             for ele in field.eleSubs:
-                constitutiveName = ele.gidName if multiField else ele.name
+                constitutiveName = ele.gidName
                 ele.mateTypeName = constitutiveName
                 self._mergeOrAddMateType(constitutiveName, ele.paramNames, ele.paramValues)
 

@@ -69,21 +69,15 @@ class MakerGidFile(MakerBase):
                 gidName = ele.gidName
                 if gidName not in eleGroups:
                     eleGroups[gidName] = {'ele': ele, 'fieldIndex': index,
-                                          'paramNames': [], 'paramValues': [], 'paramSeen': {}}
-                # 按场出现先后追加 paramNames（同名第 2 次起加序号 _1、_2...，不去重）
-                # 并同步合并与各 paramName 一一配对的 paramValues
-                paramSeen = eleGroups[gidName]['paramSeen']
+                                          'paramNames': [], 'paramValues': []}
+                # 同 gidName 保序合并去重 paramNames（与 DataProject._mergeOrAddMateType 语义一致）
+                # 仅在参数首次出现时追加，paramValues 同步一一配对，缺失位置补 0.0
                 groupNames = eleGroups[gidName]['paramNames']
                 groupValues = eleGroups[gidName]['paramValues']
                 for i, name in enumerate(ele.paramNames):
-                    if name in paramSeen:
-                        paramSeen[name] += 1
-                        groupNames.append(f"{name}_{paramSeen[name]}")
-                    else:
-                        paramSeen[name] = 0
+                    if name not in groupNames:
                         groupNames.append(name)
-                    # paramValues 与 paramNames 等长配对；缺失位置补 0.0
-                    groupValues.append(ele.paramValues[i] if i < len(ele.paramValues) else 0.0)
+                        groupValues.append(ele.paramValues[i] if i < len(ele.paramValues) else 0.0)
 
         # 添加单元和材料
         for gidName, group in eleGroups.items():

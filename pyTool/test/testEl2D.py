@@ -98,7 +98,7 @@ project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "sigmaXX"), (0, "sigma
 project.addOutputItem("eleStress", "Matrix", "OnElements", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
 project.addOutputItem("eleVolume", "Scalar", "OnElements", [(0, "volume")])
 
-outPath = "sample/El2D"
+outPath = "sample/El2D2"
 maker = MakerCpp(project, outPath)
 maker.mainMode=1
 maker.makeAll()
