@@ -12,10 +12,8 @@ ElDispFieldData::ElDispFieldData(CDFEG::DomainData* femData)
     _eleSubs.push_back(new ElQ4g(this));
     _eleSubs.push_back(new ElT3g(this));
     _eleSubs.push_back(new StressBL2g(this));
-    _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
+    _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY"};
     _nodeExtrapNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
-    _bVonMises = true;
-    _resForm = "Vector OnNodes";
 }
 
 ElDispFieldData::~ElDispFieldData() {

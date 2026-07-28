@@ -112,7 +112,6 @@ namespace CDFEG {
 		double getParam(const std::string& group, const std::string& param) const;
 	public:
 		std::string _name;
-		std::string _resForm;
 		std::vector<std::string> _dispNames;
 		std::vector<std::string> _nodeResNames;
 		std::vector<std::string> _eleResNames;
@@ -162,9 +161,6 @@ namespace CDFEG {
 		// 单元结果 + 节点结果加权外推：遍历 _eleSubs×单元调 uEle，
 		// eleResult 写 _elemRes；nodeResult 含 "weight" 时按权重最小二乘外推到 _nodeRes
 		void extrapolateNodeResults(const std::vector<std::string>& nodeResNames);
-		// 由 3 个应力分量算 von Mises 等效应力，写 _nodeRes[outName]
-		void computeVonMises(const std::string& sXX, const std::string& sYY,
-		                     const std::string& sXY, const std::string& outName = "vonMises");
 	};
 }
 #endif

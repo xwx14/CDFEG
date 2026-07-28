@@ -21,10 +21,11 @@
 
 ElQ4g::ElQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
-    _name = "ElQ4g";
+    _name="ElQ4g";
     _dispNames = { "u", "v" };
-    _mateTypeName = "ElQ4g";
+    _mateTypeName = "El";
     _types.insert("ElQ4g");
+    _types.insert("El");
 
     _dim = 2;
     _nGaus = 4;
@@ -36,43 +37,30 @@ ElQ4g::ElQ4g(CDFEG::PhyFieldData* pData)
     _gaus.resize(4);
     _refc.resize(8);
     _gaus[0] = 1.0;
-    _refc[0] = 0.5773502692;
-    _refc[1] = 0.5773502692;
+    _refc[0] = 0.5773502691896258;
+    _refc[1] = 0.5773502691896258;
     _gaus[1] = 1.0;
-    _refc[2] = 0.5773502692;
-    _refc[3] = -0.5773502692;
+    _refc[2] = 0.5773502691896258;
+    _refc[3] = -0.5773502691896258;
     _gaus[2] = 1.0;
-    _refc[4] = -0.5773502692;
-    _refc[5] = 0.5773502692;
+    _refc[4] = -0.5773502691896258;
+    _refc[5] = 0.5773502691896258;
     _gaus[3] = 1.0;
-    _refc[6] = -0.5773502692;
-    _refc[7] = -0.5773502692;
+    _refc[6] = -0.5773502691896258;
+    _refc[7] = -0.5773502691896258;
     caculateShapeCoef(2);
     _result.emass.resize(_nVar);
     _result.eload.resize(_nVar);
     _result.estif.resize(_nVar * _nVar);
     _result.edamp.resize(_nVar * _nVar);
-    _vtkCellType = VTK_QUAD;
+    _vtkCellType =VTKCellType::VTK_QUAD;
 }
 
 ElQ4g::~ElQ4g() {
 
 }
 
-std::vector<double> ElQ4g::shapeFun(const std::vector<double>& refc) {
-    std::vector<double> rt;
-    double rx = refc[0];
-    double ry = refc[1];
-    double fval = (1. - rx) / 2. * (1. - ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. + rx) / 2. * (1. - ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. + rx) / 2. * (1. + ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. - rx) / 2. * (1. + ry) / 2.;
-    rt.push_back(fval);
-    return rt;
-}
+
 
 CDFEG::EleSubResult& ElQ4g::run(
     const std::vector<double>& r,
@@ -220,7 +208,6 @@ CDFEG::uResult ElQ4g::uEle(
     res.eleResult["sigmaXX"] = sigmaXX;
     res.eleResult["sigmaYY"] = sigmaYY;
     res.eleResult["sigmaXY"] = sigmaXY;
-    res.eleResult["volume"] = totalWeight;
 
     res.nodeResult["sigmaXX"] = nodeSigmaXX;
     res.nodeResult["sigmaYY"] = nodeSigmaYY;
@@ -228,4 +215,22 @@ CDFEG::uResult ElQ4g::uEle(
     res.nodeResult["weight"] = nodeWeight;
 
     return res;
+}
+
+std::vector<double> ElQ4g::shapeFun(
+    const std::vector<double>& refc
+) {
+    std::vector<double> shapes;
+    double fval;
+    double x = refc[0];
+    double y = refc[1];
+    fval = (1. - x) / 2. * (1. - y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. + x) / 2. * (1. - y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. + x) / 2. * (1. + y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. - x) / 2. * (1. + y) / 2.;
+    shapes.push_back(fval);
+    return shapes;
 }

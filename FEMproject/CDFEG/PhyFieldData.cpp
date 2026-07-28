@@ -186,11 +186,6 @@ namespace CDFEG {
 		}
 		// 3) 单元结果 + 节点结果加权外推（uEle 经 weight 最小二乘外推到节点）
 		extrapolateNodeResults(_nodeExtrapNames);
-		// 4) von Mises 等效应力（可选，由 _bVonMises 控）
-		if (_bVonMises && _nodeExtrapNames.size() >= 3)
-		{
-			computeVonMises(_nodeExtrapNames[0], _nodeExtrapNames[1], _nodeExtrapNames[2]);
-		}
 		return 1;
 	}
 
@@ -262,19 +257,6 @@ namespace CDFEG {
 				_nodeRes[name][iNode] = (nodeWeightSum[iNode] > 0.0)
 					? nodeSum[name][iNode] / nodeWeightSum[iNode] : 0.0;
 			}
-		}
-	}
-
-	void PhyFieldData::computeVonMises(const std::string& sXX, const std::string& sYY,
-	                                   const std::string& sXY, const std::string& outName)
-	{
-		_nodeRes[outName].resize(_femData->_nPts);
-		for (int iNode = 0; iNode < _femData->_nPts; ++iNode)
-		{
-			double sx = _nodeRes[sXX][iNode];
-			double sy = _nodeRes[sYY][iNode];
-			double txy = _nodeRes[sXY][iNode];
-			_nodeRes[outName][iNode] = sqrt(sx * sx - sx * sy + sy * sy + 3.0 * txy * txy);
 		}
 	}
 

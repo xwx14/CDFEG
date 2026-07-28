@@ -22,7 +22,6 @@ public:
     virtual std::vector<double> shapeFun(
         const std::vector<double>& refc
     ) override;
-
 };
 
 #endif

@@ -24,7 +24,8 @@ int main(int argc, char* argv[]) {
     resItem2.addVal(0, "Syy");
     resItem2.addVal(0, "Sxy");
     data._prePostConfig._nodeResItems.push_back(resItem2);
-    CDFEG::ResItem resItem3("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
+    CDFEG::ResItem resItem3("eleStress", 
+        CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
     resItem3.addVal(0, "Sxx");
     resItem3.addVal(0, "Syy");
     resItem3.addVal(0, "Sxy");

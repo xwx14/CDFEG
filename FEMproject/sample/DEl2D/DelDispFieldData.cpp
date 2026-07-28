@@ -32,9 +32,8 @@ DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     // 注册边界面力载荷单元（StressBL2g，纯载荷：沿线积分把面力分配到节点）
     _eleSubs.push_back(new StressBL2g(this));
     // 应力结果名
-    _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY", "volume" };
+    _eleResNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
     _nodeExtrapNames = { "sigmaXX", "sigmaYY", "sigmaXY" };
-    _resForm = "Vector OnNodes";
     // 声明从前处理读取的 Newmark 积分参数组（gamma/beta）
     _addParams = { {"newmark","gamma","beta"} };
 }
@@ -234,7 +233,6 @@ int DelDispFieldData::uPhy()
     // 4) 应力恢复（调基类辅助：uEle 由当前位移反求应力，weight 加权外推到节点）
     //    注：coef 取 _nodeRes[disp]，其已在步骤 3 回填为 _u，与原直接取 _u 等价
     extrapolateNodeResults(_nodeExtrapNames);
-    computeVonMises("sigmaXX", "sigmaYY", "sigmaXY");
 
     // 5) 当前步结果保存为下一步初值
     _u1 = _u;

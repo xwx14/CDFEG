@@ -72,10 +72,6 @@ int main(int argc, char* argv[]) {
         eleStress.addVal(0, "sigmaYY");
         eleStress.addVal(0, "sigmaXY");
         data._prePostConfig._eleResItems.push_back(eleStress);
-        // 单元体积（OnElements）
-        CDFEG::ResItem eleVolume("eleVolume", CDFEG::ResType::Scalar, CDFEG::ResLocation::OnElements);
-        eleVolume.addVal(0, "volume");
-        data._prePostConfig._eleResItems.push_back(eleVolume);
     };
     registerItems();
 

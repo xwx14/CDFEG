@@ -43,6 +43,8 @@ namespace CDFEG {
 		~GidPrePost();
 		void setFilePath(const std::string& parentPath, const std::string& name);
 		virtual int pre();
+		virtual int post(int it = 0);
+	private:
 		int readMate(const std::map<std::string, std::string>& params);
 		int readTime(const std::string& line);
 		int readPreParams(const std::string& group, const std::string& line);
@@ -54,7 +56,7 @@ namespace CDFEG {
 		int readUBF(const std::map<std::string, std::string>& params);
 		int gidMsh();
 		int writeNodes(std::ofstream& outFile, int dim);
-		virtual int post(int it = 0);
+		
 	public:
 		// 网格文件
 		std::string _datFn;

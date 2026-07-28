@@ -247,7 +247,6 @@ CDFEG::uResult DelQ4g::uEle(
     res.eleResult["sigmaXX"] = sigmaXX;
     res.eleResult["sigmaYY"] = sigmaYY;
     res.eleResult["sigmaXY"] = sigmaXY;
-    res.eleResult["volume"] = totalWeight;
 
     res.nodeResult["sigmaXX"] = nodeSigmaXX;
     res.nodeResult["sigmaYY"] = nodeSigmaYY;
