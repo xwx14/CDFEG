@@ -12,12 +12,13 @@ ElasticT3Data::~ElasticT3Data() {
 }
 
 int ElasticT3Data::caculate() {
-	Elastic2DDispFieldData* aField = static_cast<Elastic2DDispFieldData*>(_phyDatas[0]);
-	aField->initMatrix();
-	aField->eProgram();
-	aField->solve();
-	aField->uPhy();
-	aField->_equSys.calRightVals();
+	Elastic2DDispFieldData* phy0 = static_cast<Elastic2DDispFieldData*>(_phyDatas[0]);
+	phy0->initMatrix();
+	phy0->eProgram();
+	phy0->solve();
+	phy0->uPhy();
+	phy0->_equSys.calRightVals();
+
     return 1;
 }
 

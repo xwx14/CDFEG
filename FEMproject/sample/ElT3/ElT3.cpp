@@ -16,10 +16,11 @@ static std::vector<std::vector<double>> calcBD(double E, double nu) {
 
 ElT3::ElT3(CDFEG::PhyFieldData* pData)
     : CDFEG::ElementBase(3, pData) {
-    _name = "ElT3";
+    _name="ElT3";
     _dispNames = { "u", "v" };
     _mateTypeName = "ElT3";
     _types.insert("ElT3");
+    _vtkCellType =VTKCellType::VTK_TRIANGLE;
 }
 
 ElT3::~ElT3() {

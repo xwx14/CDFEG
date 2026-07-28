@@ -15,22 +15,20 @@ int main(int argc, char* argv[]) {
 	gidPrePost.setFilePath(path, project);
 	gidPrePost.pre();
     data.caculate();
-	CDFEG::ResItem resItem1("disp", CDFEG::ResType::Vector);
-	resItem1.addVal(0, "u");
-	resItem1.addVal(0, "v");
-	data._prePostConfig._nodeResItems.push_back(resItem1);
-	// 节点应力结果（OnNodes）
-	CDFEG::ResItem resItem2("stress", CDFEG::ResType::Matrix);
-	resItem2.addVal(0, "Sxx");
-	resItem2.addVal(0, "Syy");
-	resItem2.addVal(0, "Sxy");
-	data._prePostConfig._nodeResItems.push_back(resItem2);
-	// 单元应力（OnElements，单元平均；ElT3 分量名为 Sxx/Syy/Sxy，无 volume）
-	CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
-	eleStress.addVal(0, "Sxx");
-	eleStress.addVal(0, "Syy");
-	eleStress.addVal(0, "Sxy");
-	data._prePostConfig._eleResItems.push_back(eleStress);
+    CDFEG::ResItem resItem1("disp", CDFEG::ResType::Vector);
+    resItem1.addVal(0, "u");
+    resItem1.addVal(0, "v");
+    data._prePostConfig._nodeResItems.push_back(resItem1);
+    CDFEG::ResItem resItem2("stress", CDFEG::ResType::Matrix);
+    resItem2.addVal(0, "Sxx");
+    resItem2.addVal(0, "Syy");
+    resItem2.addVal(0, "Sxy");
+    data._prePostConfig._nodeResItems.push_back(resItem2);
+    CDFEG::ResItem resItem3("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
+    resItem3.addVal(0, "Sxx");
+    resItem3.addVal(0, "Syy");
+    resItem3.addVal(0, "Sxy");
+    data._prePostConfig._eleResItems.push_back(resItem3);
     data.post(0);
     return 0;
 }
