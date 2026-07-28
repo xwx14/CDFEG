@@ -29,6 +29,10 @@ class DataField:
         self.dispNames=[]
         # 单元变量名称集合
         self.eleResNames=[]
+        # 是否对单元量做节点外推（uEle 需返回 "weight"，加权最小二乘外推到节点）
+        self.bNodeExtrap=False
+        # 需节点外推的量名；为空则外推全部 eleResNames
+        self.nodeExtrapNames=[]
         self.project=None
         self.index=1
         self.bDynamic=False
@@ -95,6 +99,10 @@ class DataField:
             'dof2': getattr(self, 'dof2', None),
             'headerGuard': getattr(self, 'headerGuard', None),
             'eleResNames': getattr(self, 'eleResNames', None),
+            # 节点外推开关（True 时对单元量做加权最小二乘外推到节点）
+            'bNodeExtrap': getattr(self, 'bNodeExtrap', False),
+            # 需节点外推的量名；为空则外推全部 eleResNames
+            'nodeExtrapNames': getattr(self, 'nodeExtrapNames', []),
             # 预处理参数，结构为多个{"name":"pr1","params":[]}
             'preParams': self.preParams
             # 注意：femDataClassName 由 DataProject.toDict() 添加
@@ -129,6 +137,9 @@ class DataField:
             field.headerGuard = data['headerGuard']
         if 'eleResNames' in data and data['eleResNames'] is not None:
             field.eleResNames = data['eleResNames']
+        # 恢复节点外推配置（旧存档无字段时取默认 False/[]）
+        field.bNodeExtrap = data.get('bNodeExtrap', False)
+        field.nodeExtrapNames = data.get('nodeExtrapNames', [])
 
         # 恢复单元子程序
         if 'eleSubs' in data:

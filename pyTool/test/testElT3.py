@@ -33,7 +33,9 @@ ele1.dispNames=["u","v"]
 ele1.eleResNames=["Sxx","Syy","Sxy"]
 ele1.paramNames=["E","nu","t","fx","fy"]
 field.addEleSub(ele1)
+field.bNodeExtrap=True
 project.addField(field)
+project.cmds.append(("imp",0))
 #后处理输出项
 project.addOutputItem("disp", "Vector", "OnNodes",
                        [(0, "u"), (0, "v")])

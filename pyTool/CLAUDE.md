@@ -35,4 +35,5 @@ DataProject（项目）→ DataField（场）→ DataEleSub / DataEleSubG（单�
 
 ## 深度参考
 
-生成器能力边界（能 / 不能生成什么）：[`.claude/rules/pyTool能力边界.md`](../.claude/rules/pyTool能力边界.md)。
+- 生成器能力边界（能 / 不能生成什么）：[`.claude/rules/pyTool能力边界.md`](../.claude/rules/pyTool能力边界.md)。
+- GiD 问题类型文件写法（`.bas/.cnd/.prb/.bat` 官方语法 + pyTool 用法 + `.dat` 段头协议）：[`.claude/rules/GiD问题类型文件写法.md`](../.claude/rules/GiD问题类型文件写法.md)。
