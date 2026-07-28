@@ -467,45 +467,45 @@ namespace CDFEG {
 		const std::string& analysis = _femData->_prePostConfig._analysisName;
 
 		// —— 单元结果（OnElements）：遍历 _eleResItems ——
-		for (ResItem& item : _femData->_prePostConfig._eleResItems)
-		{
-			if (item._iFields.empty()) continue;
-			PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
-			std::string typeStr = resTypeToStr(item._type);
-			auto valPtrs = collectResValPtrs(_femData, item, true);
-			for (ElementBase* eleSub : phy->_eleSubs)
-			{
-				std::string gpName = "GP_" + eleSub->_name;
-				std::string gidType = vtkCellTypeToGidElemType(eleSub->_vtkCellType);
-				if (it == 0)
-				{
-					outFile << "GaussPoints \"" << gpName << "\" ElemType " << gidType << std::endl;
-					outFile << "Number Of Gauss Points: 1" << std::endl;
-					outFile << "Natural Coordinates: Internal" << std::endl;
-					outFile << "End GaussPoints" << std::endl;
-				}
-				outFile << "Result \"" << item._name << "\" \"" << analysis << "\"  ";
-				outFile << std::setw(10) << it + 1 << " ";
-				outFile << typeStr << " OnGaussPoints \"" << gpName << "\"" << std::endl;
-				outFile << "ComponentNames ";
-				for (const std::string& vn : item._ValNames)
-					outFile << "\"" << vn << "\" ";
-				outFile << std::endl;
-				outFile << "Values" << std::endl;
-				for (int id : eleSub->_eleIds)
-				{
-					outFile << std::setw(10) << id + 1;
-					outFile << std::setw(16) << std::scientific << std::setprecision(7);
-					for (auto* pv : valPtrs)
-					{
-						if (id >= 0 && id < (int)pv->size()) outFile << " " << (*pv)[id];
-						else outFile << " " << 0.0;
-					}
-					outFile << std::endl;
-				}
-				outFile << "End Values" << std::endl;
-			}
-		}
+		// for (ResItem& item : _femData->_prePostConfig._eleResItems)
+		// {
+		// 	if (item._iFields.empty()) continue;
+		// 	PhyFieldData* phy = _femData->_phyDatas[item._iFields[0]];
+		// 	std::string typeStr = resTypeToStr(item._type);
+		// 	auto valPtrs = collectResValPtrs(_femData, item, true);
+		// 	for (ElementBase* eleSub : phy->_eleSubs)
+		// 	{
+		// 		std::string gpName = "GP_" + eleSub->_name;
+		// 		std::string gidType = vtkCellTypeToGidElemType(eleSub->_vtkCellType);
+		// 		if (it == 0)
+		// 		{
+		// 			outFile << "GaussPoints \"" << gpName << "\" ElemType " << gidType << std::endl;
+		// 			outFile << "Number Of Gauss Points: 1" << std::endl;
+		// 			outFile << "Natural Coordinates: Internal" << std::endl;
+		// 			outFile << "End GaussPoints" << std::endl;
+		// 		}
+		// 		outFile << "Result \"" << item._name << "\" \"" << analysis << "\"  ";
+		// 		outFile << std::setw(10) << it + 1 << " ";
+		// 		outFile << typeStr << " OnGaussPoints \"" << gpName << "\"" << std::endl;
+		// 		outFile << "ComponentNames ";
+		// 		for (const std::string& vn : item._ValNames)
+		// 			outFile << "\"" << vn << "\" ";
+		// 		outFile << std::endl;
+		// 		outFile << "Values" << std::endl;
+		// 		for (int id : eleSub->_eleIds)
+		// 		{
+		// 			outFile << std::setw(10) << id + 1;
+		// 			outFile << std::setw(16) << std::scientific << std::setprecision(7);
+		// 			for (auto* pv : valPtrs)
+		// 			{
+		// 				if (id >= 0 && id < (int)pv->size()) outFile << " " << (*pv)[id];
+		// 				else outFile << " " << 0.0;
+		// 			}
+		// 			outFile << std::endl;
+		// 		}
+		// 		outFile << "End Values" << std::endl;
+		// 	}
+		// }
 
 		// —— 节点结果（OnNodes）：遍历 _nodeResItems ——
 		for (ResItem& item : _femData->_prePostConfig._nodeResItems)
