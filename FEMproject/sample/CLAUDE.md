@@ -11,7 +11,7 @@
 | truss1D | 1D | 桁架静力 | `Truss1D` | makeData | 否 | 是 |
 | truss2D | 2D | 桁架静力 | `Truss2D` | GiD/makeData | 否 | 是 |
 | truss3D | 3D | 桁架静力 | `Truss3D` | — | 否 | 是 |
-| El2D | 2D | 平面应力静力 | `ElQ4g`/`ElT3g`/`StressBL2g` | GiD | 否 | 是 |
+| El2D | 2D | 平面应变静力 | `ElQ4g`/`ElT3g`/`StressBL2g` | GiD | 否 | 是 |
 | ElT3 | 2D | 弹性力学 | `ElT3` | — | 否 | 是 |
 | DEl2D | 2D | Newmark-β 动力学 | `DelQ4g` | GiD | **是** | **是（框架生成，逻辑手填）** |
 | Hel2D | 2D | 热弹耦合（温度场+位移场） | `HeatQ4g`/`DelQ4g` | GiD | **是** | **是（框架生成，逻辑手填）** |

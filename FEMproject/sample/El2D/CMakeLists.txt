@@ -7,7 +7,7 @@ message(STATUS "el Eigen include directory: ${EIGEN_INCLUDE_DIR}")
 
 set(SOURCES
     main.cpp
-    elData.cpp
+    El2DData.cpp
     ElDispFieldData.cpp
     ElQ4g.cpp
     ElT3g.cpp
@@ -15,7 +15,7 @@ set(SOURCES
 )
 
 set(HEADERS
-    elData.h
+    El2DData.h
     ElDispFieldData.h
     ElQ4g.h
     ElT3g.h

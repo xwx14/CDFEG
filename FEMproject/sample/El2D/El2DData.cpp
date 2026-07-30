@@ -1,18 +1,18 @@
-#include "elData.h"
+#include "El2DData.h"
 #include "ElDispFieldData.h"
 
-elData::elData() {
+El2DData::El2DData() {
     _dim = 2;
     _phyDatas.push_back(new ElDispFieldData(this));
     _mateConstitutive["El"] = { "pe", "pv", "fu", "fv", "rou", "alpha" };
     _mateConstitutive["StressBL2g"] = { "fu", "fv" };
 }
 
-elData::~elData() {
+El2DData::~El2DData() {
 
 }
 
-int elData::caculate() {
+int El2DData::caculate() {
 	ElDispFieldData* phy0 = static_cast<ElDispFieldData*>(_phyDatas[0]);
 	phy0->initMatrix();
 	phy0->eProgram();
@@ -23,7 +23,7 @@ int elData::caculate() {
     return 1;
 }
 
-int elData::main() {
+int El2DData::main() {
     caculate();
     return 1;
 }

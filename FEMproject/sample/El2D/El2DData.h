@@ -1,12 +1,12 @@
-#ifndef EL_DATA_H
-#define EL_DATA_H
+#ifndef EL2D_DATA_H
+#define EL2D_DATA_H
 #include <string>
 #include "CDFEG/DomainData.h"
 
-class elData : public CDFEG::DomainData {
+class El2DData : public CDFEG::DomainData {
 public:
-    elData();
-    ~elData();
+    El2DData();
+    ~El2DData();
     virtual int caculate() override;
     virtual int main() override;
 };

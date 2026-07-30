@@ -1,6 +1,6 @@
 #include <iostream>
 #include "ElDispFieldData.h"
-#include "elData.h"
+#include "El2DData.h"
 #include "CDFEG/gidPrePost.h"
 
 int main(int argc, char* argv[]) {
@@ -10,26 +10,25 @@ int main(int argc, char* argv[]) {
 	}
     std::string project = argv[1];
 	std::string path = argv[2];
-    elData data;
+    El2DData data;
     CDFEG::GidPrePost gidPrePost(&data);
 	gidPrePost.setFilePath(path, project);
 	gidPrePost.pre();
     data.caculate();
-	CDFEG::ResItem resItem1("disp",CDFEG::ResType::Vector);
-	resItem1.addVal(0, "u");
+    CDFEG::ResItem resItem1("disp", CDFEG::ResType::Vector);
+    resItem1.addVal(0, "u");
     resItem1.addVal(0, "v");
     data._prePostConfig._nodeResItems.push_back(resItem1);
-    CDFEG::ResItem resItem2("stress",CDFEG::ResType::Matrix);
+    CDFEG::ResItem resItem2("stress", CDFEG::ResType::Matrix);
     resItem2.addVal(0, "sigmaXX");
     resItem2.addVal(0, "sigmaYY");
     resItem2.addVal(0, "sigmaXY");
     data._prePostConfig._nodeResItems.push_back(resItem2);
-    // 单元应力（OnElements，单元平均）
-    CDFEG::ResItem eleStress("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
-    eleStress.addVal(0, "sigmaXX");
-    eleStress.addVal(0, "sigmaYY");
-    eleStress.addVal(0, "sigmaXY");
-    data._prePostConfig._eleResItems.push_back(eleStress);
+    CDFEG::ResItem resItem3("eleStress", CDFEG::ResType::Matrix, CDFEG::ResLocation::OnElements);
+    resItem3.addVal(0, "sigmaXX");
+    resItem3.addVal(0, "sigmaYY");
+    resItem3.addVal(0, "sigmaXY");
+    data._prePostConfig._eleResItems.push_back(resItem3);
     data.post(0);
     return 0;
 }

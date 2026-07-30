@@ -15,7 +15,7 @@
 // along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "ElT3g.h"
-#include "elData.h"
+#include "El2DData.h"
 #include "ElDispFieldData.h"
 #include "CDFEG/MatrixFun.h"
 ElT3g::ElT3g(CDFEG::PhyFieldData* pData)

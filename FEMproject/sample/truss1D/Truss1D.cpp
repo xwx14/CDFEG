@@ -60,6 +60,5 @@ CDFEG::uResult Truss1D::uEle(
     double axialDisp = coef.at("u").at(1) - coef.at("u").at(0);
     res.eleResult["T"] = A * E * axialDisp / L;
     res.eleResult["sigma"] = E * axialDisp / L;
-
     return res;
 }
