@@ -20,27 +20,28 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from DataProject import DataProject
 from DataField import DataField
+from DataEleSub import DataEleSub
 from DataEleSubG import DataEleSubG
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
 
-project = DataProject("el2d", 2)
+project = DataProject("El2D", 2)
 field = DataField("ElDisp")
-s = 1 / (3**0.5)
 # Q4高斯积分四边形单元
 ele1 = DataEleSubG("ElQ4g", 4)
 ele1.type = 2
 ele1.dispNames = ["u", "v"]
 ele1.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY"]
 ele1.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
+ele1.matName = "El"
+ele1.gaussWeights = [1.0, 1.0, 1.0, 1.0]
+s = 1 / (3**0.5)
 ele1.gaussPoints = [
     [s, s],
     [s, -s],
     [-s, s],
     [-s, -s]
 ]
-ele1.gidName = "El"
-ele1.gaussWeights = [1.0, 1.0, 1.0, 1.0]
 ele1.shapeFuns = [
     "(1. - x[1]) / 2. * (1. - x[2]) / 2.",
     "(1. + x[1]) / 2. * (1. - x[2]) / 2.",
@@ -52,16 +53,16 @@ field.addEleSub(ele1)
 # T3高斯积分三角形单元
 ele2 = DataEleSubG("ElT3g", 3)
 ele2.type = 2
-ele2.gidName = "El"
+ele2.matName = "El"
 ele2.dispNames = ["u", "v"]
 ele2.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY"]
 ele2.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
+ele2.gaussWeights = [1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0]
 ele2.gaussPoints = [
     [2.0 / 3.0, 1.0 / 6.0],
     [1.0 / 6.0, 2.0 / 3.0],
     [1.0 / 6.0, 1.0 / 6.0]
 ]
-ele2.gaussWeights = [1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0]
 ele2.shapeFuns = [
     "1. - x[1] - x[2]",
     "x[1]",
@@ -70,31 +71,24 @@ ele2.shapeFuns = [
 field.addEleSub(ele2)
 
 # 2节点线单元（边界荷载）
-ele3 = DataEleSubG("StressBL2g", 2)
+ele3 = DataEleSub("StressBL2g", 2)
 ele3.type = 1
 ele3.bBC = True
 ele3.dim = 1
 ele3.coordVars = ['x']
 ele3.dispNames = ["u", "v"]
 ele3.paramNames = ["fu", "fv"]
-ele3.gaussPoints = [
-    [-s],
-    [s]
-]
-ele3.gaussWeights = [1.0, 1.0]
-ele3.shapeFuns = [
-    "0.5 * (1.0 - x[1])",
-    "0.5 * (1.0 + x[1])"
-]
 field.addEleSub(ele3)
 field.bNodeExtrap=True
 project.addField(field)
 project.cmds.append(("imp",0))
 # GiD 后处理输出项（与 sample/El2D/main.cpp 一致）
-project.addOutputItem("disp", "Vector", "OnNodes", [(0, "u"), (0, "v")])
-project.addOutputItem("stress", "Matrix", "OnNodes", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
-project.addOutputItem("eleStress", "Matrix", "OnElements", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
-project.addOutputItem("eleVolume", "Scalar", "OnElements", [(0, "volume")])
+project.addOutputItem("disp","Vector", 
+                      "OnNodes", [(0, "u"), (0, "v")])
+project.addOutputItem("stress", "Matrix", 
+                      "OnNodes", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
+project.addOutputItem("eleStress", "Matrix", 
+                      "OnElements", [(0, "sigmaXX"), (0, "sigmaYY"), (0, "sigmaXY")])
 
 outPath = "sample/El2D"
 maker = MakerCpp(project, outPath)

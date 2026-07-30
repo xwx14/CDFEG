@@ -52,7 +52,7 @@ def _render(tpl, ctx):
 
 
 def test_elesub_template_renders_mateTypeName():
-    ele = {"name": "HeatQ4g", "gidName": "HelQ4g", "mateTypeName": "HelQ4g",
+    ele = {"name": "HeatQ4g", "matName": "HelQ4g", "mateTypeName": "HelQ4g",
            "dispNames": ["T"], "paramNames": ["ek"], "initCode": "",
            "vtkCellType": None, "nNodes": 4, "dim": 2,
            "gaussPoints": [[0,0]], "gaussWeights": [1.0]}
@@ -83,11 +83,11 @@ def test_makeData_singleField_uses_ele_name():
     assert p.mateTypes == [{"name": "Truss1D", "params": ["E", "A"], "defaults": [1.0, 2.0]}]
 
 
-def test_makeData_multiField_uses_gidName_and_merges_dedup():
+def test_makeData_multiField_uses_matName_and_merges_dedup():
     p = DataProject("p", 2)
     f1 = p.addField("Heat"); f2 = p.addField("Del")
-    e1 = DataEleSub("HeatQ4g", 4); e1.gidName = "HelQ4g"; e1.paramNames = ["ek", "ec", "q"]
-    e2 = DataEleSub("DelQ4g", 4); e2.gidName = "HelQ4g"; e2.paramNames = ["pe", "pv", "ek"]
+    e1 = DataEleSub("HeatQ4g", 4); e1.matName = "HelQ4g"; e1.paramNames = ["ek", "ec", "q"]
+    e2 = DataEleSub("DelQ4g", 4); e2.matName = "HelQ4g"; e2.paramNames = ["pe", "pv", "ek"]
     f1.addEleSub(e1); f2.addEleSub(e2)
     p.makeData()
     assert e1.mateTypeName == "HelQ4g" and e2.mateTypeName == "HelQ4g"

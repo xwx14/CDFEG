@@ -1,5 +1,7 @@
 # pyTool 配置式生成器 GUI 实现计划
 
+**⚠️ 术语变更（2026-07-29）**：本文档中的 `gidName` 已重命名为 `matName`（pyTool `DataEleSub` 类）。下文出现的 `gidName` 均指现今的 `matName`，原文保留未改。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 为 `pyTool/` 新增一个 PySide6 桌面界面，可视化编辑有限元项目三层结构（项目/场/单元）并一键生成 C++/CMake/GiD 代码，替代手写 `test/testXxx.py` 脚本。

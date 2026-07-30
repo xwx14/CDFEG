@@ -49,8 +49,8 @@ class MakerGidFile(MakerBase):
 
         self.data={"name":pro.name,
         "dim":pro.dim,"fields":[],"elems":[],"dbcs":[],"materials":[],"bDynamic":False,"preParams":[]}
-        # 收集所有单元，按 gidName 分组
-        eleGroups = {}  # key: gidName, value: {ele, fieldIndex}
+        # 收集所有单元，按 matName 分组
+        eleGroups = {}  # key: matName, value: {ele, fieldIndex}
         for field in pro.fields:
             # 添加场
             dof=len(field.dispNames)
@@ -66,27 +66,27 @@ class MakerGidFile(MakerBase):
             self.data["fields"].append(field1)
             
             for ele in field.eleSubs:
-                gidName = ele.gidName
-                if gidName not in eleGroups:
-                    eleGroups[gidName] = {'ele': ele, 'fieldIndex': index,
+                matName = ele.matName
+                if matName not in eleGroups:
+                    eleGroups[matName] = {'ele': ele, 'fieldIndex': index,
                                           'paramNames': [], 'paramValues': []}
-                # 同 gidName 保序合并去重 paramNames（与 DataProject._mergeOrAddMateType 语义一致）
+                # 同 matName 保序合并去重 paramNames（与 DataProject._mergeOrAddMateType 语义一致）
                 # 仅在参数首次出现时追加，paramValues 同步一一配对，缺失位置补 0.0
-                groupNames = eleGroups[gidName]['paramNames']
-                groupValues = eleGroups[gidName]['paramValues']
+                groupNames = eleGroups[matName]['paramNames']
+                groupValues = eleGroups[matName]['paramValues']
                 for i, name in enumerate(ele.paramNames):
                     if name not in groupNames:
                         groupNames.append(name)
                         groupValues.append(ele.paramValues[i] if i < len(ele.paramValues) else 0.0)
 
         # 添加单元和材料
-        for gidName, group in eleGroups.items():
+        for matName, group in eleGroups.items():
             ele = group['ele']
             fieldIndex = group['fieldIndex']
-            # 添加单元（使用 gidName）
-            self.addElem(gidName, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
-            # 添加材料（使用 gidName 和按出现先后排列的 paramNames 及其配对的 paramValues）
-            self.addMaterial(gidName, group['paramNames'], group['paramValues'], fieldIndex)
+            # 添加单元（使用 matName）
+            self.addElem(matName, ele.nNodes, getEleTypeName(ele.type), ele.index, ele.bBC)
+            # 添加材料（使用 matName 和按出现先后排列的 paramNames 及其配对的 paramValues）
+            self.addMaterial(matName, group['paramNames'], group['paramValues'], fieldIndex)
 
         self.basFn=path+"\\"+pro.name+".bas"
         self.prbFn=path+"\\"+pro.name+".prb"

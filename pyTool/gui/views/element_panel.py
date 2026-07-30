@@ -51,14 +51,14 @@ class ElementPanel(QWidget):
         self._baseClass.addItems(["EleSubBase", "IsoEleBase"])
         # 类型由实例决定（DataEleSub vs DataEleSubG），只读反映当前类型
         self._baseClass.setEnabled(False)
-        self._gidName = QLineEdit()
+        self._matName = QLineEdit()
         form.addRow("单元名称", self._name)
         form.addRow("节点数", self._nNodes)
         form.addRow("几何类型", self._type)
         form.addRow("单元维度", self._dim)
         form.addRow("边界单元", self._bBC)
         form.addRow("基类", self._baseClass)
-        form.addRow("GiD 名称", self._gidName)
+        form.addRow("材料名", self._matName)
         common.setLayout(form)
         root.addWidget(common)
 
@@ -111,7 +111,7 @@ class ElementPanel(QWidget):
         for c in (self._type, self._baseClass):
             c.currentIndexChanged.connect(self._commit)
         self._bBC.toggled.connect(self._commit)
-        self._gidName.editingFinished.connect(self._commit)
+        self._matName.editingFinished.connect(self._commit)
         self._dispNames.itemsChanged.connect(self._commit)
         self._eleResNames.itemsChanged.connect(self._commit)
         self._params.rowsChanged.connect(self._commit)
@@ -131,7 +131,7 @@ class ElementPanel(QWidget):
             self._dim.setValue(ele.dim)
             self._bBC.setChecked(ele.bBC)
             self._baseClass.setCurrentIndex(0 if ele.baseClass != "IsoEleBase" else 1)
-            self._gidName.setText(ele.gidName or ele.name)
+            self._matName.setText(ele.matName or ele.name)
             self._dispNames.setItems(ele.dispNames)
             self._eleResNames.setItems(ele.eleResNames)
             self._params.setRows(list(map(list, zip(
@@ -150,7 +150,7 @@ class ElementPanel(QWidget):
 
     def _blockAll(self, on):
         for w in (self._name, self._nNodes, self._dim, self._gaussOrder,
-                  self._type, self._baseClass, self._bBC, self._gidName):
+                  self._type, self._baseClass, self._bBC, self._matName):
             w.blockSignals(on)
 
     def _commit(self, *_):
@@ -162,7 +162,7 @@ class ElementPanel(QWidget):
         ele.type = self._type.currentIndex()
         ele.dim = self._dim.value()
         ele.bBC = self._bBC.isChecked()
-        ele.gidName = self._gidName.text()
+        ele.matName = self._matName.text()
         ele.dispNames = self._dispNames.items()
         ele.eleResNames = self._eleResNames.items()
         rows = self._params.rows()

@@ -1,5 +1,7 @@
 # pyTool 配置式生成器 GUI 设计
 
+**⚠️ 术语变更（2026-07-29）**：本文档中的 `gidName` 已重命名为 `matName`（pyTool `DataEleSub` 类）。下文出现的 `gidName` 均指现今的 `matName`，原文保留未改。
+
 - **日期**：2026-07-18
 - **状态**：已确认（待实现）
 - **范围**：为 `pyTool/` 新增一个 PySide6 桌面界面，可视化编辑有限元项目结构并一键生成 C++/CMake/GiD 代码

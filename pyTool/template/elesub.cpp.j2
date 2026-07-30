@@ -8,7 +8,7 @@
     _dispNames = { {% for name in ele.dispNames %}"{{name}}"{% if not loop.last %}, {% endif %}{% endfor %} };
     _mateTypeName = "{{ ele.mateTypeName }}";
     _types.insert("{{ele.name}}");
-    _types.insert("{{ele.gidName}}");
+    _types.insert("{{ele.matName}}");
 {{ele.initCode}}
 {% if baseClass == "IsoEleBase" %}
 {% set nGaus = ele.gaussPoints|length %}

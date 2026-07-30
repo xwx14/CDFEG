@@ -21,7 +21,6 @@ class DataProject:
         self.name = name
         # 总体坐标维度
         self.dim = dim
-        self.gidName = name
         # 坐标变量名称列表，默认为 ['x', 'y']，根据维度自动调整
         self.coordVars = ['x', 'y', 'z'][:dim]
         # 单元类型
@@ -75,12 +74,12 @@ class DataProject:
     def makeData(self):
         for field in self.fields:
             field.makeData()
-        # 建立本构表：单物理场用单元 name，多物理场用 gidName（同 key 保序合并去重）
+        # 建立本构表：单物理场用单元 name，多物理场用 matName（同 key 保序合并去重）
         self.mateTypes = []
         multiField = len(self.fields) > 1
         for field in self.fields:
             for ele in field.eleSubs:
-                constitutiveName = ele.gidName
+                constitutiveName = ele.matName
                 ele.mateTypeName = constitutiveName
                 self._mergeOrAddMateType(constitutiveName, ele.paramNames, ele.paramValues)
 

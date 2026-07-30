@@ -715,7 +715,7 @@ git commit -m "新增 macs-to-cdfeg skill 三步迁移指南"
 - [ ] **Step 1: 填充 `run`（参考 a1eq4g2.c:68-159）**
   - 清零 `_result.estif/eload/emass`（`adda` 累加，必清零）。
   - 高斯积分循环（4 点）：`dcoor`→雅可比→`inverse`→`shapn` 得 B；`weight=_gaus[iGaus]*det`。
-  - D 矩阵（平面应力）：`fact=pe/(1+pv)/(1-2pv)*vol`、`shear=(0.5-pv)`，按 `eexx/eeyy/eexy` 构建应变-应变率。
+  - D 矩阵（平面应变）：`fact=pe/(1+pv)/(1-2pv)*vol`、`shear=(0.5-pv)`，按 `eexx/eeyy/eexy` 构建应变-应变率。
   - 单刚 `estif[(iv-1)*8+(jv-1)] += stif*weigh`（行主序，`a1eq4g2.c:140-145`）。
   - 载荷 `eload[iv] += cu[..]*fu*vol*weigh`（`a1eq4g2.c:149-158`）。
 

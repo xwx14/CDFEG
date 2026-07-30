@@ -99,8 +99,8 @@ VALUE: #N# <值总数> <v1> <v2> ... <vN>
 ### CDFEG 约定（`gidprb.j2`）
 
 - 动力学：`QUESTION: TimeStep/VALUE:0.1`、`QUESTION: TotalTime/VALUE:1.0`。
-- 每个材料组：`QUESTION: <gidName>(<p1>,...,<pn>) / VALUE: #N# <n> <默认值...>`。
-- `*GenData(<gidName>,int)` 在 `.bas` 中取回值总数（即 `#N#` 后那个数）。
+- 每个材料组：`QUESTION: <matName>(<p1>,...,<pn>) / VALUE: #N# <n> <默认值...>`。
+- `*GenData(<matName>,int)` 在 `.bas` 中取回值总数（即 `#N#` 后那个数）。
 
 ---
 
@@ -248,7 +248,7 @@ echo problem directory: %3
 | `.bas` 不是图灵完备 | 无循环 over 字段名、无真正函数；复杂逻辑用 `*tcl(...)` 调 Tcl 过程。 |
 | 材料数据位置 | CDFEG 走 `.prb` 的 `#N#` 矩阵字段 + `.bas` `*GenData` 读取，**未用独立 `.mat`**。 |
 | 边单元连接 | 面力/边条件用 `*globalnodes`（面条件的全局节点号），体单元用 `*elemsConec`。 |
-| `MateTypeName` 与 `gidName` | `.cnd`/`.prb` 中的单元条件名/材料字段名用 `gidName`（GiD Condition 名，非 C++ 类名）。 |
+| `MateTypeName` 与 `matName` | `.cnd`/`.prb` 中的单元条件名/材料字段名用 `matName`（GiD Condition 名，非 C++ 类名）。 |
 
 ---
 

@@ -1,5 +1,7 @@
 # bas 变长节点单元列举改造（支持同 gidName 不同节点数单元）
 
+**⚠️ 术语变更（2026-07-29）**：本文档中的 `gidName` 已重命名为 `matName`（pyTool `DataEleSub` 类）。下文及标题中出现的 `gidName` 均指现今的 `matName`，原文保留未改。
+
 > 日期：2026-07-27
 > 范围：pyTool 生成器 + GiD bas 模板
 > 关联：使 `ElQ4g`(4 节点) 与 `ElT3g`(3 节点) 等不同节点数单元能共用同一 `gidName`，在同一 GiD condition / dat 段内混排。

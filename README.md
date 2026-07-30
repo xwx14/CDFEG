@@ -19,7 +19,7 @@ CDFEG/
 │   │   └── vtkPost.h           # VTK 后处理
 │   ├── sample/                 # 示例集（7 个独立 CMake 子项目）
 │   │   ├── truss1D/2D/3D/      #   桁架静力（1D/2D/3D）
-│   │   ├── El2D/               #   平面应力静力
+│   │   ├── El2D/               #   平面应变静力
 │   │   ├── ElT3/               #   弹性力学（T3）
 │   │   ├── DEl2D/              #   Newmark-β 动力学
 │   │   └── Hel2D/              #   热弹耦合（温度场 + 位移场）

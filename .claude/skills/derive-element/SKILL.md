@@ -9,7 +9,7 @@ description: Use when 派生或新增一种有限元单元类型（如 Q4/T3/六
 
 CDFEG 中"一种单元"= 一种材料在某物理场下的一种单元。派生单元继承 `ElementBase`（直接给单刚）或 `IsoEleBase`（等参元，形函数 + 高斯积分）。本 skill 给出从零派生一个单元的完整步骤与必踩陷阱。
 
-样板：`FEMproject/sample/El2D/ElQ4g.*`（4 节点四边形平面应力）。
+样板：`FEMproject/sample/El2D/ElQ4g.*`（4 节点四边形平面应变）。
 
 ## When to Use
 
@@ -52,7 +52,7 @@ CDFEG 中"一种单元"= 一种材料在某物理场下的一种单元。派生�
 
 ### 5. `uEle(r, coef, matParams)`（后处理，可选）
 
-从 `coef`（物理场填入的节点位移）按高斯点求应力（平面应力 D 矩阵），再以形函数加权外推到节点；返回 `eleResult`（单元平均应力）+ `nodeResult`（节点应力与 `weight`）。
+从 `coef`（物理场填入的节点位移）按高斯点求应力（平面应变 D 矩阵），再以形函数加权外推到节点；返回 `eleResult`（单元平均应力）+ `nodeResult`（节点应力与 `weight`）。
 
 ### 6. 物理场注册
 
