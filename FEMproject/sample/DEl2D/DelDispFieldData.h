@@ -42,11 +42,15 @@ public:
     virtual int eProgram() override;
     // 重写 u 程序：更新加速度/速度/位移历史 + 应力恢复
     virtual int uPhy() override;
-
+private:
+	// 由 _gamma/_beta/_dt 计算积分常数 a0..a7
+	void calcNewmarkConstants();
+	// 确保历史向量(_u/_v/_w/_u1/_v1/_w1)与 _kVar 一致，未初始化则填零
+	void ensureHistorySize();
 public:
-    // 当前步位移/速度/加速度（按节点存储，长度 = 节点数，下标为程序内节点号）
+    // 当前步位移/速度/加速度（DOF 紧凑存储：长度 = _kVar = 节点数*_dof，下标 = node*_dof + iDof）
     std::vector<double> _u, _v, _w;
-    // 上一步位移/速度/加速度（Newmark 积分历史量）
+    // 上一步位移/速度/加速度（Newmark 积分历史量，布局同 _u/_v/_w）
     std::vector<double> _u1, _v1, _w1;
 
     // Newmark-β 积分常数
@@ -56,11 +60,7 @@ public:
     // a0..a7 见 newmarka.nfe 标准公式
     double _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7;
 
-private:
-    // 由 _gamma/_beta/_dt 计算积分常数 a0..a7
-    void calcNewmarkConstants();
-    // 确保历史向量(_u/_v/_w/_u1/_v1/_w1)与 _kVar 一致，未初始化则填零
-    void ensureHistorySize();
+
 };
 
 #endif
