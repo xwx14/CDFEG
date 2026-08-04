@@ -54,6 +54,10 @@ class DataEleSub:
         self.baseClassParam = f"{self.nNodes}, pData"
         # 根据需要改变
         self.calMatrix=['eload','estif','emass','edamp']
+        # 是否为集中质量矩阵（True=集中/对角 resize(_nVar)，False=一致/满 resize(_nVar*_nVar)）
+        self.bLumpMass=True
+        # 是否为集中阻尼矩阵（True=集中/对角，False=一致/满）
+        self.bLumpDamp=True
         # 结构为多个{"name":"pr1","params":[]}
         self.preParams=[]
 
@@ -99,6 +103,8 @@ class DataEleSub:
             'coordTransFunCode': self.coordTransFunCode, # 坐标转换函数代码
             'baseClass': self.baseClass,       # 基类名称："EleSubBase" 或 "IsoEleBase"
             'calMatrix':self.calMatrix,
+            'bLumpMass':self.bLumpMass,
+            'bLumpDamp':self.bLumpDamp,
             # 预处理参数，结构为多个{"name":"pr1","params":[]}
             'preParams':self.preParams
         }
@@ -143,6 +149,8 @@ class DataEleSub:
         ele.coordTransFunCode = data.get('coordTransFunCode', '')
         ele.baseClass = data.get('baseClass', '')
         ele.calMatrix=data.get('calMatrix', [])
+        ele.bLumpMass=data.get('bLumpMass', True)
+        ele.bLumpDamp=data.get('bLumpDamp', True)
         # 恢复预处理参数（结构为多个{"name":"pr1","params":[]}）
         ele.preParams=data.get('preParams', [])
 

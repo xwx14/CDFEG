@@ -30,10 +30,18 @@
 {% endfor %}
 {% endfor %}
     caculateShapeCoef({{ ele.dim }});
+{% if ele.bLumpMass %}
     _result.emass.resize(_nVar);
+{% else %}
+    _result.emass.resize(_nVar * _nVar);
+{% endif %}
     _result.eload.resize(_nVar);
     _result.estif.resize(_nVar * _nVar);
+{% if ele.bLumpDamp %}
+    _result.edamp.resize(_nVar);
+{% else %}
     _result.edamp.resize(_nVar * _nVar);
+{% endif %}
 {% endif %}
 {% if ele.vtkCellType %}
     _vtkCellType =VTKCellType::VTK_{{ele.vtkCellType}};
