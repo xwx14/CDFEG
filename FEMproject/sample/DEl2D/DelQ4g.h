@@ -38,7 +38,9 @@ public:
         const std::map<std::string, double>& matParams
     ) override;
 
-    virtual std::vector<double> shapeFun(const std::vector<double>& refc) override;
+    virtual std::vector<double> shapeFun(
+        const std::vector<double>& refc
+    ) override;
 };
 
 #endif

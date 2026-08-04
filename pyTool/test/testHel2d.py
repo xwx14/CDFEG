@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
-# 2D热弹性力学场（平面应力）
+# 2D热弹性力学场
 import sys
 import json
 import os
@@ -30,7 +30,6 @@ s = 1 / (3**0.5)
 
 # 第一个场为温度场
 field1 = DataField("Heat")
-field1.pdeType = 1  # 1椭圆型
 field1.bDynamic=False
 hele1 = DataEleSubG("HeatQ4g", 4)
 hele1.type = 2
@@ -54,7 +53,6 @@ field1.addEleSub(hele1)
 project.addField(field1)
 # 第二个场为位移场
 field2 = DataField("DelDisp")
-field2.pdeType = 1  # 1椭圆型
 field2.bDynamic=False
 dele1=DataEleSubG("DelQ4g", 4)
 dele1.matName = "HelQ4g"
@@ -78,7 +76,8 @@ dele1.shapeFuns = [
 ]
 field2.addEleSub(dele1)
 project.addField(field2)
-
+project.cmds.append(("imp",0))
+project.cmds.append(("imp",1))
 # GiD 后处理输出项（与 sample/Hel2D/main.cpp 一致：temperature@场0，disp/stress@场1）
 project.addOutputItem("temperature", "Scalar", "OnNodes", [(0, "T")])
 project.addOutputItem("disp", "Vector", "OnNodes", [(1, "u"), (1, "v")])
@@ -86,8 +85,8 @@ project.addOutputItem("stress", "Matrix", "OnNodes", [(1, "sigmaXX"), (1, "sigma
 project.addOutputItem("eleStress", "Matrix", "OnElements", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
 project.addOutputItem("eleVolume", "Scalar", "OnElements", [(1, "volume")])
 
-outPath="E:\\myProject\\CDFEG\\FEMproject\\sample\\Hel2D"
-maker = MakerCpp(project, outPath, mode='add', sln_cmake_path="E:\\myProject\\CDFEG\\FEMproject\\CMakeLists.txt")
+outPath="sample\\Hel2D"
+maker = MakerCpp(project, outPath)
 maker.mainMode=1
 maker.makeAll()
 gidMaker = MakerGidFile(project, outPath)

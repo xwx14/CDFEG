@@ -29,7 +29,6 @@ project = DataProject("del2d", 2)
 field = DataField("DelDisp")
 field.bDynamic=True
 
-
 # Q4高斯积分四边形单元
 ele1 = DataEleSubG("DelQ4g", 4)
 ele1.type = 2
@@ -53,23 +52,13 @@ ele1.shapeFuns = [
 ]
 field.addEleSub(ele1)
 # 2节点线单元（边界荷载）
-ele3 = DataEleSubG("StressBL2g", 2)
+ele3 = DataEleSub("StressBL2g", 2)
 ele3.type = 1
 ele3.bBC = True
 ele3.dim = 1
 ele3.coordVars = ['x']
 ele3.dispNames = ["u", "v"]
 ele3.paramNames = ["fu", "fv"]
-ele3.gaussPoints = [
-    [-s],
-    [s]
-]
-ele3.gaussWeights = [1.0, 1.0]
-ele3.shapeFuns = [
-    "0.5 * (1.0 - x[1])",
-    "0.5 * (1.0 + x[1])"
-]
-ele3.paramValues = [0.0, 0.0]
 field.addEleSub(ele3)
 
 project.addField(field)

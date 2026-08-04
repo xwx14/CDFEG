@@ -16,22 +16,21 @@
 
 #ifndef STRESS_BL2G_H
 #define STRESS_BL2G_H
-#include "CDFEG/IsoEleBase.h"
+#include "CDFEG/ElementBase.h"
 
-// 二维 2 节点边界面力载荷单元（一维等参元 + smit 坐标变换，对应基准 a2ll2/a2gl2）。
-// 纯载荷单元：刚度/质量/阻尼恒为 0，仅 eload 沿线积分把面力分配到 2 节点。
-// 依附于同 id 的 DelQ4g 体单元的一条边（边 id = 所属体单元 id，由 DomainData::addEle
-// 的「节点更少即边」机制识别）。材料参数：fu（沿线切向面力密度）、fv（沿线法向面力密度）。
+// 二维 2 节点边界面力载荷单元（闭式载荷分配 + smit 坐标变换，对应基准 a2ll2/a2gl2）。
+// 纯载荷单元：刚度/质量/阻尼恒为 0，仅 eload 把面力分配到 2 节点。
+// 材料参数：fu（沿线切向面力密度）、fv（沿线法向面力密度）。
 //
-// 作为一维等参元（_dim=_nRefc=1）：形函数与高斯积分
-// 由 IsoEleBase 的 caculateShapeCoef/shapeFun/_refShapCoef 提供。
+// 线性形函数下均匀面力的等效节点载荷有闭式解 ∫N_i dΓ = L/2，
+// 故每节点各得总力一半，无需等参元数值积分（与 ElT3 闭式范式一致）。
 //
 // 计算分两步：
-//   1) computeLocalMatrix：一维等参荷载向量，estif/emass/edamp=0，
-//      eload=∫N·(fu,fv)dΓ（局部 [节点1切向,节点1法向,节点2切向,节点2法向]）；
+//   1) computeLocalMatrix：局部载荷向量 [节点1切向,节点1法向,节点2切向,节点2法向]，
+//      每分量 = (fu 或 fv) * L/2；
 //   2) coordTransform：smit 构造局部切向/法向轴→t 矩阵，tl 把局部 eload
-//      变换到全局写入 _result。
-class StressBL2g : public CDFEG::IsoEleBase {
+//      变换到全局写入 _result（a2gl2）。
+class StressBL2g : public CDFEG::ElementBase {
 public:
     StressBL2g(CDFEG::PhyFieldData* pData);
     ~StressBL2g();
@@ -50,13 +49,8 @@ public:
         const std::map<std::string, double>& matParams
     ) override;
 
-    // 一维线性形函数（沿线参考坐标 rx）
-    virtual std::vector<double> shapeFun(
-        const std::vector<double>& refc
-    ) override;
-
 private:
-    // 一维等参荷载向量：局部 [节点1切向,节点1法向,节点2切向,节点2法向]
+    // 局部载荷向量：[节点1切向,节点1法向,节点2切向,节点2法向]
     void computeLocalMatrix(const std::vector<double>& r,
                             const std::map<std::string, double>& matParams,
                             std::vector<double>& eload);

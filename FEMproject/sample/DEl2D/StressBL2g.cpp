@@ -19,26 +19,17 @@
 #include <algorithm>
 
 StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
-    : CDFEG::IsoEleBase(2, pData) {
+    : CDFEG::ElementBase(2, pData) {
     _name = "StressBL2g";
     _dispNames = { "u", "v" };
     _mateTypeName = "StressBL2g";
     _types.insert("StressBL2g");
 
-    // 一维等参元（沿线）：参考维 1，物理维 1（局部弧长）；2D 嵌入由 smit 处理。
     _dim = 1;
     _nNode = 2;
     _nDisp = 2;
     _nCoor = 1;
     _nVar = 4;   // 2 节点 × 2 自由度
-    _nRefc = 1;
-    _nGaus = 2;
-    _gaus.resize(2);
-    _refc.resize(2);
-    _gaus[0] = 1.0;  _refc[0] = -1.0;
-    _gaus[1] = 1.0;  _refc[1] = 1.0;
-    caculateShapeCoef(1);   // 预算积分点形函数 _refShapCoef
-
     _vtkCellType = VTKCellType::VTK_LINE;
     // 纯载荷单元：estif/emass/edamp 恒为 0，eload 每步重算
     _result.estif.assign(_nVar * _nVar, 0.0);
@@ -50,44 +41,30 @@ StressBL2g::StressBL2g(CDFEG::PhyFieldData* pData)
 StressBL2g::~StressBL2g() {
 }
 
-std::vector<double> StressBL2g::shapeFun(const std::vector<double>& refc) {
-    // 一维线性形函数
-    double rx = refc[0];
-    return { (1.0 - rx) / 2.0, (1.0 + rx) / 2.0 };
-}
-
 void StressBL2g::computeLocalMatrix(
     const std::vector<double>& r,
     const std::map<std::string, double>& matParams,
     std::vector<double>& eload
 ) {
-    // 一维等参（沿线）下的荷载向量。
-    // stif/mass/damp 恒 0（a2ll2.ges 中 *0.0），仅 load=+[u]*fu+[v]*fv。
-    eload.assign(_nVar, 0.0);
+    // 线性形函数下均匀面力的闭式等效节点载荷：
+    // ∫₀ᴸ N_i dΓ = L/2（线性形函数的积分），故每节点各得总力一半。
     double fu = matParams.at("fu");   // 切向面力密度
     double fv = matParams.at("fv");   // 法向面力密度
-
-    // 线长 → 参考坐标到弧长的雅可比 det = L/2；形函数取自 _refShapCoef
     double len = std::hypot(r[2] - r[0], r[3] - r[1]);
-    double det = len / 2.0;
-    // 局部 eload 顺序：[节点1切向, 节点1法向, 节点2切向, 节点2法向]
-    for (int g = 0; g < _nGaus; ++g)
-    {
-        double N1 = _refShapCoef[g][0][0];   // 节点1 的 N（[积分点][0=原值][节点]）
-        double N2 = _refShapCoef[g][0][1];   // 节点2 的 N
-        double w = det * _gaus[g];
-        eload[0] += N1 * fu * w;
-        eload[1] += N1 * fv * w;
-        eload[2] += N2 * fu * w;
-        eload[3] += N2 * fv * w;
-    }
+    double half = len / 2.0;
+    eload.assign(_nVar, 0.0);
+    // 局部 eload 顺序：[节点1切向,节点1法向,节点2切向,节点2法向]
+    eload[0] = fu * half;
+    eload[1] = fv * half;
+    eload[2] = fu * half;
+    eload[3] = fv * half;
 }
 
 void StressBL2g::coordTransform(
     const std::vector<double>& r,
     const std::vector<double>& locEload
 ) {
-    // 对应基准 smit 构造局部坐标轴 → t 矩阵 → tl 局部→全局。
+    // smit 构造局部坐标轴 → t 矩阵 → tl 局部→全局。
     // smit（施密特正交）：切向 t̂=(dx,dy)/L（节点1→2），法向 n̂=(-dy,dx)/L（逆时针90°）
     double dx = r[2] - r[0], dy = r[3] - r[1];
     double len = std::hypot(dx, dy);
@@ -109,7 +86,7 @@ void StressBL2g::coordTransform(
         for (int l = 0; l < _nVar; ++l) s += t[l][i] * locEload[l];
         _result.eload[i] = s;
     }
-    // tkt/tmt：estif/emass/edamp 局部恒 0，变换后仍 0，直接置 0
+    // estif/emass/edamp 恒 0
     std::fill(_result.estif.begin(), _result.estif.end(), 0.0);
     std::fill(_result.emass.begin(), _result.emass.end(), 0.0);
     std::fill(_result.edamp.begin(), _result.edamp.end(), 0.0);
@@ -120,7 +97,7 @@ CDFEG::EleSubResult& StressBL2g::run(
     const std::map<std::string, std::vector<double>>& coef,
     const std::map<std::string, double>& matParams
 ) {
-    // Step 1: 一维等参荷载向量
+    // Step 1: 局部载荷向量（闭式）
     std::vector<double> locEload;
     computeLocalMatrix(r, matParams, locEload);
     // Step 2: 坐标变换局部→全局，写入 _result

@@ -46,7 +46,8 @@ int del2dData::caculate() {
     if (beta <= 0.0)
     {
         std::cerr << "[del2dData] beta <= 0, 请检查 dat 文件 newmark 段" << std::endl;
-        return -1;
+        gamma = 0.5;
+        beta = 0.25;
     }
     aField->setNewmarkParams(gamma, beta, _dt);
 

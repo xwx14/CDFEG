@@ -23,7 +23,6 @@ DelQ4g::DelQ4g(CDFEG::PhyFieldData* pData)
     : CDFEG::IsoEleBase(4, pData) {
     _name = "DelQ4g";
     _dispNames = { "u", "v" };
-    // 旧项目 a1eq4g2 材料：pe/pv/fu/fv/rou/alpha 六参数
     _mateTypeName = "DelQ4g";
     _types.insert("DelQ4g");
 
@@ -37,42 +36,27 @@ DelQ4g::DelQ4g(CDFEG::PhyFieldData* pData)
     _gaus.resize(4);
     _refc.resize(8);
     _gaus[0] = 1.0;
-    _refc[0] = 0.5773502692;
-    _refc[1] = 0.5773502692;
+    _refc[0] = 0.5773502691896258;
+    _refc[1] = 0.5773502691896258;
     _gaus[1] = 1.0;
-    _refc[2] = 0.5773502692;
-    _refc[3] = -0.5773502692;
+    _refc[2] = 0.5773502691896258;
+    _refc[3] = -0.5773502691896258;
     _gaus[2] = 1.0;
-    _refc[4] = -0.5773502692;
-    _refc[5] = 0.5773502692;
+    _refc[4] = -0.5773502691896258;
+    _refc[5] = 0.5773502691896258;
     _gaus[3] = 1.0;
-    _refc[6] = -0.5773502692;
-    _refc[7] = -0.5773502692;
+    _refc[6] = -0.5773502691896258;
+    _refc[7] = -0.5773502691896258;
     caculateShapeCoef(2);
     _result.emass.resize(_nVar);
     _result.eload.resize(_nVar);
     _result.estif.resize(_nVar * _nVar);
     _result.edamp.resize(_nVar);
-    _vtkCellType = VTKCellType::VTK_QUAD;
+    _vtkCellType =VTKCellType::VTK_QUAD;
 }
 
 DelQ4g::~DelQ4g() {
 
-}
-
-std::vector<double> DelQ4g::shapeFun(const std::vector<double>& refc) {
-    std::vector<double> rt;
-    double rx = refc[0];
-    double ry = refc[1];
-    double fval = (1. - rx) / 2. * (1. - ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. + rx) / 2. * (1. - ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. + rx) / 2. * (1. + ry) / 2.;
-    rt.push_back(fval);
-    fval = (1. - rx) / 2. * (1. + ry) / 2.;
-    rt.push_back(fval);
-    return rt;
 }
 
 CDFEG::EleSubResult& DelQ4g::run(
@@ -255,3 +239,22 @@ CDFEG::uResult DelQ4g::uEle(
 
     return res;
 }
+
+std::vector<double> DelQ4g::shapeFun(
+    const std::vector<double>& refc
+) {
+    std::vector<double> shapes;
+    double fval;
+    double x = refc[0];
+    double y = refc[1];
+    fval = (1. - x) / 2. * (1. - y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. + x) / 2. * (1. - y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. + x) / 2. * (1. + y) / 2.;
+    shapes.push_back(fval);
+    fval = (1. - x) / 2. * (1. + y) / 2.;
+    shapes.push_back(fval);
+    return shapes;
+}
+
