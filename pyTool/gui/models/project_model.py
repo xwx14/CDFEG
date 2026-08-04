@@ -28,6 +28,8 @@ class ProjectModel(QObject):
 
     dirtyChanged = Signal(bool)
     structureChanged = Signal()
+    # 单元类型切换：发射 (oldEle, newEle)，供视图在树重建后恢复选中到新对象
+    eleReplaced = Signal(object, object)
 
     def __init__(self, project=None):
         super().__init__()
@@ -75,6 +77,26 @@ class ProjectModel(QObject):
         field.addEleSub(ele)
         self._afterStructChange()
         return ele
+
+    def changeEleSubType(self, field, oldEle, gauss):
+        """切换 DataEleSub ↔ DataEleSubG，原地替换保持列表位置，返回新对象。
+
+        复制公共字段（排除 baseClass 与高斯特有字段——它们由新类 __init__ 决定）。
+        高斯→普通会丢弃已填的高斯积分配置；同类型调用幂等返回原对象。
+        """
+        isG = isinstance(oldEle, DataEleSubG)
+        if (gauss and isG) or (not gauss and not isG):
+            return oldEle
+        newEle = DataEleSubG(oldEle.name) if gauss else DataEleSub(oldEle.name)
+        skip = {'baseClass', 'gaussOrder', 'gaussPoints', 'gaussWeights', 'shapeFuns'}
+        for k, v in oldEle.__dict__.items():
+            if k not in skip:
+                setattr(newEle, k, v)
+        field.eleSubs[field.eleSubs.index(oldEle)] = newEle
+        field.makeData()
+        self.eleReplaced.emit(oldEle, newEle)   # 先通知视图记录新对象，再触发树重建
+        self._afterStructChange()
+        return newEle
 
     def removeField(self, field):
         if field in self.project.fields:

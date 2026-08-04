@@ -14,22 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with CDFEG.  If not, see <https://www.gnu.org/licenses/>.
 
-# pyTool 配置式生成器主窗口
+# pyTool 配置式生成器主窗口（协调 + 文件操作 + 编辑操作 + 菜单）
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QSplitter, QTreeWidget, QTreeWidgetItem,
-    QStackedWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QMainWindow, QWidget, QSplitter, QStackedWidget,
+    QVBoxLayout, QHBoxLayout, QPushButton,
     QFileDialog, QMessageBox, QInputDialog,
 )
 from PySide6.QtCore import Qt
 
 from DataProject import DataProject
-from DataEleSubG import DataEleSubG
 from models.project_model import ProjectModel
 from services import json_io
 from views.project_panel import ProjectPanel
 from views.field_panel import FieldPanel
 from views.element_panel import ElementPanel
 from views.generate_panel import GeneratePanel
+from views.project_tree import ProjectTreeWidget
+from dialogs.add_ele_dialog import AddEleSubDialog
 
 
 class MainWindow(QMainWindow):
@@ -39,30 +40,21 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("pyTool 配置式生成器")
         self.resize(1100, 760)
-
         self._model = ProjectModel()
         self._currentFile = None
+        self._buildUi()
+        self._connectSignals()
+        self._buildMenus()
+        self.newProject()
+        self.refreshTree()
+        self._tree.setCurrentItem(self._tree.topLevelItem(0))
 
-        # ---- 左：树 + 按钮栏 ----
-        self._tree = QTreeWidget()
-        self._tree.setHeaderLabels(["项目结构"])
-        self._tree.setContextMenuPolicy(Qt.CustomContextMenu)
-
+    # ---- UI 构建 ----
+    def _buildUi(self):
+        self._tree = ProjectTreeWidget()
         self._btnAddField = QPushButton("添加场")
         self._btnAddEle = QPushButton("添加单元")
         self._btnDelete = QPushButton("删除")
-        btnBar = QHBoxLayout()
-        for b in (self._btnAddField, self._btnAddEle, self._btnDelete):
-            btnBar.addWidget(b)
-        btnBar.addStretch(1)
-
-        leftPanel = QWidget()
-        leftLayout = QVBoxLayout(leftPanel)
-        leftLayout.setContentsMargins(0, 0, 0, 0)
-        leftLayout.addWidget(self._tree)
-        leftLayout.addLayout(btnBar)
-
-        # ---- 右：堆叠面板 ----
         self._projPanel = ProjectPanel(self._model)
         self._fieldPanel = FieldPanel(self._model)
         self._elePanel = ElementPanel(self._model)
@@ -70,36 +62,44 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._projPanel)    # 0
         self._stack.addWidget(self._fieldPanel)   # 1
         self._stack.addWidget(self._elePanel)     # 2
+        self._genPanel = GeneratePanel(self._model)
+        self._genPanel.setDefaults("sample/NewProj", "FEMproject/CMakeLists.txt")
+        self.setCentralWidget(self._buildCentralWidget())
 
+    def _buildCentralWidget(self):
+        # 左：树 + 按钮栏
+        btnBar = QHBoxLayout()
+        for b in (self._btnAddField, self._btnAddEle, self._btnDelete):
+            btnBar.addWidget(b)
+        btnBar.addStretch(1)
+        leftPanel = QWidget()
+        leftLayout = QVBoxLayout(leftPanel)
+        leftLayout.setContentsMargins(0, 0, 0, 0)
+        leftLayout.addWidget(self._tree)
+        leftLayout.addLayout(btnBar)
+        # 中：堆栈面板
         splitter = QSplitter(Qt.Horizontal)
         splitter.addWidget(leftPanel)
         splitter.addWidget(self._stack)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 3)
-
-        # ---- 下：生成面板 ----
-        self._genPanel = GeneratePanel(self._model)
-        self._genPanel.setDefaults("sample/NewProj", "FEMproject/CMakeLists.txt")
-
+        # 整体：上 splitter + 下生成面板
         central = QWidget()
         outer = QVBoxLayout(central)
         outer.addWidget(splitter, 3)
         outer.addWidget(self._genPanel, 1)
-        self.setCentralWidget(central)
+        return central
 
+    def _connectSignals(self):
         self._tree.currentItemChanged.connect(self._onTreeCurrentChanged)
         self._model.dirtyChanged.connect(self._updateTitle)
         self._model.structureChanged.connect(self.refreshTree)
-
+        # 单元类型切换：记录新对象，供下次树刷新恢复选中
+        self._model.eleReplaced.connect(lambda _old, new: self._tree.markPendingSelect(new))
         # 按钮栏：复用「编辑」菜单的 slot
         self._btnAddField.clicked.connect(self._addField)
         self._btnAddEle.clicked.connect(self._addEleSub)
         self._btnDelete.clicked.connect(self._deleteSelected)
-
-        self._buildMenus()
-        self.newProject()
-        self.refreshTree()
-        self._tree.setCurrentItem(self._tree.topLevelItem(0))
 
     # ---- 菜单 ----
     def _buildMenus(self):
@@ -183,20 +183,21 @@ class MainWindow(QMainWindow):
     def _addField(self):
         name, ok = QInputDialog.getText(self, "添加场", "场名称：")
         if ok and name:
-            self._model.addField(name)
+            field = self._model.addField(name)
+            self._tree.selectByObject(field)   # 添加后直接进入本场编辑
 
     def _addEleSub(self):
         field = self._selectedField()
         if field is None:
             QMessageBox.information(self, "添加单元", "请先在左侧选择一个场节点。")
             return
-        name, ok = QInputDialog.getText(self, "添加单元", "单元名称：")
-        if ok and name:
-            gauss_btn = QMessageBox.question(
-                self, "单元类型", "是高斯积分单元（IsoEleBase）吗？",
-                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            gauss = (gauss_btn == QMessageBox.Yes)
-            self._model.addEleSub(field, name, gauss=gauss)
+        dlg = AddEleSubDialog(self)
+        if dlg.exec() == AddEleSubDialog.Accepted:
+            result = dlg.values()
+            if result:
+                name, gauss = result
+                ele = self._model.addEleSub(field, name, gauss=gauss)
+                self._tree.selectByObject(ele)   # 添加后直接进入本单元编辑
 
     def _deleteSelected(self):
         item = self._tree.currentItem()
@@ -225,35 +226,23 @@ class MainWindow(QMainWindow):
             return pdata[1] if pdata else None
         return None
 
-    # ---- 树 ----
+    # ---- 树协调 ----
     def refreshTree(self):
-        self._tree.clear()
-        proj = self._model.project
-        root = QTreeWidgetItem([f"{proj.name or '(未命名)'} (dim={proj.dim})"])
-        root.setData(0, Qt.UserRole, ("project", proj))
-        for field in proj.fields:
-            fnode = QTreeWidgetItem([field.name or "(未命名场)"])
-            fnode.setData(0, Qt.UserRole, ("field", field))
-            for ele in field.eleSubs:
-                tag = " [G]" if isinstance(ele, DataEleSubG) else ""
-                enode = QTreeWidgetItem([f"{ele.name}{tag}"])
-                enode.setData(0, Qt.UserRole, ("ele", ele))
-                fnode.addChild(enode)
-            root.addChild(fnode)
-        self._tree.addTopLevelItem(root)
-        self._tree.expandAll()
+        self._tree.refresh(self._model.project)
         self._updateTitle()
         self._updateActionButtons()
 
+    def _currentKind(self):
+        """当前选中节点的类别（"project"/"field"/"ele"），无选中返回 None。"""
+        item = self._tree.currentItem()
+        if item is None:
+            return None
+        data = item.data(0, Qt.UserRole)
+        return data[0] if data else None
+
     def _updateActionButtons(self):
         """依选中节点类型动态启用/禁用左栏按钮。"""
-        item = self._tree.currentItem()
-        kind = None
-        if item is not None:
-            data = item.data(0, Qt.UserRole)
-            if data:
-                kind = data[0]
-        hasFieldCtx = kind in ("field", "ele")
+        hasFieldCtx = self._currentKind() in ("field", "ele")
         self._btnAddField.setEnabled(True)
         self._btnAddEle.setEnabled(hasFieldCtx)
         self._btnDelete.setEnabled(hasFieldCtx)

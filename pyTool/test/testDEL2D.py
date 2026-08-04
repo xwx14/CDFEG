@@ -27,9 +27,8 @@ from MakerGidFile import MakerGidFile
 
 project = DataProject("del2d", 2)
 field = DataField("DelDisp")
-field.pdeType = 3  # 3双曲型
 field.bDynamic=True
-s = 1 / (3**0.5)
+
 
 # Q4高斯积分四边形单元
 ele1 = DataEleSubG("DelQ4g", 4)
@@ -38,6 +37,7 @@ ele1.dispNames = ["u", "v"]
 ele1.eleResNames = ["sigmaXX", "sigmaYY", "sigmaXY", "volume"]
 ele1.paramNames = ["pe", "pv", "fu", "fv", "rou", "alpha"]
 ele1.paramValues=[1.0e10, 0.3, 0.0, 0.0, 3000.0, 0.6]
+s = 1 / (3**0.5)
 ele1.gaussPoints = [
     [s, s],
     [s, -s],

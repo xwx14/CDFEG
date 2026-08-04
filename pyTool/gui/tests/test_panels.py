@@ -61,7 +61,7 @@ def test_element_panel_plain_writes_back(qapp):
     m.markClean()
     ep = ElementPanel(m)
     ep.loadEleSub(f, ele)
-    assert ep._gaussGroup.isHidden()  # 普通单元不显示高斯区
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is False  # 普通单元隐藏积分配置
     ep._name.setText("Truss2")
     ep._nNodes.setValue(3)
     ep._commit()
@@ -79,9 +79,9 @@ def test_element_panel_gauss_shows_gauss_group(qapp):
     g.shapeFuns = ["N1"]
     ep = ElementPanel(m)
     ep.loadEleSub(f, g)
-    assert not ep._gaussGroup.isHidden()  # G 单元显示高斯区
-    assert ep._gaussPoints.rows() == [["0.5", "0.5", ""]]
-    assert ep._gaussWeights.items() == ["1.0"]
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is True  # G 单元显示积分配置
+    assert ep._nGauss.value() == 1
+    assert ep._gaussTable.rows() == [["0.5", "0.5", "", "1.0"]]
     assert ep._shapeFuns.items() == ["N1"]
 
 
@@ -111,6 +111,27 @@ def test_element_panel_gauss_commit_filters_empty(qapp):
     ep._commit()
     assert g.gaussPoints == [[0.5, 0.5]]
     assert g.gaussWeights == [1.0]
+
+
+def test_element_panel_gauss_nspin_resizes_table(qapp):
+    """积分点数 SpinBox 改变积分点表格行数（尾部增删，保留已有数据）。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "Q4", gauss=True)
+    g.gaussPoints = [[0.5, 0.5], [-0.5, 0.5]]
+    g.gaussWeights = [1.0, 1.0]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, g)
+    assert ep._nGauss.value() == 2
+    assert ep._gaussTable.rowCount() == 2
+    # 增到 3：尾部加空行，已有 2 行保留
+    ep._nGauss.setValue(3)
+    assert ep._gaussTable.rowCount() == 3
+    assert ep._gaussTable.rows() == [["0.5", "0.5", "", "1.0"], ["-0.5", "0.5", "", "1.0"]]
+    # 减到 1：删尾部，剩第 1 行
+    ep._nGauss.setValue(1)
+    assert ep._gaussTable.rowCount() == 1
+    assert ep._gaussTable.rows() == [["0.5", "0.5", "", "1.0"]]
 
 
 # ---- ElementPanel CSV 输入 (Task 2) ----
@@ -146,3 +167,53 @@ def test_element_panel_csv_roundtrip_on_reload(qapp):
     ep.loadEleSub(f, ele)
     assert ep._dispNames._edit.text() == "u, v, w"
     assert ep._dispNames.items() == ["u", "v", "w"]
+
+
+# ---- ElementPanel 单元类型切换 ----
+def test_element_panel_type_switch_plain_to_gauss(qapp):
+    """编辑面板切普通→高斯等参元：stack 转 page1，对象变 DataEleSubG，公共字段保留。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Bar", gauss=False)
+    ele.nNodes = 3
+    ele.paramNames = ["E"]
+    ele.paramValues = ["1e10"]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is False
+    ep._eleType.setCurrentIndex(1)  # 切到高斯等参元
+    assert isinstance(ep._ele, DataEleSubG)
+    assert ep._ele.baseClass == "IsoEleBase"
+    assert ep._ele.nNodes == 3                # 公共字段保留
+    assert ep._ele.paramNames == ["E"]
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is True
+    assert f.eleSubs[0] is ep._ele            # 原地替换
+
+
+def test_element_panel_type_switch_gauss_to_plain_drops_gauss(qapp):
+    """编辑面板切高斯→普通：丢弃高斯配置，stack 转 page0，对象变 DataEleSub。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "Q4", gauss=True)
+    g.gaussPoints = [[0.5, 0.5]]
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, g)
+    ep._eleType.setCurrentIndex(0)  # 切到普通单元
+    assert not isinstance(ep._ele, DataEleSubG)
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is False
+    assert f.eleSubs[0] is ep._ele
+
+
+# ---- ElementPanel QTabWidget 组织 ----
+def test_element_panel_organized_into_tabs(qapp):
+    """ElementPanel 内容用 QTabWidget 分三页：基本 / 材料参数 / 积分配置。"""
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Bar", gauss=False)
+    ep = ElementPanel(m)
+    ep.loadEleSub(f, ele)
+    assert ep._tabs.count() == 3
+    assert ep._tabs.tabText(0) == "基本"
+    assert ep._tabs.tabText(1) == "材料参数"
+    assert ep._tabs.tabText(2) == "积分配置"
+    assert ep._tabs.isTabVisible(ep._gaussTabIndex) is False  # 普通单元隐藏积分配置

@@ -19,8 +19,6 @@
 #include <string>
 #include "CDFEG/DomainData.h"
 
-// 二维弹性动力学 Newmark-β 数据类
-// caculate() 内实现时间步主循环：每步 eProgram(有效矩阵+载荷) → solve → uPhy(更新u/v/w历史+应力)
 class del2dData : public CDFEG::DomainData {
 public:
     del2dData();

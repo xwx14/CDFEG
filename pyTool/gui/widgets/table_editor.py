@@ -67,6 +67,22 @@ class TableEditor(QWidget):
                 out.append(vals)
         return out
 
+    def rowCount(self):
+        """当前表格视觉行数（含未填充的空行）。"""
+        return self._table.rowCount()
+
+    def addEmptyRow(self):
+        """末尾追加一个空行。"""
+        self._addRowWithData([""] * self._ncol)
+        self.rowsChanged.emit()
+
+    def removeLastRow(self):
+        """删除末尾行。"""
+        r = self._table.rowCount() - 1
+        if r >= 0:
+            self._table.removeRow(r)
+            self.rowsChanged.emit()
+
     def _addRowWithData(self, values):
         r = self._table.rowCount()
         self._table.insertRow(r)

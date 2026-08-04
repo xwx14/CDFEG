@@ -79,3 +79,43 @@ def test_set_project_resets_dirty():
     m.setProject(proj)
     assert m.project is proj
     assert m.isDirty is False
+
+
+def test_change_elesub_type_plain_to_gauss_keeps_common_fields():
+    m = ProjectModel()
+    f = m.addField("F")
+    ele = m.addEleSub(f, "Bar", gauss=False)
+    ele.nNodes = 3
+    ele.paramNames = ["E", "A"]
+    m.markClean()
+    newEle = m.changeEleSubType(f, ele, gauss=True)
+    assert isinstance(newEle, DataEleSubG)
+    assert newEle.baseClass == "IsoEleBase"
+    assert newEle.name == "Bar"
+    assert newEle.nNodes == 3
+    assert newEle.paramNames == ["E", "A"]
+    assert f.eleSubs[0] is newEle          # 原地替换保持位置
+    assert ele not in f.eleSubs
+    assert m.isDirty is True
+
+
+def test_change_elesub_type_gauss_to_plain_drops_gauss_fields():
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "Q4", gauss=True)
+    g.gaussPoints = [[0.5, 0.5]]
+    g.gaussWeights = [1.0]
+    g.shapeFuns = ["N1"]
+    newEle = m.changeEleSubType(f, g, gauss=False)
+    assert isinstance(newEle, DataEleSub) and not isinstance(newEle, DataEleSubG)
+    assert newEle.baseClass == "ElementBase"
+    assert not hasattr(newEle, "gaussPoints")   # 普通类不含高斯字段
+    assert f.eleSubs[0] is newEle
+
+
+def test_change_elesub_type_idempotent_when_same():
+    m = ProjectModel()
+    f = m.addField("F")
+    g = m.addEleSub(f, "Q4", gauss=True)
+    same = m.changeEleSubType(f, g, gauss=True)
+    assert same is g                          # 同类型幂等返回原对象

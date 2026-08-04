@@ -115,3 +115,48 @@ def test_main_window_buttons_enable_on_ele_select(qapp):
     assert win._btnAddEle.isEnabled() is True
     assert win._btnDelete.isEnabled() is True
     win.deleteLater()
+
+
+def test_main_window_type_switch_keeps_selection(qapp):
+    """ElementPanel 切单元类型后，树重建选中保持到新对象，左栏按钮仍可用。"""
+    from PySide6.QtCore import Qt
+    from DataEleSubG import DataEleSubG
+    win = MainWindow()
+    win.newProject()
+    f = win._model.addField("F")
+    win._model.addEleSub(f, "Bar", gauss=False)
+    win.refreshTree()
+    root = win._tree.topLevelItem(0)
+    ele_node = root.child(0).child(0)
+    win._tree.setCurrentItem(ele_node)
+    # 在面板把普通单元切到高斯等参元
+    win._elePanel._eleType.setCurrentIndex(1)
+    # 树已重建：选中应指向新对象（DataEleSubG），按钮仍启用
+    cur = win._tree.currentItem()
+    assert cur is not None
+    assert cur.data(0, Qt.UserRole)[1] is win._elePanel._ele
+    assert isinstance(win._elePanel._ele, DataEleSubG)
+    assert win._btnAddEle.isEnabled() is True
+    assert win._btnDelete.isEnabled() is True
+    win.deleteLater()
+
+
+def test_main_window_add_field_selects_new_field(qapp):
+    """添加场后选中该场，右侧切到 FieldPanel（等效于 _addField 完成后的跳转）。"""
+    win = MainWindow()
+    win.newProject()
+    field = win._model.addField("F")
+    win._tree.selectByObject(field)
+    assert win._stack.currentIndex() == win._STACK_FIELD
+    win.deleteLater()
+
+
+def test_main_window_add_ele_selects_new_ele(qapp):
+    """添加单元后选中该单元，右侧切到 ElementPanel。"""
+    win = MainWindow()
+    win.newProject()
+    f = win._model.addField("F")
+    ele = win._model.addEleSub(f, "Bar", gauss=False)
+    win._tree.selectByObject(ele)
+    assert win._stack.currentIndex() == win._STACK_ELE
+    win.deleteLater()
