@@ -7,6 +7,7 @@ public:
     DelDispFieldData(CDFEG::DomainData* femData);
     ~DelDispFieldData();
 
+
 };
 
 #endif

@@ -38,7 +38,8 @@
 *NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
 
 *end  
-{%- if field.bDynamic %}
+
+{% if field.bDynamic %}
 ** name=D1{{field.name}},structure="I32**1 F64**{{field.dof}}",type="initVal",index={{field.index}}
 *Set Cond volume-D1{{field.fullname}} *nodes
 *Add Cond surface-D1{{field.fullname}} *nodes
@@ -66,7 +67,7 @@
 *NodesNum{%for i in range(field.dof)%} *cond({{2*i+2}}){%endfor%}
 
 *end  
-{% endif -%}
+{% endif %}
 {% endfor %}
 {%- for bc in dbcs %}** name=bc{{bc.name}},structure="F64**{{bc.n}}",type="dbc",index={{bc.index}}
 *Set Cond volume-{{bc.name}} *nodes

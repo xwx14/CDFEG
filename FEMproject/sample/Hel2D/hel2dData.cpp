@@ -6,7 +6,6 @@ hel2dData::hel2dData() {
     _dim = 2;
     _phyDatas.push_back(new HeatFieldData(this));
     _phyDatas.push_back(new DelDispFieldData(this));
-    // 注册统一本构类型 HelQ4g（热场 ek/ec/q + 弹性场 pe/pv/fu/fv/rou/alpha/alfa）
     _mateConstitutive["HelQ4g"] = { "ek", "ec", "q", "pe", "pv", "fu", "fv", "rou", "alpha", "alfa" };
 }
 
@@ -15,23 +14,18 @@ hel2dData::~hel2dData() {
 }
 
 int hel2dData::caculate() {
-    // 顺序耦合（对应旧 hel.c）：先解温度场 a，再以温度为热载荷解位移场 b
-    HeatFieldData* heatField = static_cast<HeatFieldData*>(_phyDatas[0]);
-    DelDispFieldData* delField = static_cast<DelDispFieldData*>(_phyDatas[1]);
-
-    // 各场方程编号 + 稀疏骨架
-    heatField->initMatrix();
-    delField->initMatrix();
-
-    // a 场（Heat）：组装热传导总刚 + 热源 → 求解温度 → 回填 _nodeRes["T"]
-    heatField->eProgram();
-    heatField->solve();
-    heatField->uPhy();
-
-    // b 场（DelDisp）：组装弹性总刚 + 体力/热载荷（取温度）→ 求解位移 → 回填位移 + 应力
-    delField->eProgram_el();
-    delField->solve();
-    delField->uPhy();
+	HeatFieldData* phy0 = static_cast<HeatFieldData*>(_phyDatas[0]);
+	phy0->initMatrix();
+	phy0->eProgram();
+	phy0->solve();
+	phy0->uPhy();
+	phy0->_equSys.calRightVals();
+	DelDispFieldData* phy1 = static_cast<DelDispFieldData*>(_phyDatas[1]);
+	phy1->initMatrix();
+	phy1->eProgram();
+	phy1->solve();
+	phy1->uPhy();
+	phy1->_equSys.calRightVals();
 
     return 1;
 }

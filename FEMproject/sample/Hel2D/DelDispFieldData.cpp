@@ -1,9 +1,6 @@
 #include "DelDispFieldData.h"
 #include "hel2dData.h"
 #include "DelQ4g.h"
-#include "CDFEG/ElementBase.h"
-#include "CDFEG/EquationSystem.h"
-#include <cmath>
 
 DelDispFieldData::DelDispFieldData(CDFEG::DomainData* femData)
     : CDFEG::PhyFieldData(2, femData) {

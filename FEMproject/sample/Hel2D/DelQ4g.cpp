@@ -62,7 +62,7 @@ CDFEG::EleSubResult& DelQ4g::run(
     double fv = matParams.at("fv");
     double alfa = matParams.at("alfa");
     double vol = 1.0;
-    // 平面应变本构因子（与 ElQ4g / 旧 beq4g2 一致）
+    // 平面应变本构因子
     double fact = pe / (1.0 + pv) / (1.0 - pv * 2.0) * vol;
     double shear = 0.5 - pv;
 
@@ -86,7 +86,7 @@ CDFEG::EleSubResult& DelQ4g::run(
         // 高斯点温度 tn = Σ N_i·T_i（参照 ebeq4g2 插值）
         double tn = 0.0;
         for (int i = 0; i < 4; ++i) tn += cu[i][0] * T[i];
-        // 热载荷因子 ft = pe·alfa·tn/(1-2pv)（参照 beq4g2.c）
+        // 热载荷因子 ft = pe·alfa·tn/(1-2pv)
         double ft = pe * alfa * tn / (1.0 - 2.0 * pv);
 
         // B 矩阵分量（应变-位移）：自由度节点交错 [u1,v1,u2,v2,...]
@@ -133,7 +133,7 @@ CDFEG::EleSubResult& DelQ4g::run(
     if (_bSaveResult) _results.push_back(_result);
     return _result;
 }
-// 应力恢复（含热项扣除）：参照 macs/hel ceq4g2.c + ElQ4g 节点加权外推
+// 应力恢复（含热项扣除）：节点加权外推
 // σxx = fact·((1-pv)·exx + pv·eyy) - ft；σyy 对称；σxy = fact·shear·exy
 // 节点应力 = Σ N·σ·w / Σ N·w（≡基准最小二乘平滑）
 CDFEG::uResult DelQ4g::uEle(
@@ -182,7 +182,7 @@ CDFEG::uResult DelQ4g::uEle(
         }
 
         // 应力：基准 ehelc 传入 elemb 材料，ceq4g2 的 alfa 取 prmt[3] = fu(=0)，
-        // 故热项 ft = 0，应力不扣除热膨胀项（仅弹性应力 D·ε，与基准 unodc0 对齐）
+        // 故热项 ft = 0，应力不扣除热膨胀项（仅弹性应力 D·ε）
         double gSigmaXX = fact * ((1 - pv) * exx + pv * eyy);
         double gSigmaYY = fact * (pv * exx + (1 - pv) * eyy);
         double gSigmaXY = fact * shear * exy;

@@ -24,19 +24,17 @@ from DataEleSub import DataEleSub
 from DataEleSubG import DataEleSubG
 from MakerCpp import MakerCpp
 from MakerGidFile import MakerGidFile
+
 project = DataProject("hel2d", 2)
-
-s = 1 / (3**0.5)
-
 # 第一个场为温度场
 field1 = DataField("Heat")
-field1.bDynamic=False
 hele1 = DataEleSubG("HeatQ4g", 4)
 hele1.type = 2
 hele1.matName = "HelQ4g"
 hele1.dispNames = ["T"]
 hele1.paramNames = ["ek", "ec", "q"]
 hele1.paramValues = [1.0, 1.0, 0.0]
+s = 1 / (3**0.5)
 hele1.gaussPoints = [
     [s, s], 
     [s, -s],
@@ -53,7 +51,6 @@ field1.addEleSub(hele1)
 project.addField(field1)
 # 第二个场为位移场
 field2 = DataField("DelDisp")
-field2.bDynamic=False
 dele1=DataEleSubG("DelQ4g", 4)
 dele1.matName = "HelQ4g"
 dele1.type = 2
@@ -75,6 +72,8 @@ dele1.shapeFuns = [
     "(1. - x[1]) / 2. * (1. + x[2]) / 2."
 ]
 field2.addEleSub(dele1)
+field2.bNodeExtrap=True
+field2.nodeExtrapNames=["sigmaXX","sigmaYY","sigmaXY"]
 project.addField(field2)
 project.cmds.append(("imp",0))
 project.cmds.append(("imp",1))
@@ -83,7 +82,6 @@ project.addOutputItem("temperature", "Scalar", "OnNodes", [(0, "T")])
 project.addOutputItem("disp", "Vector", "OnNodes", [(1, "u"), (1, "v")])
 project.addOutputItem("stress", "Matrix", "OnNodes", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
 project.addOutputItem("eleStress", "Matrix", "OnElements", [(1, "sigmaXX"), (1, "sigmaYY"), (1, "sigmaXY")])
-project.addOutputItem("eleVolume", "Scalar", "OnElements", [(1, "volume")])
 
 outPath="sample\\Hel2D"
 maker = MakerCpp(project, outPath)

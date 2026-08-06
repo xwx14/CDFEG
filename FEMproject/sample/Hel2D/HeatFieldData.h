@@ -7,6 +7,7 @@ public:
     HeatFieldData(CDFEG::DomainData* femData);
     ~HeatFieldData();
 
+
 };
 
 #endif
